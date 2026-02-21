@@ -6,7 +6,7 @@ import UserHome from "../pages/user/UserHome";
 const AppRoutes = () => {
     return (
         <Routes>
-            <Route path="/login" element={<Login />} />
+            <Route path="/" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/user/home" element={<UserHome />} />
         </Routes>
