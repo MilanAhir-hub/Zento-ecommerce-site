@@ -5,15 +5,15 @@ dotenv.config();
 
 const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST || "smtp-relay.brevo.com",
-    port: Number(process.env.EMAIL_PORT) || 587, // Converted to Number for TypeScript safety
-    secure: false, // false for 587 and 2525
+    port: 465, // Hardcoded to 465 to enforce SSL and bypass Render's outbound 587 blocking
+    secure: true, // MUST be true for port 465
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
     },
     logger: true, // Log information to console
     debug: true, // Include SMTP traffic in the logs
-    connectionTimeout: 10000, // Time out after 10 seconds
+    connectionTimeout: 10000,
 });
 
 export const sendEmail = async (
