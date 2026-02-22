@@ -5,8 +5,8 @@ dotenv.config();
 
 const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST || "smtp-relay.brevo.com",
-    port: 465, // Hardcoded to 465 to enforce SSL and bypass Render's outbound 587 blocking
-    secure: true, // MUST be true for port 465
+    port: 2525, // Hardcoded to 465 to enforce SSL and bypass Render's outbound 587 blocking
+    secure: false, // MUST be true for port 465
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
