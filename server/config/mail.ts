@@ -4,8 +4,8 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
-    host: "smtp-relay.brevo.com",
-    port: 2525, // Using 2525 because Render often blocks outbound 587/465
+    host: process.env.EMAIL_HOST || "smtp-relay.brevo.com",
+    port: Number(process.env.EMAIL_PORT) || 587, // Converted to Number for TypeScript safety
     secure: false, // false for 587 and 2525
     auth: {
         user: process.env.EMAIL_USER,
