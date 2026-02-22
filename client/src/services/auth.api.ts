@@ -12,3 +12,15 @@ export const authService = {
         return await api.post("/auth/logout");
     }
 };
+
+export const sendOtp = async (email: string) => {
+    return await api.post("/auth/send-otp", { email });
+};
+
+export const verifyOtp = async (email: string, otp: string) => {
+    return await api.post("/auth/verify-otp", { email, otp });
+};
+
+export const resetPassword = async (email: string, otp: string, password: string) => {
+    return await api.post("/auth/reset-password", { email, otp, password });
+};

@@ -5,6 +5,8 @@ export interface IUser extends mongoose.Document {
     name: string;
     email: string;
     password?: string;
+    resetPasswordOTP?: string;
+    resetPasswordOTPExpires?: Date;
     comparePassword: (enteredPassword: string) => Promise<boolean>;
 }
 
@@ -12,6 +14,8 @@ const UserSchema = new mongoose.Schema<IUser>({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    resetPasswordOTP: { type: String },
+    resetPasswordOTPExpires: { type: Date },
 }, { timestamps: true });
 
 // Hash password before saving
