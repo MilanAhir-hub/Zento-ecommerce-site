@@ -92,6 +92,8 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
     try {
         const { email } = req.body;
 
+        console.log("FORGOT PASSWORD HIT");
+
         // Basic validation
         if (!email) {
             res.status(400).json({ message: "Please provide email" });
