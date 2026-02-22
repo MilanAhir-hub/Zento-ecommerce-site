@@ -14,7 +14,7 @@ export const authService = {
 };
 
 export const sendOtp = async (email: string) => {
-    return await api.post("/auth/send-otp", { email });
+    return await api.post("/auth/forgot-password", { email });
 };
 
 export const verifyOtp = async (email: string, otp: string) => {

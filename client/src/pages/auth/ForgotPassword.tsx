@@ -1,36 +1,31 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import useSendOTP from "../../hooks/auth/useSendOTP";
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState("");
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
-    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+
+    const { mutate: sendOtpMutate, isPending } = useSendOTP();
 
     const handleSendOTP = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
         setSuccess("");
-        setLoading(true);
-
-        try {
-            const response = await axios.post(
-                `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/auth/forgot-password`,
-                { email }
-            );
-
-            setSuccess(response.data.message || "OTP sent to your email.");
-            // Store the email in state or local storage if you want to prepopulate it on the reset password page
-            setTimeout(() => {
-                navigate("/verify-otp", { state: { email } });
-            }, 2000);
-        } catch (err: any) {
-            setError(err.response?.data?.message || "Failed to send OTP.");
-        } finally {
-            setLoading(false);
-        }
+        sendOtpMutate(email, {
+            onSuccess: (response: any) => {
+                setSuccess(response.data?.message || "OTP sent to your email.");
+                // Store the email in state or local storage if you want to prepopulate it on the reset password page
+                setTimeout(() => {
+                    navigate("/verify-otp", { state: { email } });
+                }, 2000);
+            },
+            onError: (err: any) => {
+                setError(err.response?.data?.message || "Failed to send OTP.");
+            }
+        });
     };
 
     return (
@@ -82,11 +77,11 @@ const ForgotPassword = () => {
                     <div>
                         <button
                             type="submit"
-                            disabled={loading}
-                            className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${loading ? "opacity-75 cursor-not-allowed" : ""
+                            disabled={isPending}
+                            className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${isPending ? "opacity-75 cursor-not-allowed" : ""
                                 }`}
                         >
-                            {loading ? "Sending..." : "Send OTP"}
+                            {isPending ? "Sending..." : "Send OTP"}
                         </button>
                     </div>
                 </form>
