@@ -24,6 +24,7 @@ interface AuthContextType {
     isAuthenticated: boolean;
     isLoading: boolean;
     login: (credentials: LoginCredentials) => Promise<void>;
+    googleLogin: (googleToken: string) => Promise<void>;
     signup: (userData: SignupData) => Promise<void>;
     logout: () => Promise<void>;
     checkAuth: () => Promise<void>;
@@ -39,7 +40,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const checkAuth = async () => {
         try {
             setIsLoading(true);
-            const response = await api.get("/auth/me"); // 🔥 important
+            const response = await api.get("/auth/me"); // important
             setUser(response.data.user);
             setIsAuthenticated(true);
         } catch (error) {
@@ -60,6 +61,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setIsAuthenticated(true);
     };
 
+    const googleLogin = async (googleToken: string) => {
+        const response = await authService.googleLogin(googleToken);
+        setUser(response.data.user);
+        setIsAuthenticated(true);
+    };
+
     const signup = async (userData: SignupData) => {
         const response = await authService.signup(userData);
         setUser(response.data.user);
@@ -73,7 +80,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, signup, logout, checkAuth }}>
+        <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, googleLogin, signup, logout, checkAuth }}>
             {children}
         </AuthContext.Provider>
     );

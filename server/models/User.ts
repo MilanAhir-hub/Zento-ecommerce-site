@@ -5,6 +5,8 @@ export interface IUser extends mongoose.Document {
     name: string;
     email: string;
     password?: string;
+    googleId?: string;
+    picture?: string;
     resetPasswordOTP?: string;
     resetPasswordOTPExpires?: Date;
     comparePassword: (enteredPassword: string) => Promise<boolean>;
@@ -13,7 +15,9 @@ export interface IUser extends mongoose.Document {
 const UserSchema = new mongoose.Schema<IUser>({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    password: { type: String, required: function (this: any) { return !this.googleId; } },
+    googleId: { type: String, sparse: true, unique: true },
+    picture: { type: String },
     resetPasswordOTP: { type: String },
     resetPasswordOTPExpires: { type: Date },
 }, { timestamps: true });

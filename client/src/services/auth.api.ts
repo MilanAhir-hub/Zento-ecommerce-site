@@ -5,6 +5,9 @@ export const authService = {
     login: async (credentials: LoginCredentials) => {
         return await api.post("/auth/login", credentials);
     },
+    googleLogin: async (googleToken: string) => {
+        return await api.post("/auth/google", { googleToken });
+    },
     signup: async (userData: SignupData) => {
         return await api.post("/auth/signup", userData);
     },

@@ -3,6 +3,7 @@ import { Response } from "express";
 
 export const generateToken = (res: Response, userId: string): string => {
     const jwtSecret = process.env.JWT_SECRET;
+    const isProduction = process.env.NODE_ENV === "production";
 
     if (!jwtSecret) {
         throw new Error("JWT_SECRET is not defined in environment variables");
@@ -16,8 +17,8 @@ export const generateToken = (res: Response, userId: string): string => {
 
     res.cookie("token", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        secure: isProduction,
+        sameSite: isProduction ? "none" : "lax",
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 

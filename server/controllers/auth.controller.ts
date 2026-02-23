@@ -3,6 +3,8 @@ import { User } from "../models/User";
 import { generateToken } from "../utils/generateToken";
 import { generateOTP, hashOTP } from "../utils/generateOTP";
 import { sendEmail } from "../config/mail";
+import { OAuth2Client } from "google-auth-library";
+import { AuthRequest } from "../middlewares/auth.middleware";
 
 // signup user
 export const signupUser = async (req: Request, res: Response): Promise<void> => {
@@ -81,7 +83,15 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 
 export const logout = (req: Request, res: Response) => {
     try {
-        res.clearCookie("token");
+        const isProduction = process.env.NODE_ENV === "production";
+
+        res.clearCookie("token", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+            path: "/"
+        });
+
         res.status(200).json({ message: "Logout successful" });
     } catch (error: any) {
         res.status(500).json({ message: error.message || "Internal server error" });
@@ -192,3 +202,77 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
         res.status(500).json({ message: error.message || "Internal server error" });
     }
 };
+
+import axios from "axios";
+
+export const googleLogin = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { googleToken } = req.body; // this is now access_token
+
+        if (!googleToken) {
+            res.status(400).json({ message: "Google token is missing" });
+            return;
+        }
+
+        const googleResponse = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
+            headers: { Authorization: `Bearer ${googleToken}` }
+        });
+
+        const payload = googleResponse.data;
+        if (!payload) {
+            res.status(400).json({ message: "Invalid Google token" });
+            return;
+        }
+
+        const { sub: googleId, email, name, picture } = payload;
+
+        if (!email || !name) {
+            res.status(400).json({ message: "Missing essential data from Google account" });
+            return;
+        }
+
+        let user = await User.findOne({ email });
+
+        if (!user) {
+            // Create user
+            user = await User.create({
+                name,
+                email,
+                googleId,
+                picture,
+            });
+        } else if (!user.googleId) {
+            // User exists but has no googleId, link them
+            user.googleId = googleId;
+            user.picture = user.picture || picture;
+            await user.save();
+        }
+
+        const userResponse = user.toObject();
+        delete userResponse.password;
+
+        const token = generateToken(res, userResponse._id.toString());
+
+        res.status(200).json({
+            message: "Google login successful",
+            user: userResponse,
+            token
+        });
+    } catch (error: any) {
+        res.status(500).json({ message: error.response?.data?.error_description || error.message || "Internal server error during Google login" });
+    }
+};
+
+export const getProfile = async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+        const user = await User.findById(req.userId).select("-password -resetPasswordOTP -resetPasswordOTPExpires");
+        if (!user) {
+            res.status(404).json({ message: "User not found" });
+            return;
+        }
+        res.status(200).json({ user });
+    } catch (error: any) {
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
