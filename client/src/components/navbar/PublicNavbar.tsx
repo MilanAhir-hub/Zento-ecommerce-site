@@ -46,7 +46,7 @@ const PublicNavbar = () => {
                                 </Link>
 
                                 {user ? (
-                                    <Link to="/user/home" className="flex items-center justify-center text-white bg-stone-900 rounded-full h-7 w-7 text-[11px] font-bold hover:bg-black transition-colors cursor-pointer group">
+                                    <Link to="/user/profile" className="flex items-center justify-center text-white bg-stone-900 rounded-full h-7 w-7 text-[11px] font-bold hover:bg-black transition-colors cursor-pointer group">
                                         {getInitials(user.name)}
                                     </Link>
                                 ) : (
