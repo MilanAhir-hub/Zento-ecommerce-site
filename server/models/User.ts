@@ -7,6 +7,11 @@ export interface IUser extends mongoose.Document {
     password?: string;
     googleId?: string;
     picture?: string;
+    role: "user" | "vendor" | "admin";
+    storeName?: string;
+    storeDescription?: string;
+    logo?: string;
+    address?: string;
     resetPasswordOTP?: string;
     resetPasswordOTPExpires?: Date;
     comparePassword: (enteredPassword: string) => Promise<boolean>;
@@ -18,6 +23,15 @@ const UserSchema = new mongoose.Schema<IUser>({
     password: { type: String, required: function (this: any) { return !this.googleId; } },
     googleId: { type: String, sparse: true, unique: true },
     picture: { type: String },
+    role: {
+        type: String,
+        enum: ["user", "vendor", "admin"],
+        default: "user",
+    },
+    storeName: { type: String },
+    storeDescription: { type: String },
+    logo: { type: String },
+    address: { type: String },
     resetPasswordOTP: { type: String },
     resetPasswordOTPExpires: { type: Date },
 }, { timestamps: true });

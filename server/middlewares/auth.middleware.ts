@@ -23,3 +23,25 @@ export const isAuthenticated = (req: AuthRequest, res: Response, next: NextFunct
         return;
     }
 };
+
+import { User } from "../models/User";
+
+export const isVendor = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        if (!req.userId) {
+            res.status(401).json({ message: "Authentication required" });
+            return;
+        }
+
+        const user = await User.findById(req.userId);
+        if (!user || user.role !== "vendor") {
+            res.status(403).json({ message: "Access denied. Vendor resources only." });
+            return;
+        }
+
+        next();
+    } catch (error) {
+        res.status(500).json({ message: "Internal server error during authorization" });
+        return;
+    }
+};

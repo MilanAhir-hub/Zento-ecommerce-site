@@ -32,8 +32,12 @@ app.use(cookieParser());
 
 // Routes
 import authRoutes from "./routes/auth.routes";
+import userRoutes from "./routes/user.routes";
+import vendorRoutes from "./routes/vendor.routes";
 
 app.use("/api/auth", authRoutes);
+app.use("/api/user", userRoutes);
+app.use("/api/vendor", vendorRoutes);
 
 app.get("/", (req, res) => {
     res.send("Server is running...");
