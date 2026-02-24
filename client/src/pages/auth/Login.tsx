@@ -16,7 +16,7 @@ const Login = () => {
                 setError("");
                 // We send the access_token to our backend
                 await googleLogin(tokenResponse.access_token);
-                navigate("/user/home");
+                navigate("/");
             } catch (err: any) {
                 setError(err.response?.data?.message || "Google Login failed");
             }

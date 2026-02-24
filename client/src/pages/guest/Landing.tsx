@@ -1,7 +1,11 @@
-const Landing = () => {
+import PublicNavbar from "../../components/navbar/PublicNavbar"
+
+const GuestLandingPage = () => {
     return (
-        <div>Landing page</div>
+       <>
+       <PublicNavbar/>
+       </>
     )
 }
 
-export default Landing
+export default GuestLandingPage

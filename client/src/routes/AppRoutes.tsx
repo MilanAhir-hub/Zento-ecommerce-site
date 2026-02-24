@@ -5,11 +5,12 @@ import UserHome from "../pages/user/UserHome";
 import ForgotPassword from "../pages/auth/ForgotPassword";
 import VerifyOTP from "../pages/auth/VerifyOTP";
 import ResetPassword from "../pages/auth/ResetPassword";
+import GuestLandingPage from "../pages/guest/Landing";
 
 const AppRoutes = () => {
     return (
         <Routes>
-            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/" element={<GuestLandingPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/user/home" element={<UserHome />} />
@@ -18,6 +19,7 @@ const AppRoutes = () => {
             <Route path="/reset-password" element={<ResetPassword />} />
         </Routes>
     )
+
 }
 
 export default AppRoutes
