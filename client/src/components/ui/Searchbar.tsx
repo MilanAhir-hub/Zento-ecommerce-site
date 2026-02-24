@@ -2,28 +2,24 @@ import { Search, Camera } from 'lucide-react';
 
 const Searchbar = () => {
     return (
-        <div className="flex items-center border-b gap-3 border-stone-200 h-[46px] overflow-hidden max-w-md w-full px-2 focus-within:border-stone-900 transition-colors">
-            <Search className="h-5 w-5 text-stone-400 shrink-0" />
+        <div className="flex items-center bg-[#f5f5f5] rounded-full h-9 md:h-11 w-full px-3 md:px-4 overflow-hidden border border-transparent focus-within:border-stone-300 focus-within:bg-white focus-within:shadow-[0_2px_12px_rgba(0,0,0,0.06)] transition-all duration-300">
+            <Search className="h-4 w-4 md:h-5 md:w-5 text-stone-500 shrink-0 mr-1.5 md:mr-2" />
             <input
                 type="text"
-                placeholder="Find premium products..."
-                className="w-full h-full outline-none placeholder-stone-400 text-stone-700 bg-transparent text-sm"
+                placeholder="Search an item..."
+                className="w-full h-full outline-none placeholder-stone-500 text-stone-900 bg-transparent text-sm md:text-[15px]"
             />
-            <div className="flex items-center gap-2 shrink-0">
-                <button
-                    type="button"
-                    className="p-1.5 text-stone-400 hover:text-stone-900 hover:bg-stone-100 rounded-full transition-all duration-200"
-                    title="Search by image"
-                >
-                    <Camera className="h-5 w-5" />
-                </button>
-                <button
-                    type="submit"
-                    className="bg-stone-900 hover:bg-stone-800 px-5 h-8 rounded-full text-xs font-medium text-white transition-all transform active:scale-95 shadow-sm"
-                >
-                    Search
-                </button>
-            </div>
+            {/* Divider */}
+            <div className="h-5 md:h-6 w-px bg-stone-300 mx-2 md:mx-3"></div>
+
+            {/* Visual Search Button */}
+            <button
+                type="button"
+                className="shrink-0 p-1 md:p-1.5 text-stone-500 hover:text-stone-900 hover:bg-stone-200 rounded-full transition-colors"
+                title="Visual Search"
+            >
+                <Camera className="h-4 w-4 md:h-5 md:w-5" />
+            </button>
         </div>
     );
 };

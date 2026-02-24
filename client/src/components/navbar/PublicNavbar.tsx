@@ -1,138 +1,127 @@
-import { useState } from 'react';
-import { ShoppingCart, User, Menu, X, ChevronRight, Home, LayoutGrid, Heart, Package, Search } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { ShoppingCart, User, ChevronRight, ChevronLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Searchbar from '../ui/Searchbar';
+import CategoryBadge from '../category/CategoryBadge';
+import { categories } from '../../constants/categories';
+import Logo from '../ui/Logo';
 
 const PublicNavbar = () => {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const [canScrollLeft, setCanScrollLeft] = useState(false);
+    const [canScrollRight, setCanScrollRight] = useState(true);
 
-    const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+    const handleCategoriesScroll = () => {
+        if (scrollRef.current) {
+            const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+            setCanScrollLeft(scrollLeft > 0);
+            setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 2);
+        }
+    };
 
-    const navLinks = [
-        { name: 'Home', path: '/', icon: Home },
-        { name: 'Categories', path: '/categories', icon: LayoutGrid },
-        { name: 'Wishlist', path: '/wishlist', icon: Heart },
-        { name: 'My Orders', path: '/orders', icon: Package },
-    ];
+    const scrollCategories = (dir: 'left' | 'right') => {
+        if (scrollRef.current) {
+            const offset = dir === 'left' ? -300 : 300;
+            scrollRef.current.scrollBy({ left: offset, behavior: 'smooth' });
+        }
+    };
+
+    useEffect(() => {
+        handleCategoriesScroll();
+        window.addEventListener('resize', handleCategoriesScroll);
+        return () => window.removeEventListener('resize', handleCategoriesScroll);
+    }, []);
 
     return (
-        <>
-            <nav className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-stone-200 transition-all duration-300">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center h-20 gap-4">
+        <header className="sticky top-0 z-50 w-full bg-white transition-all duration-300">
+            {/* Top Row: Main Header */}
+            <div className="bg-white border-b border-stone-100">
+                <div className="w-full md:w-[80%] mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex flex-col md:flex-row justify-between items-center py-2 md:py-3 md:h-[76px] gap-2 md:gap-8">
 
-                        {/* Left Section: Hamburger (Mobile) + Logo */}
-                        <div className="flex items-center gap-4">
-                            <button
-                                onClick={toggleMenu}
-                                className="sm:hidden p-2 -ml-2 text-stone-600 hover:text-stone-900 transition-colors rounded-full hover:bg-stone-100 cursor-pointer"
-                            >
-                                <Menu className="h-6 w-6" />
-                            </button>
+                        {/* Logo (Desktop Only) */}
+                        <Link to="/" className="hidden md:flex shrink-0 items-center gap-2 cursor-pointer transition-transform hover:scale-105 duration-200">
+                            <Logo />
+                        </Link>
 
-                            <Link to="/" className="shrink-0 flex items-center gap-2 cursor-pointer transition-transform hover:scale-105 duration-200">
-                                <div className="w-10 h-10 bg-stone-900 rounded-xl flex justify-center items-center shadow-md">
-                                    <span className="text-white font-bold text-xl tracking-wider">Z</span>
-                                </div>
-                                <span className="hidden sm:block font-bold text-2xl tracking-tight text-stone-900">Zento</span>
-                            </Link>
+                        {/* Searchbar & Mobile User/Cart Controls */}
+                        <div className="w-full md:flex-1 flex items-center gap-3 md:gap-0 mt-1 md:mt-0">
+                            <div className="flex-1 w-full md:max-w-xl xl:max-w-2xl md:mx-auto">
+                                <Searchbar />
+                            </div>
+
+                            {/* Mobile User/Cart Controls */}
+                            <div className="md:hidden flex items-center gap-4 shrink-0">
+                                <Link to="/cart" className="relative flex items-center text-stone-800 hover:text-black transition-colors cursor-pointer group">
+                                    <ShoppingCart className="h-5 w-5 group-hover:scale-110 transition-transform" />
+                                    <span className="absolute -top-1.5 -right-1.5 inline-flex items-center justify-center min-w-[16px] h-[16px] px-1 text-[9px] font-bold leading-none text-white bg-stone-900 rounded-full">
+                                        0
+                                    </span>
+                                </Link>
+
+                                <Link to="/login" className="flex items-center text-stone-800 hover:text-black transition-colors cursor-pointer group">
+                                    <User className="h-5 w-5 group-hover:scale-110 transition-transform" />
+                                </Link>
+                            </div>
                         </div>
 
-                        {/* Center: Searchbar (Hidden on very small screens, or collapsed) */}
-                        <div className="hidden md:flex flex-1 max-w-md">
-                            <Searchbar />
-                        </div>
-
-                        {/* Right: Cart and Signin */}
-                        <div className="flex items-center gap-2 sm:gap-5 shrink-0">
-                            {/* Search (Mobile Only) */}
-                            <button className="md:hidden p-2 text-stone-600 hover:text-stone-900 transition-colors rounded-full hover:bg-stone-100 cursor-pointer">
-                                <Search className="h-6 w-6" />
-                            </button>
-
-                            {/* Cart Button */}
-                            <Link to="/cart" className="relative p-2 text-stone-600 hover:text-stone-900 transition-colors rounded-full hover:bg-stone-100 duration-200 cursor-pointer">
-                                <ShoppingCart className="h-6 w-6" />
-                                <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-500 rounded-full shadow-sm">
+                        {/* Desktop User/Cart Controls */}
+                        <div className="hidden md:flex items-center justify-end gap-8 shrink-0 min-w-[180px]">
+                            <Link to="/cart" className="relative flex items-center text-stone-800 hover:text-black transition-colors cursor-pointer group">
+                                <ShoppingCart className="h-[22px] w-[22px] group-hover:scale-110 transition-transform" />
+                                <span className="absolute -top-2 -right-2 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold leading-none text-white bg-stone-900 rounded-full">
                                     0
                                 </span>
                             </Link>
 
-                            <div className="hidden sm:block h-8 w-px bg-stone-200"></div>
-
-                            {/* Signin Button */}
-                            <Link to="/login" className="hidden sm:flex items-center justify-center gap-2 bg-stone-900 hover:bg-stone-800 text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all shadow-md hover:shadow-lg active:scale-95 duration-200 cursor-pointer">
-                                <User className="h-4 w-4" />
-                                <span>Sign In</span>
-                            </Link>
-
-                            {/* User Icon (Mobile only when logged out) */}
-                            <Link to="/login" className="sm:hidden p-2 text-stone-600 hover:text-stone-900 transition-colors rounded-full hover:bg-stone-100 cursor-pointer">
-                                <User className="h-6 w-6" />
+                            <Link to="/login" className="flex items-center gap-2 text-stone-800 hover:text-black transition-colors cursor-pointer group">
+                                <User className="h-[22px] w-[22px] group-hover:scale-110 transition-transform" />
+                                <span className="text-sm font-semibold tracking-wide">Sign in</span>
                             </Link>
                         </div>
                     </div>
                 </div>
-            </nav>
+            </div>
 
-            {/* Mobile Sidebar / Drawer */}
-            <div
-                className={`fixed inset-0 z-60 bg-black/50 transition-opacity duration-300 sm:hidden ${isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
-                onClick={toggleMenu}
-            />
-
-            <aside
-                className={`fixed top-0 left-0 z-70 h-full w-[280px] bg-white shadow-2xl transition-transform duration-300 transform sm:hidden ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
-            >
-                <div className="flex flex-col h-full">
-                    {/* Drawer Header */}
-                    <div className="flex items-center justify-between p-5 border-b border-stone-100">
-                        <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 bg-stone-900 rounded-lg flex justify-center items-center shadow-md">
-                                <span className="text-white font-bold text-lg tracking-wider">Z</span>
-                            </div>
-                            <span className="font-bold text-xl tracking-tight text-stone-900">Zento</span>
-                        </div>
+            {/* Bottom Row: Categories Bar */}
+            <div className="w-full bg-white border-b border-stone-200">
+                <div className="w-full md:w-[80%] mx-auto px-4 sm:px-6 lg:px-8 relative flex items-center py-4">
+                    <div className={`absolute left-0 top-0 bottom-0 w-12 bg-linear-to-r from-white via-white to-transparent z-10 hidden md:flex items-center justify-start pl-2 transition-opacity duration-300 ${!canScrollLeft ? 'opacity-30 pointer-events-none' : 'opacity-100'}`}>
                         <button
-                            onClick={toggleMenu}
-                            className="p-2 text-stone-400 hover:text-stone-900 transition-colors rounded-full hover:bg-stone-50 cursor-pointer"
+                            onClick={() => scrollCategories('left')}
+                            disabled={!canScrollLeft}
+                            className="p-1 bg-white border border-stone-200 hover:bg-stone-50 rounded-full cursor-pointer transition-all shadow-sm disabled:cursor-default"
                         >
-                            <X className="h-6 w-6" />
+                            <ChevronLeft className="h-4 w-4 text-stone-800" />
                         </button>
                     </div>
 
-                    {/* Drawer Content */}
-                    <div className="flex-1 overflow-y-auto py-5 px-4 space-y-2">
-                        {navLinks.map((link) => (
-                            <Link
-                                key={link.name}
-                                to={link.path}
-                                onClick={toggleMenu}
-                                className="flex items-center justify-between p-3 rounded-xl hover:bg-stone-50 transition-colors group"
-                            >
-                                <div className="flex items-center gap-4">
-                                    <link.icon className="h-5 w-5 text-stone-400 group-hover:text-stone-900 transition-colors" />
-                                    <span className="text-sm font-medium text-stone-600 group-hover:text-stone-900">{link.name}</span>
-                                </div>
-                                <ChevronRight className="h-4 w-4 text-stone-300 group-hover:text-stone-400" />
-                            </Link>
+                    <div
+                        ref={scrollRef}
+                        onScroll={handleCategoriesScroll}
+                        className="flex items-start overflow-x-auto scroll-smooth whitespace-nowrap [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] w-full pb-1"
+                    >
+                        {categories.map(cat => (
+                            <CategoryBadge
+                                key={cat.id}
+                                name={cat.name}
+                                image={cat.image}
+                            />
                         ))}
                     </div>
 
-                    {/* Drawer Footer */}
-                    <div className="p-5 border-t border-stone-100">
-                        <Link
-                            to="/login"
-                            onClick={toggleMenu}
-                            className="flex items-center justify-center gap-2 w-full bg-stone-900 text-white py-3 rounded-xl font-medium shadow-md active:scale-[0.98] transition-all"
+                    <div className={`absolute right-0 top-0 bottom-0 w-12 bg-linear-to-l from-white via-white to-transparent z-10 hidden md:flex items-center justify-end pr-2 transition-opacity duration-300 ${!canScrollRight ? 'opacity-30 pointer-events-none' : 'opacity-100'}`}>
+                        <button
+                            onClick={() => scrollCategories('right')}
+                            disabled={!canScrollRight}
+                            className="p-1 bg-white border border-stone-200 hover:bg-stone-50 rounded-full cursor-pointer transition-all shadow-sm disabled:cursor-default"
                         >
-                            <User className="h-5 w-5" />
-                            <span>Sign In</span>
-                        </Link>
+                            <ChevronRight className="h-4 w-4 text-stone-800" />
+                        </button>
                     </div>
                 </div>
-            </aside>
-        </>
+            </div>
+        </header>
     );
 };
 
