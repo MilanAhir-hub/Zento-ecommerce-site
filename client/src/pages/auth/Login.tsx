@@ -32,7 +32,7 @@ const Login = () => {
 
         try {
             await login({ email, password });
-            navigate("/user/home");
+            navigate("/");
         } catch (err: any) {
             setError(err.response?.data?.message || "Login failed");
         }
