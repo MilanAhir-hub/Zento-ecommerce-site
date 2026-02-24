@@ -20,6 +20,8 @@ const UserProfile = () => {
     const navigate = useNavigate();
     const [isAccountOpen, setIsAccountOpen] = useState(true);
 
+    console.log('Hey there!');
+
     const handleLogout = async () => {
         try {
             await logout();
