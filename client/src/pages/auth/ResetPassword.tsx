@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import useResetPassword from "../../hooks/auth/useResetPassword";
 
 const ResetPassword = () => {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
 
@@ -13,11 +16,9 @@ const ResetPassword = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Retrieve email and otp passed from the VerifyOTP component
     const email = location.state?.email;
     const otp = location.state?.otp;
 
-    // Redirect to forgot-password if accessed directly without email/otp
     useEffect(() => {
         if (!email || !otp) {
             navigate("/forgot-password");
@@ -43,7 +44,7 @@ const ResetPassword = () => {
             { email, otp, password },
             {
                 onSuccess: (response: any) => {
-                    setSuccess(response.data?.message || "Password reset successful! Redirecting to login...");
+                    setSuccess(response.data?.message || "Password reset successful!");
                     setTimeout(() => {
                         navigate("/login");
                     }, 2000);
@@ -56,63 +57,80 @@ const ResetPassword = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
-                <div>
-                    <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                        Create New Password
+        <div className="min-h-screen flex items-center justify-center bg-[#f8f8f8] py-12 px-4 sm:px-6 lg:px-8 font-sans">
+            <div className="max-w-[440px] w-full bg-white p-8 sm:p-12 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-stone-100">
+                <div className="mb-10 text-center">
+                    <h2 className="text-[28px] font-bold text-stone-900 tracking-tight">
+                        New Password
                     </h2>
-                    <p className="mt-2 text-center text-sm text-gray-600">
-                        Your new password must be different from previous used passwords.
+                    <p className="mt-3 text-[15px] font-medium text-stone-500">
+                        Create a secure password for your account.
                     </p>
                 </div>
 
-                <form className="mt-8 space-y-6" onSubmit={handleResetPassword}>
+                <form className="space-y-6" onSubmit={handleResetPassword}>
                     {error && (
-                        <div className="bg-red-50 text-red-500 text-center p-3 rounded-md text-sm border border-red-200">
+                        <div className="bg-red-50 text-red-600 text-center p-4 rounded-2xl text-sm font-semibold border border-red-100">
                             {error}
                         </div>
                     )}
                     {success && (
-                        <div className="bg-green-50 text-green-600 text-center p-3 rounded-md text-sm border border-green-200">
+                        <div className="bg-green-50 text-green-600 text-center p-4 rounded-2xl text-sm font-semibold border border-green-100">
                             {success}
                         </div>
                     )}
 
-                    <div className="rounded-md shadow-sm -space-y-px">
+                    <div className="space-y-5">
+                        {/* New Password */}
                         <div>
-                            <label htmlFor="new-password" className="sr-only">New Password</label>
-                            <input
-                                id="new-password"
-                                name="password"
-                                type="password"
-                                required
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                placeholder="New Password"
-                            />
+                            <label htmlFor="new-password" className="block text-xs font-bold text-stone-400 uppercase tracking-widest mb-2 pl-1">
+                                New Password
+                            </label>
+                            <div className="relative">
+                                <input
+                                    id="new-password"
+                                    name="password"
+                                    type={showPassword ? "text" : "password"}
+                                    required
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="appearance-none block w-full px-5 py-3.5 pr-12 border border-stone-200 bg-stone-50/50 rounded-2xl text-stone-900 font-medium placeholder-stone-400 focus:outline-none focus:ring-0 focus:border-stone-900 focus:bg-white transition-all text-sm"
+                                    placeholder="••••••••"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-900 transition-colors focus:outline-none"
+                                >
+                                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                                </button>
+                            </div>
                         </div>
-                        <div>
-                            <label htmlFor="confirm-password" className="sr-only">Confirm Password</label>
-                            <input
-                                id="confirm-password"
-                                name="confirmPassword"
-                                type="password"
-                                required
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                placeholder="Confirm Password"
-                            />
-                        </div>
-                    </div>
 
-                    <div className="flex items-center justify-between">
-                        <div className="text-sm">
-                            <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
-                                Back to login
-                            </Link>
+                        {/* Confirm Password */}
+                        <div>
+                            <label htmlFor="confirm-password" className="block text-xs font-bold text-stone-400 uppercase tracking-widest mb-2 pl-1">
+                                Confirm Password
+                            </label>
+                            <div className="relative">
+                                <input
+                                    id="confirm-password"
+                                    name="confirmPassword"
+                                    type={showConfirmPassword ? "text" : "password"}
+                                    required
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    className="appearance-none block w-full px-5 py-3.5 pr-12 border border-stone-200 bg-stone-50/50 rounded-2xl text-stone-900 font-medium placeholder-stone-400 focus:outline-none focus:ring-0 focus:border-stone-900 focus:bg-white transition-all text-sm"
+                                    placeholder="••••••••"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-900 transition-colors focus:outline-none"
+                                >
+                                    {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -120,11 +138,23 @@ const ResetPassword = () => {
                         <button
                             type="submit"
                             disabled={isPending}
-                            className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${isPending ? "opacity-75 cursor-not-allowed" : ""
-                                }`}
+                            className="w-full flex items-center justify-center py-4 px-4 border border-transparent text-[15px] font-bold rounded-full text-white bg-stone-900 hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-900 transition-all shadow-md active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed group"
                         >
-                            {isPending ? "Resetting..." : "Reset Password"}
+                            {isPending ? (
+                                <>
+                                    <Loader2 className="animate-spin h-5 w-5 mr-3" />
+                                    Resetting...
+                                </>
+                            ) : (
+                                "Reset Password"
+                            )}
                         </button>
+                    </div>
+
+                    <div className="text-center">
+                        <Link to="/login" className="text-sm font-bold text-stone-900 hover:text-stone-600 transition-colors">
+                            Back to Login
+                        </Link>
                     </div>
                 </form>
             </div>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Loader2 } from "lucide-react";
 import useSendOTP from "../../hooks/auth/useSendOTP";
 
 const ForgotPassword = () => {
@@ -17,7 +18,6 @@ const ForgotPassword = () => {
         sendOtpMutate(email, {
             onSuccess: (response: any) => {
                 setSuccess(response.data?.message || "OTP sent to your email.");
-                // Store the email in state or local storage if you want to prepopulate it on the reset password page
                 setTimeout(() => {
                     navigate("/verify-otp", { state: { email } });
                 }, 2000);
@@ -29,60 +29,66 @@ const ForgotPassword = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
-                <div>
-                    <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                        Forgot your password?
+        <div className="min-h-screen flex items-center justify-center bg-[#f8f8f8] py-12 px-4 sm:px-6 lg:px-8 font-sans">
+            <div className="max-w-[440px] w-full bg-white p-8 sm:p-12 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-stone-100">
+                <div className="mb-10 text-center">
+                    <h2 className="text-[28px] font-bold text-stone-900 tracking-tight">
+                        Forgot Password
                     </h2>
-                    <p className="mt-2 text-center text-sm text-gray-600">
-                        Enter your email address and we'll send you an OTP to reset your password.
+                    <p className="mt-3 text-[15px] font-medium text-stone-500">
+                        Enter your email to receive a 6-digit verification code.
                     </p>
                 </div>
-                <form className="mt-8 space-y-6" onSubmit={handleSendOTP}>
+
+                <form className="space-y-6" onSubmit={handleSendOTP}>
                     {error && (
-                        <div className="bg-red-50 text-red-500 text-center p-3 rounded-md text-sm border border-red-200">
+                        <div className="bg-red-50 text-red-600 text-center p-4 rounded-2xl text-sm font-semibold border border-red-100">
                             {error}
                         </div>
                     )}
                     {success && (
-                        <div className="bg-green-50 text-green-600 text-center p-3 rounded-md text-sm border border-green-200">
+                        <div className="bg-green-50 text-green-600 text-center p-4 rounded-2xl text-sm font-semibold border border-green-100">
                             {success}
                         </div>
                     )}
-                    <div className="rounded-md shadow-sm -space-y-px">
-                        <div>
-                            <label htmlFor="email-address" className="sr-only">Email address</label>
-                            <input
-                                id="email-address"
-                                name="email"
-                                type="email"
-                                required
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                placeholder="Email address"
-                            />
-                        </div>
-                    </div>
 
-                    <div className="flex items-center justify-between">
-                        <div className="text-sm">
-                            <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
-                                Back to login
-                            </Link>
-                        </div>
+                    <div>
+                        <label htmlFor="email-address" className="block text-xs font-bold text-stone-400 uppercase tracking-widest mb-2 pl-1">
+                            Email Address
+                        </label>
+                        <input
+                            id="email-address"
+                            name="email"
+                            type="email"
+                            required
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="appearance-none block w-full px-5 py-3.5 border border-stone-200 bg-stone-50/50 rounded-2xl text-stone-900 font-medium placeholder-stone-400 focus:outline-none focus:ring-0 focus:border-stone-900 focus:bg-white transition-all text-sm"
+                            placeholder="name@example.com"
+                        />
                     </div>
 
                     <div>
                         <button
                             type="submit"
                             disabled={isPending}
-                            className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${isPending ? "opacity-75 cursor-not-allowed" : ""
-                                }`}
+                            className="w-full flex items-center justify-center py-4 px-4 border border-transparent text-[15px] font-bold rounded-full text-white bg-stone-900 hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-900 transition-all shadow-md active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed group"
                         >
-                            {isPending ? "Sending..." : "Send OTP"}
+                            {isPending ? (
+                                <>
+                                    <Loader2 className="animate-spin h-5 w-5 mr-3" />
+                                    Processing...
+                                </>
+                            ) : (
+                                "Send OTP"
+                            )}
                         </button>
+                    </div>
+
+                    <div className="text-center">
+                        <Link to="/login" className="text-sm font-bold text-stone-900 hover:text-stone-600 transition-colors">
+                            Back to Login
+                        </Link>
                     </div>
                 </form>
             </div>
