@@ -10,7 +10,7 @@ const CategoryBadge = ({ name, image }: CategoryBadgeProps) => {
 
     return (
         <div
-            onClick={() => navigate(`/products?category=${name}`)}
+            onClick={() => navigate(`/category/${name}`)}
             className="flex flex-col md:flex-row items-center justify-center gap-1.5 md:gap-3 group cursor-pointer shrink-0 w-1/5 md:w-[14.28%] px-1 md:px-2 py-2 md:py-1.5 rounded-2xl md:rounded-full hover:bg-stone-900 transition-colors duration-300"
         >
             {/* Image Container */}

@@ -1,11 +1,9 @@
-import PublicNavbar from "../../components/navbar/PublicNavbar"
-
 const GuestLandingPage = () => {
     return (
-       <>
-       <PublicNavbar/>
-       </>
-    )
-}
+        <div className="p-8">
+            <h1 className="text-2xl font-bold">Landing Page</h1>
+        </div>
+    );
+};
 
-export default GuestLandingPage
+export default GuestLandingPage;

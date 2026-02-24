@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const checkAuth = async () => {
         try {
             setIsLoading(true);
-            const response = await api.get("/auth/me"); // important
+            const response = await api.get("/user/me"); // important
             setUser(response.data.user);
             setIsAuthenticated(true);
         } catch (error) {
