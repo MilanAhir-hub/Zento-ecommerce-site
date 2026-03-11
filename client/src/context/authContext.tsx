@@ -2,10 +2,16 @@ import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import api from "../services/api";
 import { authService } from "../services/auth.api";
+export interface VendorRequestData {
+    _id: string;
+    status: 'pending' | 'approved' | 'rejected';
+}
+
 export interface User {
     _id: string;
     name: string;
     email: string;
+    role: "user" | "vendor" | "admin";
 }
 
 export interface LoginCredentials {
@@ -21,6 +27,7 @@ export interface SignupData {
 
 interface AuthContextType {
     user: User | null;
+    vendorRequest: VendorRequestData | null;
     isAuthenticated: boolean;
     isLoading: boolean;
     login: (credentials: LoginCredentials) => Promise<void>;
@@ -34,6 +41,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
+    const [vendorRequest, setVendorRequest] = useState<VendorRequestData | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -42,9 +50,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             setIsLoading(true);
             const response = await api.get("/user/me"); // important
             setUser(response.data.user);
+            setVendorRequest(response.data.vendorRequest || null);
             setIsAuthenticated(true);
         } catch (error) {
             setUser(null);
+            setVendorRequest(null);
             setIsAuthenticated(false);
         } finally {
             setIsLoading(false);
@@ -58,6 +68,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const login = async (credentials: LoginCredentials) => {
         const response = await authService.login(credentials);
         setUser(response.data.user);
+
+        // After login, we must re-check auth to get the vendorRequest and other sensitive info 
+        // since the old authService.login might only return minimal user data
+        await checkAuth();
         setIsAuthenticated(true);
     };
 
@@ -76,11 +90,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const logout = async () => {
         await authService.logout();
         setUser(null);
+        setVendorRequest(null);
         setIsAuthenticated(false);
     };
 
     return (
-        <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, googleLogin, signup, logout, checkAuth }}>
+        <AuthContext.Provider value={{ user, vendorRequest, isAuthenticated, isLoading, login, googleLogin, signup, logout, checkAuth }}>
             {children}
         </AuthContext.Provider>
     );

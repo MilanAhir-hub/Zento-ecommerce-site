@@ -45,3 +45,23 @@ export const isVendor = async (req: AuthRequest, res: Response, next: NextFuncti
         return;
     }
 };
+
+export const isAdmin = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        if (!req.userId) {
+            res.status(401).json({ message: "Authentication required" });
+            return;
+        }
+
+        const user = await User.findById(req.userId);
+        if (!user || user.role !== "admin") {
+            res.status(403).json({ message: "Access denied. Admin resources only." });
+            return;
+        }
+
+        next();
+    } catch (error) {
+        res.status(500).json({ message: "Internal server error during authorization" });
+        return;
+    }
+};

@@ -21,8 +21,8 @@ const PublicNavbar = () => {
     return (
         <header className="sticky top-0 z-50 w-full bg-white transition-all duration-300">
             {/* Top Row: Main Header */}
-            <div className="bg-white border-b border-stone-100">
-                <div className="w-full md:w-[80%] mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="bg-white">
+                <div className="w-full md:w-[95%] mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex flex-col md:flex-row justify-between items-center py-2 md:py-3 md:h-[76px] gap-2 md:gap-8">
 
                         {/* Logo (Desktop Only) */}

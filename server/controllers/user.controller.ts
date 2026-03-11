@@ -8,6 +8,7 @@ import { Wishlist } from "../models/Wishlist";
 import { Review } from "../models/Review";
 import { Address } from "../models/Address";
 import { Notification } from "../models/Notification";
+import { VendorRequest } from "../models/VendorRequest";
 import { AuthRequest } from "../middlewares/auth.middleware";
 
 export const profile = async (req: AuthRequest, res: Response): Promise<void> => {
@@ -26,9 +27,65 @@ export const profile = async (req: AuthRequest, res: Response): Promise<void> =>
             return;
         }
 
+        const vendorRequest = await VendorRequest.findOne({ user: userId });
+
         res.status(200).json({
             success: true,
-            user
+            user,
+            vendorRequest
+        });
+    } catch (error: any) {
+        res.status(500).json({
+            success: false,
+            message: error.message || "Internal Server Error"
+        });
+    }
+};
+
+// --- VENDOR REQUEST ---
+
+export const submitVendorRequest = async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+        const userId = req.userId;
+
+        if (!userId) {
+            res.status(401).json({ success: false, message: "Not authorized" });
+            return;
+        }
+
+        const existingRequest = await VendorRequest.findOne({ user: userId });
+        if (existingRequest && existingRequest.status !== 'rejected') {
+            res.status(400).json({ success: false, message: "You already have a pending or approved request." });
+            return;
+        }
+
+        const user = await User.findById(userId);
+        if (user?.role === 'vendor') {
+            res.status(400).json({ success: false, message: "You are already a vendor." });
+            return;
+        }
+
+        const { storeName, businessType, gstNumber, phoneNumber, storeAddress, bankAccountNumber, ifscCode, storeLogo } = req.body;
+
+        const newRequest = new VendorRequest({
+            user: userId,
+            storeName,
+            businessType,
+            gstNumber,
+            phoneNumber,
+            storeAddress,
+            bankAccountNumber,
+            ifscCode,
+            storeLogo,
+            status: 'pending'
+        });
+
+        await newRequest.save();
+
+        res.status(201).json({
+            success: true,
+            message: "Vendor request submitted successfully",
+            vendorRequest: newRequest
         });
     } catch (error: any) {
         res.status(500).json({
@@ -58,7 +115,7 @@ export const getAllProducts = async (req: Request, res: Response): Promise<void>
             totalProducts,
             totalPages: Math.ceil(totalProducts / limit),
             currentPage: page,
-            products,
+            data: products,
         });
     } catch (error: any) {
         res.status(500).json({ success: false, message: error.message || "Internal Server Error" });
@@ -69,6 +126,11 @@ export const getAllProducts = async (req: Request, res: Response): Promise<void>
 export const getProductById = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
+
+        if (!mongoose.isValidObjectId(id)) {
+            res.status(404).json({ success: false, message: "Product not found" });
+            return;
+        }
 
         const product = await Product.findById(id);
 
@@ -114,7 +176,7 @@ export const searchProducts = async (req: Request, res: Response): Promise<void>
             totalProducts,
             totalPages: Math.ceil(totalProducts / limit),
             currentPage: page,
-            products,
+            data: products,
         });
     } catch (error: any) {
         res.status(500).json({ success: false, message: error.message || "Internal Server Error" });
@@ -149,7 +211,7 @@ export const getProductByCategory = async (req: Request, res: Response): Promise
             totalProducts,
             totalPages: Math.ceil(totalProducts / limit),
             currentPage: page,
-            products,
+            data: products,
         });
     } catch (error: any) {
         res.status(500).json({ success: false, message: error.message || "Internal Server Error" });

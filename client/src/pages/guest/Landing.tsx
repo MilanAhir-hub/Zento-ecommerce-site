@@ -1,8 +1,18 @@
+import FeaturedProducts from "../../sections/Landing/FeaturedProducts";
+import Hero from "../../sections/Landing/Hero";
+import Trust from "../../sections/Landing/Trust";
+import CallToAction from "../../sections/Landing/CallToAction";
+import CategorySliders from "../../sections/Landing/CategorySliders";
+
 const GuestLandingPage = () => {
     return (
-        <div className="p-8">
-            <h1 className="text-2xl font-bold">Landing Page</h1>
-        </div>
+        <>
+            <Hero />
+            <CategorySliders />
+            <FeaturedProducts />
+            <Trust />
+            <CallToAction />
+        </>
     );
 };
 

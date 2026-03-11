@@ -1,0 +1,13 @@
+client/src/components/category/CategoryBadge.tsx
+client/src/components/category/CategoryBar.tsx
+client/src/components/navbar/PublicNavbar.tsx
+client/src/components/ui/Loader.tsx
+client/src/components/ui/Searchbar.tsx
+client/src/pages/auth/ForgotPassword.tsx
+client/src/pages/auth/Login.tsx
+client/src/pages/auth/ResetPassword.tsx
+client/src/pages/auth/Signup.tsx
+client/src/pages/auth/VerifyOTP.tsx
+client/src/pages/guest/Landing.tsx
+client/src/pages/user/UserProfile.tsx
+client/src/routes/AppRoutes.tsx

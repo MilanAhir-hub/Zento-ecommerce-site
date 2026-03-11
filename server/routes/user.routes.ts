@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
     profile,
+    submitVendorRequest,
     getAllProducts,
     getProductById,
     searchProducts,
@@ -36,6 +37,7 @@ import { isAuthenticated } from "../middlewares/auth.middleware";
 const router = Router();
 
 router.get("/me", isAuthenticated, profile);
+router.post("/vendor-request", isAuthenticated, submitVendorRequest);
 
 // --- PRODUCT BROWSING ROUTES ---
 router.get("/products", getAllProducts);

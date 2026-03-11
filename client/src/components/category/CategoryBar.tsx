@@ -30,8 +30,8 @@ const CategoryBar = () => {
     }, []);
 
     return (
-        <div className="w-full bg-white border-b border-stone-200">
-            <div className="w-full md:w-[80%] mx-auto px-4 sm:px-6 lg:px-8 relative flex items-center py-4">
+        <div className="w-full bg-white">
+            <div className="w-full md:w-[95%] mx-auto px-4 sm:px-6 lg:px-8 relative flex items-center py-4">
                 <div className={`absolute left-0 top-0 bottom-0 w-12 bg-linear-to-r from-white via-white to-transparent z-10 hidden md:flex items-center justify-start pl-2 transition-opacity duration-300 ${!canScrollLeft ? 'opacity-30 pointer-events-none' : 'opacity-100'}`}>
                     <button
                         onClick={() => scrollCategories('left')}
