@@ -1,131 +1,166 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { Heart, Sparkles } from "lucide-react";
-import Button, { getButtonStyles } from "./Button";
+import { Link, useNavigate } from "react-router-dom";
+import { getCloudinaryUrl } from "../../utils/cloudinaryImage";
+import { useCart } from "../../hooks/cart/useCart";
+import { useAuth } from "../../context/authContext";
+import { useInteractionLogger } from "../../hooks/useInteractionLogger";
+import { useWishlist } from "../../hooks/useWishlist";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { FavouriteIcon } from "@hugeicons/core-free-icons";
+import BlurImage from "./BlurImage";
 
 export interface Product {
     _id: string;
     title: string;
-    description: string;
     price: number;
-    oldPrice?: number;
     imageUrl: string;
-    category: string;
-    stock?: number;
 }
 
-export interface ProductCardProps {
-    product: Product;
+export const ProductCard = ({ product }: { product: Product }) => {
+    const { cart, addToCart, isAddingToCart } = useCart();
+    const { isAuthenticated } = useAuth();
+    const { log } = useInteractionLogger();
+    const { toggleWishlist, isInWishlist } = useWishlist();
+    const navigate = useNavigate();
 
-    // Action Handlers
-    onAddToCart?: (productId: string) => void;
-    isAddingToCart?: boolean;
-    isAddedToCart?: boolean;
+    const isProductInCart = cart?.items?.some(
+        (item) => item.product._id === product._id
+    );
 
-    onAddToWishlist?: (productId: string) => void;
-    onAskAI?: (productId: string) => void;
-}
+    const handleProductClick = () => {
+        log({
+            productId: product._id,
+            action: 'view',
+            price: product.price
+        });
+    };
 
-export const ProductCard = ({
-    product,
-    onAddToCart,
-    isAddingToCart = false,
-    isAddedToCart = false,
-    onAddToWishlist,
-    onAskAI,
-}: ProductCardProps) => {
-    // Shared formatting
-    const formattedPrice = product.price ? product.price.toLocaleString() : "0";
+    const handleAddToCart = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation(); //without this when button click, parent will click automatically
+
+        if (!isAuthenticated) {
+            navigate("/auth/login");
+            return;
+        }
+
+        // Log the interaction
+        log({
+            productId: product._id,
+            action: 'add_to_cart',
+            price: product.price,
+            quantity: 1
+        });
+
+        await addToCart({ productId: product._id });
+    };
+
+    const handleWishlistToggle = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!isAuthenticated) {
+            navigate("/auth/login");
+            return;
+        }
+
+        await toggleWishlist(product._id);
+    };
 
     return (
-        <div className="group bg-white rounded-xl overflow-hidden border border-stone-100 shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-300 flex flex-col h-full w-full">
-            {/* Top Image Section */}
-            <div className="relative aspect-[4/5] sm:aspect-[3/4] md:aspect-square bg-stone-100 overflow-hidden shrink-0 block">
-                <Link to={`/products/${product._id}`} className="absolute inset-0 z-0 block">
-                    <img
-                        src={product.imageUrl}
+        <Link
+            to={`/products/${product._id}`}
+            onClick={handleProductClick}
+            className="group block relative"
+        >
+            <div
+                className="
+                flex flex-col items-center text-center pb-6
+                transition-all duration-300
+                border-3 border-gray-200 rounded-4xl
+                hover:border-gray-300
+                ease-out
+                overflow-hidden
+                bg-white
+                p-4
+            "
+            >
+                {/* Image Container with Consistent Padding for Centering */}
+                <div className="w-full aspect-square bg-[#fafafa] rounded-[28px] overflow-hidden p-6 flex items-center justify-center">
+                    <BlurImage
+                        src={getCloudinaryUrl(product.imageUrl, {
+                            width: 600,
+                            quality: "auto",
+                            format: "auto",
+                        })}
                         alt={product.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 block"
+                        wrapperClassName="w-full h-full bg-transparent"
+                        className="
+                            object-contain
+                            transition-transform duration-700 
+                            ease-[cubic-bezier(0.22,1,0.36,1)]
+                            group-hover:scale-105
+                        "
                     />
-                </Link>
 
-                {/* Badge: Category */}
-                <div className="absolute top-4 left-4 z-10 pointer-events-none">
-                    <span className="bg-white/90 backdrop-blur-sm text-[10px] font-bold text-stone-900 px-3 py-1.5 rounded-full uppercase tracking-widest shadow-sm">
-                        {product.category}
-                    </span>
-                </div>
-
-                {/* Floating Action Buttons */}
-                <div className="absolute top-4 right-4 z-10 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-x-2 group-hover:translate-x-0">
+                    {/* Wishlist Heart Button - Visible on Hover */}
                     <button
-                        onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            if (onAddToWishlist) onAddToWishlist(product._id);
-                        }}
-                        className="bg-white rounded-full shadow-md p-2 flex items-center justify-center hover:bg-red-50 hover:text-red-500 text-stone-400 transition-colors"
+                        onClick={handleWishlistToggle}
+                        className={`
+                            absolute top-4 right-4 p-2.5 rounded-full 
+                            bg-white/70 backdrop-blur-md shadow-sm
+                            transition-all duration-300 transform
+                            opacity-0 translate-y-2
+                            group-hover:opacity-100 group-hover:translate-y-0
+                            hover:bg-white hover:scale-110 active:scale-95
+                            z-10
+                        `}
+                        aria-label={isInWishlist(product._id) ? "Remove from wishlist" : "Add to wishlist"}
                     >
-                        <Heart className="w-4 h-4 transition-colors" />
-                    </button>
-
-                    <button
-                        onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            if (onAskAI) onAskAI(product._id);
-                        }}
-                        className="bg-white rounded-full shadow-md p-2 flex items-center justify-center hover:bg-stone-50 hover:text-stone-500 text-stone-400 transition-colors"
-                        title="Ask AI about this product"
-                    >
-                        <Sparkles className="w-4 h-4 transition-colors" />
+                        <HugeiconsIcon
+                            icon={FavouriteIcon}
+                            size={18}
+                            className={`transition-colors duration-300 ${isInWishlist(product._id) ? "text-[#ff2d55] fill-[#ff2d55]" : "text-gray-400 group-hover:text-gray-600"
+                                }`}
+                        />
                     </button>
                 </div>
-            </div>
-
-            {/* Bottom Content Section */}
-            <div className="p-4 md:p-5 flex flex-col flex-1 text-sm">
-                <Link to={`/products/${product._id}`} className="block flex-1 group/link">
-                    {/* Price */}
-                    <div className="mb-1">
-                        <span className="text-stone-900 text-[12px] md:text-[16px] font-bold">
-                            ₹{formattedPrice}
-                        </span>
-                    </div>
-
-                    <h3 className="font-bold text-stone-900 transition-colors line-clamp-2 group-hover/link:text-blue-700 text-[16px] my-1.5 leading-tight h-[2.5rem]">
+                {/* Title and Price Container (Fixed height for alignment) */}
+                <div className="mt-5 w-full flex flex-col items-center justify-start h-[75px] px-2">
+                    <h3 className="
+                        text-[15px] font-medium text-neutral-900
+                        line-clamp-2 leading-snug
+                        transition-colors duration-300
+                        group-hover:text-neutral-700
+                    ">
                         {product.title}
                     </h3>
 
-                    {/* Description text */}
-                    <p className="text-stone-500 line-clamp-2 mt-1 mb-4 text-sm h-[2.5rem]">
-                        {product.description || "Top-tier premium product curated specially for our featured section."}
+                    <p className="
+                        mt-1.5 text-[15px] text-neutral-600
+                        transition-colors duration-300
+                    ">
+                        ₹{product.price.toLocaleString("en-IN")}
                     </p>
-                </Link>
-
-                {/* Call To Actions */}
-                <div className="mt-auto pt-2 grid grid-cols-2 gap-2 flex-none z-10 pointer-events-auto">
-                    <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                            e.stopPropagation();
-                            e.preventDefault();
-                            if (onAddToCart) onAddToCart(product._id);
-                        }}
-                        disabled={isAddingToCart}
-                        className="w-full h-10 md:h-11"
-                    >
-                        {isAddedToCart ? 'Added' : isAddingToCart ? 'Adding...' : 'Add'}
-                    </Button>
-                    <Link
-                        to={`/products/${product._id}`}
-                        className={getButtonStyles('primary', 'sm', 'w-full h-10 md:h-11')}
-                    >
-                        Buy now
-                    </Link>
                 </div>
+
+                {/* CTA */}
+                <button
+                    onClick={handleAddToCart}
+                    disabled={isAddingToCart}
+                    className="
+                        mt-6 w-full bg-[#0071e3] text-white text-[14px] font-semibold
+                        py-3 px-6 rounded-full
+                        transition-all duration-300
+                        hover:bg-[#005bb5] hover:shadow-lg hover:shadow-[#0071e3]/20
+                        active:scale-[0.98]
+                        disabled:opacity-50
+                        cursor-pointer
+                    "
+                >
+                    {isProductInCart ? "Added" : isAddingToCart ? "Adding..." : "Add to Bag"}
+                </button>
+
             </div>
-        </div>
+        </Link>
     );
 };

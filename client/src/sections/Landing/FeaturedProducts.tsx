@@ -1,8 +1,10 @@
 import { useRef } from "react";
-import { ChevronLeft, ChevronRight, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useProducts } from "../../hooks/products/useProducts";
 import { ProductCard } from "../../components/ui/ProductCard";
+import Button from "../../components/ui/Button";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowLeft01Icon, ArrowRight01Icon, Alert01Icon } from "@hugeicons/core-free-icons";
 
 const FeaturedProducts = () => {
     // Replace manual api fetching and state with useQuery hook
@@ -33,7 +35,7 @@ const FeaturedProducts = () => {
             <section className="py-16 bg-white">
                 <div className="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="h-[400px] flex flex-col items-center justify-center text-stone-500 gap-4">
-                        <AlertCircle className="w-12 h-12 text-red-500 opacity-50" />
+                        <HugeiconsIcon icon={Alert01Icon} className="w-12 h-12 text-red-500 opacity-50" />
                         <p className="font-medium text-lg">Failed to load featured products.</p>
                     </div>
                 </div>
@@ -60,20 +62,24 @@ const FeaturedProducts = () => {
 
                     {/* Navigation Arrows */}
                     <div className="hidden sm:flex items-center gap-3">
-                        <button
+                        <Button
+                            variant="outline"
+                            size="icon"
                             onClick={() => scroll('left')}
-                            className="h-12 w-12 flex items-center justify-center rounded-full border border-stone-200 bg-white text-stone-600 hover:bg-stone-50 hover:text-stone-900 transition-colors shadow-sm active:scale-95"
+                            className="h-12 w-12 bg-white text-stone-600 hover:text-stone-900 shadow-sm"
                             aria-label="Scroll left"
                         >
-                            <ChevronLeft className="w-6 h-6" />
-                        </button>
-                        <button
+                            <HugeiconsIcon icon={ArrowLeft01Icon} size={24} />
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="icon"
                             onClick={() => scroll('right')}
-                            className="h-12 w-12 flex items-center justify-center rounded-full border border-stone-200 bg-white text-stone-600 hover:bg-stone-50 hover:text-stone-900 transition-colors shadow-sm active:scale-95"
+                            className="h-12 w-12 bg-white text-stone-600 hover:text-stone-900 shadow-sm"
                             aria-label="Scroll right"
                         >
-                            <ChevronRight className="w-6 h-6" />
-                        </button>
+                            <HugeiconsIcon icon={ArrowRight01Icon} size={24} />
+                        </Button>
                     </div>
                 </div>
 
@@ -84,18 +90,7 @@ const FeaturedProducts = () => {
                 >
                     {products.map((product) => (
                         <div key={product._id} className="flex-none w-[300px] sm:w-[340px] md:w-[360px] snap-start">
-                            <ProductCard
-                                product={product}
-                                onAddToCart={(id: string) => {
-                                    console.log('Add to cart', id);
-                                }}
-                                onAddToWishlist={(id: string) => {
-                                    console.log('Add to wishlist', id);
-                                }}
-                                onAskAI={(id: string) => {
-                                    console.log('Ask AI', id);
-                                }}
-                            />
+                            <ProductCard product={product} />
                         </div>
                     ))}
                 </div>
@@ -103,7 +98,7 @@ const FeaturedProducts = () => {
                 {/* Mobile View All button */}
                 <div className="mt-4 sm:hidden text-center border-t border-stone-100 pt-6">
                     <Link to="/products" className="inline-flex items-center text-sm font-bold text-stone-900 uppercase tracking-widest hover:text-stone-600 transition-colors">
-                        View All Products <ChevronRight className="ml-1 w-4 h-4" />
+                        View All Products <HugeiconsIcon icon={ArrowRight01Icon} size={16} className="ml-1" />
                     </Link>
                 </div>
             </div>

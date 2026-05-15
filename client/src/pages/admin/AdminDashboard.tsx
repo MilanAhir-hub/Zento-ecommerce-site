@@ -1,8 +1,15 @@
 import { useState } from "react";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
-    LayoutDashboard, Users, ShoppingBag, Store,
-    Settings, LogOut, Package, AlertCircle
-} from "lucide-react";
+    DashboardCircleIcon,
+    UserGroupIcon,
+    ShoppingBag01Icon,
+    Store01Icon,
+    Settings01Icon,
+    Logout01Icon,
+    PackageIcon,
+    Alert01Icon
+} from "@hugeicons/core-free-icons";
 
 import DashboardOverview from "../../sections/admin/DashboardOverview";
 import OrdersManagement from "../../sections/admin/OrdersManagement";
@@ -11,127 +18,138 @@ import CustomersManagement from "../../sections/admin/CustomersManagement";
 import VendorsManagement from "../../sections/admin/VendorsManagement";
 import VendorRequests from "../../sections/admin/VendorRequests";
 import AdminSettings from "../../sections/admin/AdminSettings";
+import { useAdminRealTime } from "../../hooks/admin/useAdminRealTime";
+import { useAuth } from "../../context/authContext";
 
 const AdminDashboard = () => {
+    useAdminRealTime(); // Mounts the global real-time socket connection for the admin area
+
     const [activeSection, setActiveSection] = useState('overview');
+    const [filterVendorId, setFilterVendorId] = useState<string | null>(null);
+    const { logout } = useAuth();
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+        } catch (error) {
+            console.error("Logout failed:", error);
+        }
+    };
 
     const renderSection = () => {
         switch (activeSection) {
             case 'overview': return <DashboardOverview />;
             case 'orders': return <OrdersManagement />;
-            case 'products': return <ProductsManagement />;
+            case 'products': return <ProductsManagement filterVendorId={filterVendorId} onClearFilter={() => setFilterVendorId(null)} />;
             case 'customers': return <CustomersManagement />;
-            case 'vendors': return <VendorsManagement />;
+            case 'vendors': return (
+                <VendorsManagement
+                    onViewCatalog={(vendorId) => {
+                        setFilterVendorId(vendorId);
+                        setActiveSection('products');
+                    }}
+                />
+            );
             case 'requests': return <VendorRequests />;
             case 'settings': return <AdminSettings />;
             default: return <DashboardOverview />;
         }
     };
 
+    const navItems = [
+        { id: 'overview', label: 'Dashboard', icon: DashboardCircleIcon, group: 'Overview' },
+        { id: 'orders', label: 'Orders', icon: ShoppingBag01Icon, group: 'Management', badge: 12 },
+        { id: 'products', label: 'Products', icon: PackageIcon, group: 'Management' },
+        { id: 'customers', label: 'Customers', icon: UserGroupIcon, group: 'Management' },
+        { id: 'vendors', label: 'All Vendors', icon: Store01Icon, group: 'Vendors' },
+        { id: 'requests', label: 'Requests', icon: Alert01Icon, group: 'Vendors', badge: 3, badgeColor: 'bg-red-500' },
+    ];
+
     return (
-        <div className="min-h-screen bg-stone-50 flex font-sans">
+        <div className="min-h-screen bg-[#f5f5f7] flex font-sans antialiased text-[#1d1d1f]">
 
             {/* Sidebar */}
-            <aside className="w-64 bg-white border-r border-stone-200 hidden md:flex flex-col">
-                <div className="h-16 flex items-center px-6 border-b border-stone-100">
-                    <span className="text-xl font-black tracking-tighter text-stone-900">ZENTO ADMIN</span>
+            <aside className="w-72 bg-white/80 backdrop-blur-xl border-r border-[#d2d2d7]/30 hidden md:flex flex-col sticky top-0 h-screen">
+                <div className="h-20 flex items-center px-8">
+                    <span className="text-[22px] font-bold tracking-tight text-[#1d1d1f]">Zento <span className="text-[#0071e3]">Admin</span></span>
                 </div>
 
-                <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
-                    <div className="mb-6">
-                        <p className="px-3 text-xs font-bold text-stone-400 uppercase tracking-widest mb-3">Overview</p>
-                        <button
-                            onClick={() => setActiveSection('overview')}
-                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl group transition-all ${activeSection === 'overview' ? 'bg-stone-900 text-white' : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900'
-                                }`}
-                        >
-                            <LayoutDashboard className={`w-5 h-5 ${activeSection === 'overview' ? 'text-stone-300 group-hover:text-white' : 'text-stone-400 group-hover:text-stone-700'}`} />
-                            <span className="font-semibold text-sm">Dashboard</span>
-                        </button>
-                    </div>
-
-                    <div className="mb-6">
-                        <p className="px-3 text-xs font-bold text-stone-400 uppercase tracking-widest mb-3">Management</p>
-                        <button
-                            onClick={() => setActiveSection('orders')}
-                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl group transition-all ${activeSection === 'orders' ? 'bg-stone-900 text-white' : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900'
-                                }`}
-                        >
-                            <ShoppingBag className={`w-5 h-5 ${activeSection === 'orders' ? 'text-stone-300 group-hover:text-white' : 'text-stone-400 group-hover:text-stone-700'}`} />
-                            <span className="font-semibold text-sm">Orders</span>
-                            <span className={`ml-auto py-0.5 px-2 rounded-full text-[10px] font-bold ${activeSection === 'orders' ? 'bg-stone-700 text-stone-200' : 'bg-stone-200 text-stone-700'}`}>12</span>
-                        </button>
-                        <button
-                            onClick={() => setActiveSection('products')}
-                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl group transition-all ${activeSection === 'products' ? 'bg-stone-900 text-white' : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900'
-                                }`}
-                        >
-                            <Package className={`w-5 h-5 ${activeSection === 'products' ? 'text-stone-300 group-hover:text-white' : 'text-stone-400 group-hover:text-stone-700'}`} />
-                            <span className="font-semibold text-sm">Products</span>
-                        </button>
-                        <button
-                            onClick={() => setActiveSection('customers')}
-                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl group transition-all ${activeSection === 'customers' ? 'bg-stone-900 text-white' : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900'
-                                }`}
-                        >
-                            <Users className={`w-5 h-5 ${activeSection === 'customers' ? 'text-stone-300 group-hover:text-white' : 'text-stone-400 group-hover:text-stone-700'}`} />
-                            <span className="font-semibold text-sm">Customers</span>
-                        </button>
-                    </div>
-
-                    <div className="mb-6">
-                        <p className="px-3 text-xs font-bold text-stone-400 uppercase tracking-widest mb-3">Vendors</p>
-                        <button
-                            onClick={() => setActiveSection('vendors')}
-                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl group transition-all ${activeSection === 'vendors' ? 'bg-stone-900 text-white' : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900'
-                                }`}
-                        >
-                            <Store className={`w-5 h-5 ${activeSection === 'vendors' ? 'text-stone-300 group-hover:text-white' : 'text-stone-400 group-hover:text-stone-700'}`} />
-                            <span className="font-semibold text-sm">All Vendors</span>
-                        </button>
-                        <button
-                            onClick={() => setActiveSection('requests')}
-                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl group transition-all ${activeSection === 'requests' ? 'bg-stone-900 text-white' : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900'
-                                }`}
-                        >
-                            <AlertCircle className={`w-5 h-5 ${activeSection === 'requests' ? 'text-stone-300 group-hover:text-white' : 'text-stone-400 group-hover:text-stone-700'}`} />
-                            <span className="font-semibold text-sm">Requests</span>
-                            <span className={`ml-auto py-0.5 px-2 rounded-full text-[10px] font-bold ${activeSection === 'requests' ? 'bg-red-900/50 text-red-200' : 'bg-red-100 text-red-600'}`}>3</span>
-                        </button>
-                    </div>
+                <nav className="flex-1 px-4 py-4 space-y-8 overflow-y-auto custom-scrollbar">
+                    {['Overview', 'Management', 'Vendors'].map((group) => (
+                        <div key={group} className="space-y-1">
+                            <p className="px-4 text-[11px] font-bold text-[#86868b] uppercase tracking-widest mb-3">{group}</p>
+                            {navItems.filter(item => item.group === group).map((item) => (
+                                <button
+                                    key={item.id}
+                                    onClick={() => setActiveSection(item.id)}
+                                    className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-2xl group transition-all duration-200 ${activeSection === item.id
+                                        ? 'bg-[#0071e3] text-white shadow-[0_8px_20px_rgba(0,113,227,0.2)]'
+                                        : 'text-[#1d1d1f] hover:bg-[#f5f5f7] hover:text-[#0071e3]'
+                                        }`}
+                                >
+                                    <HugeiconsIcon
+                                        icon={item.icon}
+                                        size={20}
+                                        className={`${activeSection === item.id ? 'text-white' : 'text-[#86868b] group-hover:text-[#0071e3]'}`}
+                                    />
+                                    <span className="font-semibold text-[14px]">{item.label}</span>
+                                    {item.badge && (
+                                        <span className={`ml-auto py-0.5 px-2 rounded-full text-[10px] font-bold ${activeSection === item.id
+                                            ? 'bg-white/20 text-white'
+                                            : (item.badgeColor || 'bg-[#f5f5f7] text-[#86868b]')
+                                            }`}>
+                                            {item.badge}
+                                        </span>
+                                    )}
+                                </button>
+                            ))}
+                        </div>
+                    ))}
                 </nav>
 
-                <div className="p-4 border-t border-stone-100">
+                <div className="p-6 space-y-2">
                     <button
                         onClick={() => setActiveSection('settings')}
-                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl group transition-all ${activeSection === 'settings' ? 'bg-stone-900 text-white' : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900'
+                        className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-2xl group transition-all duration-200 ${activeSection === 'settings'
+                            ? 'bg-[#0071e3] text-white shadow-[0_8px_20px_rgba(0,113,227,0.2)]'
+                            : 'text-[#1d1d1f] hover:bg-[#f5f5f7] hover:text-[#0071e3]'
                             }`}
                     >
-                        <Settings className={`w-5 h-5 ${activeSection === 'settings' ? 'text-stone-300 group-hover:text-white' : 'text-stone-400 group-hover:text-stone-700'}`} />
-                        <span className="font-semibold text-sm">Settings</span>
+                        <HugeiconsIcon icon={Settings01Icon} size={20} className={`${activeSection === 'settings' ? 'text-white' : 'text-[#86868b] group-hover:text-[#0071e3]'}`} />
+                        <span className="font-semibold text-[14px]">Settings</span>
                     </button>
-                    <button className="w-full flex items-center gap-3 px-3 py-2.5 text-red-600 hover:bg-red-50 hover:text-red-700 rounded-xl group transition-all mt-1">
-                        <LogOut className="w-5 h-5 text-red-400 group-hover:text-red-600" />
-                        <span className="font-semibold text-sm">Sign out</span>
+                    <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-[#e30000] hover:bg-red-50 rounded-2xl group transition-all duration-200"
+                    >
+                        <HugeiconsIcon icon={Logout01Icon} size={20} className="text-[#ff453a] group-hover:text-[#e30000]" />
+                        <span className="font-semibold text-[14px]">Sign out</span>
                     </button>
                 </div>
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+            <main className="flex-1 flex flex-col min-w-0">
                 {/* Header */}
-                <header className="h-16 bg-white border-b border-stone-200 flex items-center justify-between px-6 lg:px-8 shrink-0">
-                    <h1 className="text-xl font-bold text-stone-900">Dashboard</h1>
-                    <div className="flex items-center gap-4">
-                        {/* Avatar */}
-                        <div className="w-9 h-9 bg-stone-900 text-white rounded-full flex items-center justify-center font-bold text-sm shadow-sm cursor-pointer hover:bg-stone-800 transition-colors">
-                            AD
+                <header className="h-20 bg-white/80 backdrop-blur-xl border-b border-[#d2d2d7]/30 flex items-center justify-between px-8 lg:px-12 sticky top-0 z-30">
+                    <div className="flex flex-col">
+                        <h1 className="text-[22px] font-bold text-[#1d1d1f] tracking-tight">
+                            {navItems.find(i => i.id === activeSection)?.label || 'Settings'}
+                        </h1>
+                    </div>
+                    <div className="flex items-center gap-6">
+                        <div className="flex-col items-end hidden sm:flex">
+                            <span className="text-[13px] font-bold text-[#1d1d1f]">Milan Gagiya</span>
+                            <span className="text-[11px] font-medium text-[#86868b]">Super Admin</span>
+                        </div>
+                        <div className="w-10 h-10 bg-white rounded-full border border-[#d2d2d7]/30 flex items-center justify-center font-bold text-sm shadow-sm cursor-pointer hover:bg-[#f5f5f7] transition-all duration-200">
+                            MG
                         </div>
                     </div>
                 </header>
 
                 {/* Dashboard Content */}
-                <div className="flex-1 overflow-y-auto p-6 lg:p-8">
+                <div className="flex-1 p-8 lg:p-12 max-w-[1400px]">
                     {renderSection()}
                 </div>
             </main>

@@ -1,4 +1,5 @@
-import { Users, Loader2, ShieldAlert } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { UserGroupIcon, Loading03Icon, Shield02Icon } from "@hugeicons/core-free-icons";
 import { useAdminCustomers, useUpdateUserRole } from "../../hooks/admin/useAdmin";
 
 const CustomersManagement = () => {
@@ -9,7 +10,7 @@ const CustomersManagement = () => {
         <div className="bg-white rounded-2xl border border-stone-200 shadow-[0_2px_10px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col h-full min-h-[500px]">
             <div className="px-6 py-5 border-b border-stone-100 flex items-center justify-between shrink-0">
                 <h2 className="text-xl font-bold text-stone-900 flex items-center gap-3">
-                    <Users className="w-6 h-6 text-stone-400" />
+                    <HugeiconsIcon icon={UserGroupIcon} size={24} className="text-stone-400" />
                     Customers
                 </h2>
                 <div className="flex gap-2">
@@ -23,12 +24,12 @@ const CustomersManagement = () => {
             <div className="p-6 flex-1 overflow-x-auto">
                 {isLoading ? (
                     <div className="flex flex-col items-center justify-center h-full min-h-[300px]">
-                        <Loader2 className="w-8 h-8 text-stone-300 animate-spin mb-4" />
+                        <HugeiconsIcon icon={Loading03Icon} size={32} className="text-stone-300 animate-spin mb-4" />
                         <p className="text-sm font-medium text-stone-500">Loading customers...</p>
                     </div>
                 ) : !customers || customers.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full min-h-[300px] text-center">
-                        <Users className="w-16 h-16 text-stone-200 mb-4" />
+                        <HugeiconsIcon icon={UserGroupIcon} size={64} className="text-stone-200 mb-4" />
                         <h3 className="text-lg font-bold text-stone-900 mb-1">No Customers Found</h3>
                         <p className="text-stone-400 font-medium max-w-sm">There are no registered customers on the platform yet.</p>
                     </div>
@@ -56,8 +57,8 @@ const CustomersManagement = () => {
                                     <td className="py-4 px-4 text-sm font-medium text-stone-600">{customer.email}</td>
                                     <td className="py-4 px-4">
                                         <span className={`px-3 py-1 rounded-full text-xs font-bold ${customer.role === 'admin' ? 'bg-purple-100 text-purple-700' :
-                                                customer.role === 'vendor' ? 'bg-blue-100 text-blue-700' :
-                                                    'bg-stone-100 text-stone-700'
+                                            customer.role === 'vendor' ? 'bg-blue-100 text-blue-700' :
+                                                'bg-stone-100 text-stone-700'
                                             }`}>
                                             {customer.role.toUpperCase()}
                                         </span>
@@ -72,7 +73,7 @@ const CustomersManagement = () => {
                                             disabled={updateRole.isPending}
                                             className="text-xs font-bold text-stone-500 hover:text-stone-900 transition-colors flex items-center gap-1 ml-auto"
                                         >
-                                            <ShieldAlert className="w-4 h-4" />
+                                            <HugeiconsIcon icon={Shield02Icon} size={16} />
                                             Make Admin
                                         </button>
                                     </td>

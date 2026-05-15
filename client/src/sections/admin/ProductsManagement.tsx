@@ -1,64 +1,107 @@
-import { Package, Plus, Loader2, Trash2 } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { PackageIcon, PlusSignIcon, Loading03Icon, Delete01Icon } from "@hugeicons/core-free-icons";
 import { useAdminProducts, useDeleteProductAdmin } from "../../hooks/admin/useAdmin";
 
-const ProductsManagement = () => {
+const ProductsManagement = ({ filterVendorId, onClearFilter }: { filterVendorId: string | null, onClearFilter: () => void }) => {
     const { data: products, isLoading } = useAdminProducts();
     const deleteProduct = useDeleteProductAdmin();
 
+    const filteredProducts = filterVendorId
+        ? products?.filter((p: any) => p.vendor?._id === filterVendorId)
+        : products;
+
+    const activeVendorName = filterVendorId && products
+        ? products.find((p: any) => p.vendor?._id === filterVendorId)?.vendor?.storeName || 'Vendor'
+        : null;
+
     return (
-        <div className="bg-white rounded-2xl border border-stone-200 shadow-[0_2px_10px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col h-full min-h-[500px]">
-            <div className="px-6 py-5 border-b border-stone-100 flex items-center justify-between shrink-0">
-                <h2 className="text-xl font-bold text-stone-900 flex items-center gap-3">
-                    <Package className="w-6 h-6 text-stone-400" />
-                    Products Inventory
-                </h2>
-                <button className="text-sm font-bold text-white bg-stone-900 px-4 py-2 rounded-xl hover:bg-stone-800 transition-colors flex items-center gap-2">
-                    <Plus className="w-4 h-4" />
+        <div className="bg-white rounded-4xl border border-[#d2d2d7]/30 overflow-hidden flex flex-col h-full min-h-[500px] shadow-sm">
+            <div className="px-8 py-6 border-b border-[#f5f5f7] flex items-center justify-between shrink-0">
+                <div className="flex flex-col gap-1">
+                    <h2 className="text-[18px] font-bold text-[#1d1d1f] flex items-center gap-3">
+                        <HugeiconsIcon icon={PackageIcon} size={24} className="text-[#0071e3]" />
+                        {filterVendorId ? `${activeVendorName}'s Catalog` : 'Products Inventory'}
+                    </h2>
+                    {filterVendorId && (
+                        <div className="flex items-center gap-2">
+                            <span className="text-[11px] font-medium text-[#86868b]">Showing products from 1 vendor</span>
+                            <button
+                                onClick={onClearFilter}
+                                className="text-[11px] font-bold text-[#0071e3] hover:underline cursor-pointer"
+                            >
+                                Clear filter
+                            </button>
+                        </div>
+                    )}
+                </div>
+                <button className="text-[13px] font-bold text-white bg-[#0071e3] px-5 py-2.5 rounded-2xl hover:bg-[#005bb5] transition-all flex items-center gap-2 shadow-md shadow-[#0071e3]/10">
+                    <HugeiconsIcon icon={PlusSignIcon} size={16} />
                     Add Product
                 </button>
             </div>
-            <div className="p-6 flex-1 overflow-x-auto">
+            <div className="p-4 flex-1 overflow-x-auto">
                 {isLoading ? (
-                    <div className="flex flex-col items-center justify-center h-full min-h-[300px]">
-                        <Loader2 className="w-8 h-8 text-stone-300 animate-spin mb-4" />
-                        <p className="text-sm font-medium text-stone-500">Loading products...</p>
+                    <div className="flex flex-col items-center justify-center py-32">
+                        <HugeiconsIcon icon={Loading03Icon} size={32} className="text-[#0071e3] animate-spin mb-4" />
+                        <p className="text-[14px] font-medium text-[#86868b]">Syncing inventory...</p>
                     </div>
-                ) : !products || products.length === 0 ? (
-                    <div className="p-8 flex-1 flex flex-col items-center justify-center h-full min-h-[300px] text-center">
-                        <Package className="w-16 h-16 text-stone-200 mb-4" />
-                        <h3 className="text-lg font-bold text-stone-900 mb-1">Manage Products</h3>
-                        <p className="text-stone-400 font-medium max-w-sm">Add, remove, or edit products available in the catalog across all vendors.</p>
+                ) : !filteredProducts || filteredProducts.length === 0 ? (
+                    <div className="p-12 flex-1 flex flex-col items-center justify-center text-center">
+                        <div className="w-20 h-20 bg-[#f5f5f7] rounded-full flex items-center justify-center mb-6">
+                            <HugeiconsIcon icon={PackageIcon} size={40} className="text-[#c1c1c7]" />
+                        </div>
+                        <h3 className="text-[18px] font-bold text-[#1d1d1f] mb-1">
+                            {filterVendorId ? 'No products found' : 'Scale your catalog'}
+                        </h3>
+                        <p className="text-[#86868b] text-[14px] max-w-[280px]">
+                            {filterVendorId
+                                ? "This vendor hasn't listed any products yet."
+                                : "Manage and monitor your global product inventory across all verified vendors."
+                            }
+                        </p>
+                        {filterVendorId && (
+                            <button
+                                onClick={onClearFilter}
+                                className="mt-4 text-[13px] font-bold text-[#0071e3] hover:underline cursor-pointer"
+                            >
+                                View full inventory
+                            </button>
+                        )}
                     </div>
                 ) : (
-                    <table className="w-full text-left border-collapse">
+                    <table className="w-full text-left">
                         <thead>
-                            <tr className="border-b border-stone-100">
-                                <th className="py-3 px-4 text-xs font-bold text-stone-400 uppercase tracking-wider">Product</th>
-                                <th className="py-3 px-4 text-xs font-bold text-stone-400 uppercase tracking-wider">Category</th>
-                                <th className="py-3 px-4 text-xs font-bold text-stone-400 uppercase tracking-wider">Price</th>
-                                <th className="py-3 px-4 text-xs font-bold text-stone-400 uppercase tracking-wider">Vendor</th>
-                                <th className="py-3 px-4 text-xs font-bold text-stone-400 uppercase tracking-wider text-right">Actions</th>
+                            <tr className="border-b border-[#f5f5f7]">
+                                <th className="py-4 px-6 text-[11px] font-bold text-[#86868b] uppercase tracking-widest">Product Info</th>
+                                <th className="py-4 px-6 text-[11px] font-bold text-[#86868b] uppercase tracking-widest">Category</th>
+                                <th className="py-4 px-6 text-[11px] font-bold text-[#86868b] uppercase tracking-widest">Price</th>
+                                <th className="py-4 px-6 text-[11px] font-bold text-[#86868b] uppercase tracking-widest">Ownership</th>
+                                <th className="py-4 px-6 text-[11px] font-bold text-[#86868b] uppercase tracking-widest text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            {products.map((product: any) => (
-                                <tr key={product._id} className="border-b border-stone-50 hover:bg-stone-50/50 transition-colors">
-                                    <td className="py-4 px-4">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-12 h-12 rounded-xl bg-stone-100 flex items-center justify-center overflow-hidden shrink-0">
+                        <tbody className="divide-y divide-[#f5f5f7]">
+                            {filteredProducts.map((product: any) => (
+                                <tr key={product._id} className="hover:bg-[#fbfbfd] transition-colors group">
+                                    <td className="py-5 px-6">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 rounded-2xl bg-[#f5f5f7] border border-[#d2d2d7]/30 flex items-center justify-center overflow-hidden shrink-0 group-hover:scale-105 transition-transform">
                                                 <img src={product.imageUrl} alt={product.title} className="w-full h-full object-cover" />
                                             </div>
-                                            <p className="font-bold text-sm text-stone-900 line-clamp-1 max-w-[200px]">{product.title}</p>
+                                            <p className="font-bold text-[14px] text-[#1d1d1f] line-clamp-1">{product.title}</p>
                                         </div>
                                     </td>
-                                    <td className="py-4 px-4 text-sm font-semibold text-stone-500 capitalize">{product.category}</td>
-                                    <td className="py-4 px-4 font-bold text-sm text-stone-900">₹{product.price}</td>
-                                    <td className="py-4 px-4">
-                                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${product.vendor ? 'bg-blue-100 text-blue-700' : 'bg-stone-100 text-stone-700'}`}>
+                                    <td className="py-5 px-6">
+                                        <span className="text-[13px] font-medium text-[#86868b] capitalize">{product.category}</span>
+                                    </td>
+                                    <td className="py-5 px-6">
+                                        <span className="font-bold text-[14px] text-[#1d1d1f]">₹{product.price.toLocaleString()}</span>
+                                    </td>
+                                    <td className="py-5 px-6">
+                                        <span className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-tight ${product.vendor ? 'bg-[#0071e3]/5 text-[#0071e3]' : 'bg-[#f5f5f7] text-[#86868b]'}`}>
                                             {product.vendor ? product.vendor.storeName : 'Platform'}
                                         </span>
                                     </td>
-                                    <td className="py-4 px-4 text-right">
+                                    <td className="py-5 px-6 text-right">
                                         <button
                                             onClick={() => {
                                                 if (confirm(`Are you sure you want to forcibly remove ${product.title}?`)) {
@@ -66,10 +109,10 @@ const ProductsManagement = () => {
                                                 }
                                             }}
                                             disabled={deleteProduct.isPending}
-                                            className="text-xs p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors inline-flex disabled:opacity-50"
+                                            className="p-2.5 rounded-xl bg-red-50 text-[#ff453a] hover:bg-[#ff453a] hover:text-white transition-all inline-flex disabled:opacity-50 border border-red-100 cursor-pointer"
                                             title="Delete product"
                                         >
-                                            <Trash2 className="w-4 h-4" />
+                                            <HugeiconsIcon icon={Delete01Icon} size={16} />
                                         </button>
                                     </td>
                                 </tr>

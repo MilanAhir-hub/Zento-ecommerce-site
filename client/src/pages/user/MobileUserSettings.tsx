@@ -1,5 +1,6 @@
 import { useNavigate, Link } from "react-router-dom";
-import { X, User, LogOut } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon, User02Icon, Logout01Icon } from "@hugeicons/core-free-icons";
 import { useAuth } from "../../context/authContext";
 
 const getInitials = (name?: string) => {
@@ -33,7 +34,7 @@ const MobileUserSettings = () => {
             {/* Header */}
             <div className="p-4 flex items-center">
                 <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-stone-600 hover:bg-stone-50 rounded-full transition-colors cursor-pointer">
-                    <X className="h-6 w-6" />
+                    <HugeiconsIcon icon={Cancel01Icon} size={24} />
                 </button>
             </div>
 
@@ -49,12 +50,12 @@ const MobileUserSettings = () => {
             {/* Actions List */}
             <div className="w-full border-t border-stone-100 flex-1">
                 <Link to="/user/personal-info" className="w-full flex items-center gap-4 px-6 py-5 hover:bg-stone-50 transition-colors border-b border-stone-100 group">
-                    <User className="h-5 w-5 text-stone-400 group-hover:text-stone-600" />
+                    <HugeiconsIcon icon={User02Icon} size={20} className="text-stone-400 group-hover:text-stone-600" />
                     <span className="text-[15px] font-semibold text-stone-700 group-hover:text-stone-900">Personal Info on Zento</span>
                 </Link>
 
                 <button onClick={handleLogout} className="w-full flex items-center gap-4 px-6 py-5 hover:bg-red-50 transition-colors group cursor-pointer text-left border-b border-stone-100">
-                    <LogOut className="h-5 w-5 text-red-500" />
+                    <HugeiconsIcon icon={Logout01Icon} size={20} className="text-red-500" />
                     <span className="text-[15px] font-semibold text-red-600">Sign Out</span>
                 </button>
             </div>

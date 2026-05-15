@@ -104,6 +104,20 @@ export const useAdminVendors = () => {
     });
 };
 
+export const useRemoveVendor = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ id, reason }: { id: string, reason: string }) => {
+            const { data } = await api.post(`/admin/vendors/${id}/remove`, { reason });
+            return data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["admin_vendors"] });
+            queryClient.invalidateQueries({ queryKey: ["admin_stats"] });
+        }
+    });
+};
+
 // --- VENDOR REQUESTS ---
 export const useAdminVendorRequests = () => {
     return useQuery({
@@ -118,8 +132,8 @@ export const useAdminVendorRequests = () => {
 export const useHandleVendorRequest = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async ({ id, action }: { id: string, action: 'approve' | 'reject' }) => {
-            const { data } = await api.put(`/admin/vendor-requests/${id}`, { action });
+        mutationFn: async ({ id, action, reason }: { id: string, action: 'approve' | 'reject', reason?: string }) => {
+            const { data } = await api.put(`/admin/vendor-requests/${id}`, { action, reason });
             return data.data;
         },
         onSuccess: () => {

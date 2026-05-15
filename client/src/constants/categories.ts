@@ -1,70 +1,87 @@
-import electronicsImg from '../assets/categories/electronics.svg';
-import fashionImg from '../assets/categories/fashion.svg';
-import footwearImg from '../assets/categories/footwear.svg';
-import beautyImg from '../assets/categories/beauty.svg';
-import kitchenImg from '../assets/categories/kitchen.svg';
-import furnitureImg from '../assets/categories/furniture.svg';
-import sportsImg from '../assets/categories/sports.svg';
-import toysImg from '../assets/categories/toys.svg';
-import groceriesImg from '../assets/categories/groceries.svg';
-import accessoriesImg from '../assets/categories/accessories.svg';
-import automotiveImg from '../assets/categories/automotive.svg';
-
 export const categories = [
     {
         id: 1,
-        name: 'Electronics',
-        image: electronicsImg,
+        name: 'Men',
+        subcategories: [
+            'T-Shirts',
+            'Shirts',
+            'Jeans',
+            'Trousers',
+            'Jackets',
+            'Hoodies',
+        ],
     },
     {
         id: 2,
-        name: 'Fashion',
-        image: fashionImg,
+        name: 'Women',
+        subcategories: [
+            'Dresses',
+            'Tops',
+            'Jeans',
+            'Skirts',
+            'Ethnic Wear',
+            'Jackets',
+        ],
     },
     {
         id: 3,
         name: 'Footwear',
-        image: footwearImg,
+        subcategories: [
+            'Sneakers',
+            'Formal Shoes',
+            'Boots',
+            'Sandals',
+            'Heels',
+        ],
     },
     {
         id: 4,
-        name: 'Beauty',
-        image: beautyImg,
+        name: 'Accessories',
+        subcategories: [
+            'Watches',
+            'Bags',
+            'Belts',
+            'Sunglasses',
+            'Jewelry',
+        ],
     },
     {
         id: 5,
-        name: 'Home',
-        image: kitchenImg,
+        name: 'Streetwear',
+        subcategories: [
+            'Oversized T-Shirts',
+            'Cargo Pants',
+            'Hoodies',
+            'Sneakers',
+        ],
     },
     {
         id: 6,
-        name: 'Furniture',
-        image: furnitureImg,
+        name: 'Casual Wear',
+        subcategories: [
+            'T-Shirts',
+            'Jeans',
+            'Shorts',
+            'Casual Shirts',
+        ],
     },
     {
         id: 7,
-        name: 'Sports',
-        image: sportsImg,
+        name: 'Formal Wear',
+        subcategories: [
+            'Blazers',
+            'Suits',
+            'Formal Shirts',
+            'Trousers',
+        ],
     },
     {
         id: 8,
-        name: 'Toys',
-        image: toysImg,
+        name: 'Luxury',
+        subcategories: [
+            'Designer Jackets',
+            'Premium Dresses',
+            'Exclusive Collections',
+        ],
     },
-    {
-        id: 9,
-        name: 'Groceries',
-        image: groceriesImg,
-    },
-    {
-        id: 10,
-        name: 'Automotive',
-        image: automotiveImg,
-    },
-    {
-        id: 11,
-        name: 'Accessories',
-        image: accessoriesImg,
-    },
-]
-
+];

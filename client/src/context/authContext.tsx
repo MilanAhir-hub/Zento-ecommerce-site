@@ -5,6 +5,7 @@ import { authService } from "../services/auth.api";
 export interface VendorRequestData {
     _id: string;
     status: 'pending' | 'approved' | 'rejected';
+    rejectionReason?: string;
 }
 
 export interface User {

@@ -1,0 +1,133 @@
+
+> client@0.0.0 lint
+> eslint .
+
+
+C:\Users\Milan Gagiya\Documents\PROJECT RESUME\ECOMMERCE\client\src\components\ui\Button.tsx
+  8:14  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\Milan Gagiya\Documents\PROJECT RESUME\ECOMMERCE\client\src\components\ui\CardSlider.tsx
+  34:38  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Milan Gagiya\Documents\PROJECT RESUME\ECOMMERCE\client\src\context\authContext.tsx
+   55:18  error  'error' is defined but never used                                                                                               @typescript-eslint/no-unused-vars
+  104:14  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\Milan Gagiya\Documents\PROJECT RESUME\ECOMMERCE\client\src\hooks\cart\useCart.ts
+  23:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  53:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  73:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  84:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Milan Gagiya\Documents\PROJECT RESUME\ECOMMERCE\client\src\hooks\useWishlist.ts
+  22:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  34:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  45:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  51:54  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Milan Gagiya\Documents\PROJECT RESUME\ECOMMERCE\client\src\pages\auth\ForgotPassword.tsx
+  20:35  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  26:28  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Milan Gagiya\Documents\PROJECT RESUME\ECOMMERCE\client\src\pages\auth\Login.tsx
+  25:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  44:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Milan Gagiya\Documents\PROJECT RESUME\ECOMMERCE\client\src\pages\auth\ResetPassword.tsx
+  47:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  53:32  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Milan Gagiya\Documents\PROJECT RESUME\ECOMMERCE\client\src\pages\auth\Signup.tsx
+  26:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  45:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Milan Gagiya\Documents\PROJECT RESUME\ECOMMERCE\client\src\pages\auth\VerifyOTP.tsx
+  72:32  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Milan Gagiya\Documents\PROJECT RESUME\ECOMMERCE\client\src\pages\cart\Cart.tsx
+  112:233  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Milan Gagiya\Documents\PROJECT RESUME\ECOMMERCE\client\src\pages\user\UserProfile.tsx
+  48:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Milan Gagiya\Documents\PROJECT RESUME\ECOMMERCE\client\src\pages\vendor-dashboard\components\DashboardHeader.tsx
+  7:11  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Milan Gagiya\Documents\PROJECT RESUME\ECOMMERCE\client\src\pages\vendor-dashboard\components\Sidebar.tsx
+  14:14  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  25:11  error  Unexpected any. Specify a different type                                                                                        @typescript-eslint/no-explicit-any
+
+C:\Users\Milan Gagiya\Documents\PROJECT RESUME\ECOMMERCE\client\src\pages\vendor-dashboard\components\StatsCard.tsx
+  6:11  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Milan Gagiya\Documents\PROJECT RESUME\ECOMMERCE\client\src\pages\vendor-dashboard\sections\vendor\AddProduct.tsx
+   52:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\Milan Gagiya\Documents\PROJECT RESUME\ECOMMERCE\client\src\pages\vendor-dashboard\sections\vendor\AddProduct.tsx:52:13
+  50 |     useEffect(() => {
+  51 |         if (isEditMode && productData) {
+> 52 |             setFormData({
+     |             ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  53 |                 title: productData.title || "",
+  54 |                 price: productData.price?.toString() || "",
+  55 |                 category: productData.category || "",  react-hooks/set-state-in-effect
+   60:48  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   @typescript-eslint/no-explicit-any
+  132:23  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   @typescript-eslint/no-explicit-any
+
+C:\Users\Milan Gagiya\Documents\PROJECT RESUME\ECOMMERCE\client\src\pages\vendor-dashboard\sections\vendor\Analytics.tsx
+   43:47  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  108:52  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Milan Gagiya\Documents\PROJECT RESUME\ECOMMERCE\client\src\pages\vendor-dashboard\sections\vendor\Orders.tsx
+  60:74  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Milan Gagiya\Documents\PROJECT RESUME\ECOMMERCE\client\src\pages\vendor-dashboard\sections\vendor\Overview.tsx
+  56:74  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Milan Gagiya\Documents\PROJECT RESUME\ECOMMERCE\client\src\pages\vendor-dashboard\sections\vendor\Products.tsx
+  57:74  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Milan Gagiya\Documents\PROJECT RESUME\ECOMMERCE\client\src\pages\vendor-dashboard\sections\vendor\Settings.tsx
+   7:37  error  'isError' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 @typescript-eslint/no-unused-vars
+   7:46  error  'error' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   @typescript-eslint/no-unused-vars
+  22:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\Milan Gagiya\Documents\PROJECT RESUME\ECOMMERCE\client\src\pages\vendor-dashboard\sections\vendor\Settings.tsx:22:13
+  20 |     useEffect(() => {
+  21 |         if (store) {
+> 22 |             setFormData({
+     |             ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  23 |                 storeName: store.storeName || "",
+  24 |                 storeDescription: store.storeDescription || "",
+  25 |                 logo: store.logo || "",  react-hooks/set-state-in-effect
+
+C:\Users\Milan Gagiya\Documents\PROJECT RESUME\ECOMMERCE\client\src\sections\admin\CustomersManagement.tsx
+  47:55  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Milan Gagiya\Documents\PROJECT RESUME\ECOMMERCE\client\src\sections\admin\OrdersManagement.tsx
+  45:49  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Milan Gagiya\Documents\PROJECT RESUME\ECOMMERCE\client\src\sections\admin\ProductsManagement.tsx
+  45:53  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Milan Gagiya\Documents\PROJECT RESUME\ECOMMERCE\client\src\sections\admin\VendorRequests.tsx
+   9:52  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  36:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Milan Gagiya\Documents\PROJECT RESUME\ECOMMERCE\client\src\sections\admin\VendorsManagement.tsx
+  30:47  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 44 problems (44 errors, 0 warnings)
+

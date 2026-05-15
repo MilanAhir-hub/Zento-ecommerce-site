@@ -1,101 +1,105 @@
 import { Link } from "react-router-dom";
-import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+    Facebook01Icon,
+    NewTwitterIcon,
+    InstagramIcon,
+    Linkedin01Icon,
+    Mail01Icon,
+    CallIcon,
+    Location01Icon
+} from "@hugeicons/core-free-icons";
 import Logo from "./Logo";
 
 const Footer = () => {
     return (
-        <footer className="bg-white border-t border-stone-200 pt-16 pb-8 font-sans">
-            <div className="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
-                    {/* Brand Info */}
-                    <div className="space-y-6">
-                        <Link to="/" className="inline-block">
-                            <Logo />
-                        </Link>
-                        <p className="text-stone-500 leading-relaxed font-medium mt-4">
-                            Your premium destination for the best tech, fashion, and lifestyle products. We deliver quality and trust.
+        <footer className="bg-white border-t border-[#e5e5e7] py-12">
+
+            <div className="max-w-[1440px] mx-auto px-6 space-y-10">
+
+                {/* TOP */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+
+                    {/* BRAND */}
+                    <div className="space-y-4">
+                        <Logo />
+
+                        <p className="text-[13px] text-[#6e6e73] leading-relaxed max-w-xs">
+                            Premium destination for tech, fashion and lifestyle essentials.
                         </p>
-                        <div className="flex space-x-4 pt-2">
-                            <a href="#" className="h-10 w-10 flex items-center justify-center rounded-full bg-stone-100 text-stone-600 hover:bg-stone-900 hover:text-white transition-all duration-300">
-                                <Facebook className="h-4 w-4" />
-                            </a>
-                            <a href="#" className="h-10 w-10 flex items-center justify-center rounded-full bg-stone-100 text-stone-600 hover:bg-stone-900 hover:text-white transition-all duration-300">
-                                <Twitter className="h-4 w-4" />
-                            </a>
-                            <a href="#" className="h-10 w-10 flex items-center justify-center rounded-full bg-stone-100 text-stone-600 hover:bg-stone-900 hover:text-white transition-all duration-300">
-                                <Instagram className="h-4 w-4" />
-                            </a>
-                            <a href="#" className="h-10 w-10 flex items-center justify-center rounded-full bg-stone-100 text-stone-600 hover:bg-stone-900 hover:text-white transition-all duration-300">
-                                <Linkedin className="h-4 w-4" />
-                            </a>
+
+                        {/* SOCIAL */}
+                        <div className="flex items-center gap-4 pt-2 text-[#86868b]">
+                            <HugeiconsIcon icon={Facebook01Icon} size={16} className="hover:text-[#1d1d1f] cursor-pointer" />
+                            <HugeiconsIcon icon={NewTwitterIcon} size={16} className="hover:text-[#1d1d1f] cursor-pointer" />
+                            <HugeiconsIcon icon={InstagramIcon} size={16} className="hover:text-[#1d1d1f] cursor-pointer" />
+                            <HugeiconsIcon icon={Linkedin01Icon} size={16} className="hover:text-[#1d1d1f] cursor-pointer" />
                         </div>
                     </div>
 
-                    {/* Quick Links */}
+                    {/* LINKS */}
                     <div>
-                        <h3 className="text-lg font-bold text-stone-900 mb-6 tracking-tight">Quick Links</h3>
-                        <ul className="space-y-4">
-                            <li>
-                                <Link to="/about" className="text-stone-500 hover:text-stone-900 font-medium transition-colors">About Us</Link>
-                            </li>
-                            <li>
-                                <Link to="/products" className="text-stone-500 hover:text-stone-900 font-medium transition-colors">Shop</Link>
-                            </li>
-                            <li>
-                                <Link to="/faq" className="text-stone-500 hover:text-stone-900 font-medium transition-colors">FAQ</Link>
-                            </li>
+                        <h3 className="text-[13px] font-semibold text-[#1d1d1f] mb-4">
+                            Shop
+                        </h3>
+                        <ul className="space-y-2 text-[13px] text-[#6e6e73]">
+                            <li><Link to="/products" className="hover:text-[#1d1d1f]">All Products</Link></li>
+                            <li><Link to="/about" className="hover:text-[#1d1d1f]">About</Link></li>
+                            <li><Link to="/faq" className="hover:text-[#1d1d1f]">FAQ</Link></li>
                         </ul>
                     </div>
 
-                    {/* Legal */}
+                    {/* LEGAL */}
                     <div>
-                        <h3 className="text-lg font-bold text-stone-900 mb-6 tracking-tight">Legal</h3>
-                        <ul className="space-y-4">
-                            <li>
-                                <Link to="/privacy" className="text-stone-500 hover:text-stone-900 font-medium transition-colors">Privacy Policy</Link>
-                            </li>
-                            <li>
-                                <Link to="/terms" className="text-stone-500 hover:text-stone-900 font-medium transition-colors">Terms of Service</Link>
-                            </li>
-                            <li>
-                                <Link to="/refund" className="text-stone-500 hover:text-stone-900 font-medium transition-colors">Refund Policy</Link>
-                            </li>
+                        <h3 className="text-[13px] font-semibold text-[#1d1d1f] mb-4">
+                            Legal
+                        </h3>
+                        <ul className="space-y-2 text-[13px] text-[#6e6e73]">
+                            <li><Link to="/privacy" className="hover:text-[#1d1d1f]">Privacy</Link></li>
+                            <li><Link to="/terms" className="hover:text-[#1d1d1f]">Terms</Link></li>
+                            <li><Link to="/refund" className="hover:text-[#1d1d1f]">Refunds</Link></li>
                         </ul>
                     </div>
 
-                    {/* Contact */}
-                    <div>
-                        <h3 className="text-lg font-bold text-stone-900 mb-6 tracking-tight">Contact Us</h3>
-                        <ul className="space-y-4">
-                            <li className="flex items-start">
-                                <MapPin className="h-5 w-5 text-stone-400 mt-0.5 mr-3 shrink-0" />
-                                <span className="text-stone-500 font-medium">123 Commerce Avenue, New York, NY 10001</span>
-                            </li>
-                            <li className="flex items-center">
-                                <Phone className="h-5 w-5 text-stone-400 mr-3 shrink-0" />
-                                <span className="text-stone-500 font-medium">+1 (555) 123-4567</span>
-                            </li>
-                            <li className="flex items-center">
-                                <Mail className="h-5 w-5 text-stone-400 mr-3 shrink-0" />
-                                <span className="text-stone-500 font-medium">support@zento.com</span>
-                            </li>
-                        </ul>
+                    {/* CONTACT */}
+                    <div className="space-y-3 text-[13px] text-[#6e6e73]">
+                        <h3 className="text-[13px] font-semibold text-[#1d1d1f] mb-2">
+                            Contact
+                        </h3>
+
+                        <div className="flex items-start gap-2">
+                            <HugeiconsIcon icon={Location01Icon} size={14} />
+                            <span>New York, USA</span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <HugeiconsIcon icon={CallIcon} size={14} />
+                            <span>+1 555 123 4567</span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <HugeiconsIcon icon={Mail01Icon} size={14} />
+                            <span>support@zento.com</span>
+                        </div>
                     </div>
                 </div>
 
-                <div className="border-t border-stone-200 pt-8 mt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p className="text-stone-400 font-medium text-sm text-center md:text-left">
-                        &copy; {new Date().getFullYear()} Zento Commerce. All rights reserved.
+                {/* BOTTOM */}
+                <div className="border-t border-[#f2f2f2] pt-6 flex flex-col md:flex-row justify-between items-center gap-3 text-[12px] text-[#86868b]">
+
+                    <p>
+                        © {new Date().getFullYear()} Zento
                     </p>
-                    <div className="flex items-center gap-2">
-                        <span className="text-stone-400 font-medium text-sm">Secure Checkout</span>
-                        {/* Placeholder for payment icons */}
+
+                    <div className="flex items-center gap-3">
+                        <span>Secure checkout</span>
                         <div className="flex gap-1">
-                            <div className="h-6 w-10 bg-stone-100 rounded border border-stone-200"></div>
-                            <div className="h-6 w-10 bg-stone-100 rounded border border-stone-200"></div>
-                            <div className="h-6 w-10 bg-stone-100 rounded border border-stone-200"></div>
+                            <div className="h-4 w-8 bg-[#f5f5f7] rounded-sm"></div>
+                            <div className="h-4 w-8 bg-[#f5f5f7] rounded-sm"></div>
+                            <div className="h-4 w-8 bg-[#f5f5f7] rounded-sm"></div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </footer>

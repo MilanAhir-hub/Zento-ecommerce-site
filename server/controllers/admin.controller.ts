@@ -3,6 +3,8 @@ import { User } from "../models/User";
 import { Product } from "../models/Product";
 import { Order } from "../models/Order";
 import { VendorRequest } from "../models/VendorRequest";
+import { Notification } from "../models/Notification";
+import { getIO } from "../utils/socket";
 
 // ==========================================
 // OVERVIEW STATS
@@ -52,6 +54,15 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
         if (!order) {
             return res.status(404).json({ success: false, message: "Order not found" });
         }
+
+        // ⭐ REAL-TIME UPDATE
+        try {
+            getIO().emit("admin_order_update");
+            getIO().emit("admin_stats_update");
+        } catch (e) {
+            console.error("Socket emit failed:", e);
+        }
+
         res.status(200).json({ success: true, data: order });
     } catch (error: any) {
         res.status(500).json({ success: false, message: error.message || "Server Error" });
@@ -160,7 +171,7 @@ export const getVendorRequests = async (req: Request, res: Response) => {
 export const handleVendorRequest = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const { action } = req.body; // 'approve' or 'reject'
+        const { action, reason } = req.body; // 'approve' or 'reject', and optional reason
 
         const vendorRequest: any = await VendorRequest.findById(id);
         if (!vendorRequest) {
@@ -174,15 +185,84 @@ export const handleVendorRequest = async (req: Request, res: Response) => {
             // Update user role to vendor
             await User.findByIdAndUpdate(vendorRequest.user, { role: 'vendor' });
 
+            await Notification.create({
+                user: vendorRequest.user,
+                title: "Vendor Application Approved",
+                message: "Congratulations! Your request to become a vendor has been approved. You can now access the vendor dashboard and manage your products.",
+                type: "system"
+            });
+
         } else if (action === 'reject') {
             vendorRequest.status = 'rejected';
+            if (reason) {
+                vendorRequest.rejectionReason = reason;
+            }
             await vendorRequest.save();
+
+            await Notification.create({
+                user: vendorRequest.user,
+                title: "Vendor Application Rejected",
+                message: `We're sorry, but your vendor application has been rejected by the administrator. ${reason ? `Reason: ${reason}` : ''}`,
+                type: "system"
+            });
         } else {
             return res.status(400).json({ success: false, message: "Invalid action" });
         }
 
-        res.status(200).json({ success: true, message: `Vendor request ${action}d successfully`, data: vendorRequest });
+        // ⭐ REAL-TIME UPDATE
+        try {
+            getIO().emit("admin_vendor_request_update");
+            getIO().emit("admin_stats_update"); // Pending vendor count might have changed
+            getIO().emit(`user_notification_${vendorRequest.user}`); // 🚀 Notify the specific user instantly!
+        } catch (e) {
+            console.error("Socket emit failed:", e);
+        }
+
+        res.status(200).json({ success: true, message: `Request ${action}d successfully`, data: vendorRequest });
     } catch (error: any) {
         res.status(500).json({ success: false, message: error.message || "Server Error" });
+    }
+};
+
+// ==========================================
+// REMOVE VENDOR 
+// ==========================================
+export const removeVendor = async (req: Request, res: Response) => {
+    try {
+        const vendorId = req.params.id; // it's user id of the vendor
+        const { reason } = req.body;
+
+        const vendor = await User.findById(vendorId);
+        if (!vendor) {
+            return res.status(404).json({ success: false, message: "Vendor not found" });
+        }
+        if (vendor.role !== 'vendor') {
+            return res.status(400).json({ success: false, message: "User is not currently a vendor" });
+        }
+
+        // Downgrade back to normal user
+        vendor.role = 'user';
+        await vendor.save();
+
+        // Document the reason inside the vendor's fresh new notification
+        await Notification.create({
+            user: vendorId,
+            title: "Vendor Status Revoked",
+            message: `Your vendor privileges have been removed by the administrator. Reason: ${reason || "Violation of policies"}`,
+            type: "system"
+        });
+
+        // ⭐ REAL-TIME UPDATE
+        try {
+            getIO().emit("admin_stats_update");
+            getIO().emit(`user_notification_${vendorId}`); // Tell the vendor's React App to query for new notifications instantly
+        } catch (e) {
+            console.error("Socket emit failed:", e);
+        }
+
+        res.status(200).json({ success: true, message: "Vendor successfully removed." });
+
+    } catch (err: any) {
+        res.status(500).json({ success: false, message: err.message || "Server Error" });
     }
 };

@@ -1,0 +1,18 @@
+import api from './api';
+
+export interface InteractionData {
+    userId: string;
+    productId: string;
+    action: 'view' | 'click' | 'add_to_cart' | 'remove_from_cart' | 'checkout' | 'purchase' | 'search_query';
+    price: number;
+    quantity?: number;
+}
+
+export const logUserInteraction = async (data: InteractionData) => {
+    try {
+        const response = await api.post('/interactions/log', data);
+        return response.data;
+    } catch (error) {
+        console.error("Failed to log interaction", error);
+    }
+};

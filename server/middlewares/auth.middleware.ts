@@ -16,6 +16,7 @@ export const isAuthenticated = (req: AuthRequest, res: Response, next: NextFunct
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { userId: string };
         req.userId = decoded.userId;
+        console.log("🔐 User authenticated:", req.userId);
 
         next();
     } catch (error) {
@@ -34,6 +35,7 @@ export const isVendor = async (req: AuthRequest, res: Response, next: NextFuncti
         }
 
         const user = await User.findById(req.userId);
+        console.log("🔐 User role:", user?.role);
         if (!user || user.role !== "vendor") {
             res.status(403).json({ message: "Access denied. Vendor resources only." });
             return;
@@ -54,6 +56,7 @@ export const isAdmin = async (req: AuthRequest, res: Response, next: NextFunctio
         }
 
         const user = await User.findById(req.userId);
+        console.log("🔐 User role:", user?.role);
         if (!user || user.role !== "admin") {
             res.status(403).json({ message: "Access denied. Admin resources only." });
             return;

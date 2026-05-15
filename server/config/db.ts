@@ -4,14 +4,14 @@ const connectDB = async (): Promise<void> => {
     try {
         const mongoUri = process.env.MONGO_URI || "mongodb://localhost:27017/ecommerce";
 
-        const conn = await mongoose.connect(mongoUri);
+        await mongoose.connect(mongoUri);
 
-        console.log(`MongoDB Connected: ${conn.connection.host}`);
+        console.log("✅ MongoDB connected");
     } catch (error) {
         if (error instanceof Error) {
-            console.error(`Error connecting to MongoDB: ${error.message}`);
+            console.error("❌ Error connecting to MongoDB:", error.message);
         } else {
-            console.error("Unknown error connecting to MongoDB");
+            console.error("❌ Unknown error connecting to MongoDB");
         }
 
         // Exit process with failure

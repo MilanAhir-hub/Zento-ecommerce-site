@@ -14,7 +14,9 @@ interface Product {
     imageUrl: string;
 }
 
-const CategorySection = ({ category }: { category: { id: number; name: string; image: string } }) => {
+type Category = (typeof categories)[number];
+
+const CategorySection = ({ category }: { category: Category }) => {
     const { data: products, isLoading } = useQuery({
         queryKey: ['products', 'category', category.name],
         queryFn: async () => {

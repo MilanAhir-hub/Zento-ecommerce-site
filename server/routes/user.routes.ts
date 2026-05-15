@@ -30,7 +30,11 @@ import {
     updateAddress,
     deleteAddress,
     getMyNotifications,
-    markNotificationsAsRead
+    markNotificationsAsRead,
+    getSearchHistory,
+    addSearchHistory,
+    syncSearchHistory,
+    removeSearchHistory
 } from "../controllers/user.controller";
 import { isAuthenticated } from "../middlewares/auth.middleware";
 
@@ -81,7 +85,14 @@ router.put("/address/:id", isAuthenticated, updateAddress);
 router.delete("/address/:id", isAuthenticated, deleteAddress);
 
 // --- NOTIFICATION ROUTES ---
+// --- NOTIFICATION ROUTES ---
 router.get("/notifications", isAuthenticated, getMyNotifications);
 router.put("/notifications/read", isAuthenticated, markNotificationsAsRead);
+
+// --- SEARCH HISTORY ROUTES ---
+router.get("/search-history", isAuthenticated, getSearchHistory);
+router.post("/search-history", isAuthenticated, addSearchHistory);
+router.post("/search-history/sync", isAuthenticated, syncSearchHistory);
+router.delete("/search-history/:keyword", isAuthenticated, removeSearchHistory);
 
 export default router;

@@ -3,9 +3,60 @@
 @theme {
     --font-sans: 'Inter', sans-serif;
     --font-orbitron: 'Orbitron', sans-serif;
+    --color-fontGray: #626263;
+}
+
+html,
+body {
+    background-color: white;
+    min-height: 100vh;
 }
 
 body {
     font-family: 'Inter', sans-serif;
 }
 
+/* Custom Utilities */
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+/* WhatsApp-Style Premium Scrollbar (Zero Layout Shift) */
+.whatsapp-chat-scrollbar {
+    /* Always keep the scrollbar width stable, but toggle color */
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    transition: scrollbar-color 0.3s ease;
+}
+
+.whatsapp-chat-scrollbar::-webkit-scrollbar {
+    width: 3px;
+    /* Extra thin (approx half of initial width) */
+}
+
+.whatsapp-chat-scrollbar::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 20px;
+}
+
+.whatsapp-chat-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.whatsapp-chat-scrollbar.is-scrolling {
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+.whatsapp-chat-scrollbar.is-scrolling::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+/* Smooth Scroll for Chat */
+.chat-smooth-scroll {
+    scroll-behavior: smooth;
+}

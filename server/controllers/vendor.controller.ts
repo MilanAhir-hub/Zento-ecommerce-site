@@ -3,30 +3,118 @@ import { Product } from "../models/Product";
 import { Order } from "../models/Order";
 import { User } from "../models/User";
 import { AuthRequest } from "../middlewares/auth.middleware";
+import { uploadToCloudinary } from "../middlewares/upload.middleware";
 
-// Create a new vendor product
-export const createVendorProduct = async (req: AuthRequest, res: Response): Promise<void> => {
+export const createVendorProduct = async (
+    req: AuthRequest,
+    res: Response
+): Promise<void> => {
     try {
         const vendorId = req.userId;
-        const { title, description, price, imageUrl, stock } = req.body;
 
-        if (!title || !description || price === undefined || stock === undefined) {
-            res.status(400).json({ message: "Please provide all required fields" });
+        const { title, description, price, stock, category, subcategory } = req.body;
+
+        // Validate required fields
+        if (!title || !description || price === undefined || stock === undefined || !category) {
+            res.status(400).json({
+                success: false,
+                message: "Please provide all required fields including category",
+            });
             return;
         }
 
+        // Parse existing images
+        let existingImageUrls: string[] = [];
+        if (req.body.existingImages) {
+            existingImageUrls = Array.isArray(req.body.existingImages)
+                ? req.body.existingImages
+                : [req.body.existingImages];
+        }
+
+        // Get uploaded files
+        const files = req.files as Express.Multer.File[] || [];
+
+        if (files.length === 0 && existingImageUrls.length === 0) {
+            res.status(400).json({
+                success: false,
+                message: "At least one product image is required",
+            });
+            return;
+        }
+
+        // Validate max images
+        if (files.length + existingImageUrls.length > 6) {
+            res.status(400).json({
+                success: false,
+                message: "Maximum 6 images allowed",
+            });
+            return;
+        }
+
+        // Upload images to Cloudinary
+        const uploadResults = await Promise.all(
+            files.map((file, index) =>
+                uploadToCloudinary(
+                    file.buffer,
+                    "zento/products",
+                    `${vendorId}_${Date.now()}_${Math.round(Math.random() * 1e9)}_${index}`
+                )
+            )
+        );
+
+        // Extract public_id from url helper
+        const getPublicId = (url: string) => {
+            try {
+                const parts = url.split('/upload/');
+                if (parts.length > 1) {
+                    const pathParts = parts[1].split('/');
+                    if (pathParts[0].startsWith('v') && !isNaN(parseInt(pathParts[0].substring(1)))) {
+                        pathParts.shift();
+                    }
+                    const fullId = pathParts.join('/');
+                    const dotIdx = fullId.lastIndexOf('.');
+                    return dotIdx > -1 ? fullId.substring(0, dotIdx) : fullId;
+                }
+            } catch (e) { }
+            return "unknown";
+        };
+
+        // Format new images for database
+        let images = uploadResults.map((img) => ({
+            url: img.url,
+            public_id: img.public_id,
+        }));
+
+        // Append existing images (AI enhanced)
+        existingImageUrls.forEach(url => {
+            images.push({ url, public_id: getPublicId(url) });
+        });
+
+        // Primary image
+        const imageUrl = images.length > 0 ? images[0].url : "";
+
+        // Create product
         const product = await Product.create({
             title,
             vendorId,
             description,
+            category,
+            subcategory,
             price,
-            imageUrl,
             stock,
+            imageUrl,
+            images,
         });
 
-        res.status(201).json({ success: true, product });
+        res.status(201).json({
+            success: true,
+            product,
+        });
     } catch (error: any) {
-        res.status(500).json({ success: false, message: error.message || "Internal Server Error" });
+        res.status(500).json({
+            success: false,
+            message: error.message || "Internal Server Error",
+        });
     }
 };
 
@@ -36,10 +124,72 @@ export const updateVendorProduct = async (req: AuthRequest, res: Response): Prom
         const { id } = req.params;
         const vendorId = req.userId;
 
+        const updateData: any = { ...req.body };
+
+        // Parse existing images (URLs that the frontend kept)
+        let existingImageUrls: string[] = [];
+        if (req.body.existingImages) {
+            existingImageUrls = Array.isArray(req.body.existingImages)
+                ? req.body.existingImages
+                : [req.body.existingImages];
+        }
+
+        const getPublicId = (url: string) => {
+            try {
+                const parts = url.split('/upload/');
+                if (parts.length > 1) {
+                    const pathParts = parts[1].split('/');
+                    if (pathParts[0].startsWith('v') && !isNaN(parseInt(pathParts[0].substring(1)))) {
+                        pathParts.shift();
+                    }
+                    const fullId = pathParts.join('/');
+                    const dotIdx = fullId.lastIndexOf('.');
+                    return dotIdx > -1 ? fullId.substring(0, dotIdx) : fullId;
+                }
+            } catch (e) { }
+            return "unknown";
+        };
+
+        // If new images were uploaded, upload them to Cloudinary
+        const files = req.files as Express.Multer.File[] || [];
+        let finalImages: { url: string, public_id: string }[] = [];
+
+        // Add preserved/enhanced existing images
+        existingImageUrls.forEach(url => {
+            finalImages.push({ url, public_id: getPublicId(url) });
+        });
+
+        if (files.length > 0) {
+            const uploadResults = await Promise.all(
+                files.map((file, index) =>
+                    uploadToCloudinary(
+                        file.buffer,
+                        "zento/products",
+                        `${vendorId}_${Date.now()}_${Math.round(Math.random() * 1e9)}_${index}`
+                    )
+                )
+            );
+            const uploadedImages = uploadResults.map((img) => ({
+                url: img.url,
+                public_id: img.public_id,
+            }));
+
+            finalImages = [...finalImages, ...uploadedImages];
+        }
+
+        if (finalImages.length > 0) {
+            updateData.images = finalImages;
+            updateData.imageUrl = finalImages[0].url;
+        } else {
+            // Prevent clearing all images accidentally, require at least one
+            res.status(400).json({ success: false, message: "At least one product image is required" });
+            return;
+        }
+
         // Find and update the product only if it belongs to this vendor
         const updatedProduct = await Product.findOneAndUpdate(
             { _id: id, vendorId },
-            { $set: req.body },
+            { $set: updateData },
             { new: true, runValidators: true }
         );
 
@@ -371,6 +521,9 @@ export const updateStoreInfo = async (req: AuthRequest, res: Response): Promise<
         const vendorId = req.userId;
         const { storeName, storeDescription, logo, address } = req.body;
 
+        console.log("Updating store info for vendor:", vendorId);
+        console.log("New data from body:", req.body);
+
         const updatedVendor = await User.findByIdAndUpdate(
             vendorId,
             {
@@ -383,6 +536,8 @@ export const updateStoreInfo = async (req: AuthRequest, res: Response): Promise<
             },
             { new: true, runValidators: true }
         ).select("-password -resetPasswordOTP -resetPasswordOTPExpires");
+
+        console.log("Update database result:", updatedVendor ? "User found & updated" : "User not found");
 
         if (!updatedVendor) {
             res.status(404).json({ message: "Vendor not found" });

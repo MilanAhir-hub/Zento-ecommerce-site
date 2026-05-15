@@ -11,6 +11,7 @@ export interface IVendorRequest extends Document {
     ifscCode: string;
     storeLogo?: string;
     status: 'pending' | 'approved' | 'rejected';
+    rejectionReason?: string;
 }
 
 const VendorRequestSchema: Schema = new Schema(
@@ -56,6 +57,9 @@ const VendorRequestSchema: Schema = new Schema(
             type: String,
             enum: ['pending', 'approved', 'rejected'],
             default: 'pending'
+        },
+        rejectionReason: {
+            type: String
         }
     },
     {

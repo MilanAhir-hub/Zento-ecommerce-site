@@ -1,57 +1,96 @@
-import { AlertCircle } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Alert01Icon } from "@hugeicons/core-free-icons";
 import { useProducts } from "../../hooks/products/useProducts";
 import { ProductCard } from "../../components/ui/ProductCard";
+import { useLocation } from "react-router-dom";
 
 const Listing = () => {
-    const { data: products = [], isLoading, isError } = useProducts({ limit: 50 });
+    const location = useLocation();
+    const visualSearchData = location.state?.visualSearchData;
+    const visualDescription = location.state?.visualDescription;
 
-    if (isLoading) {
+    const { data: regularProducts = [], isLoading, isError } = useProducts({ limit: 50 });
+
+    const isVisualSearch = !!visualSearchData;
+    const products = isVisualSearch ? visualSearchData : regularProducts;
+
+    // Loading State (Apple style minimal)
+    if (!isVisualSearch && isLoading) {
         return (
-            <div className="min-h-[400px] flex items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-stone-900"></div>
+            <div className="min-h-[60vh] flex items-center justify-center bg-white">
+                <div className="w-6 h-6 border border-neutral-300 border-t-neutral-900 rounded-full animate-spin"></div>
             </div>
         );
     }
 
+    // Error State (clean + calm)
     if (isError) {
         return (
-            <div className="min-h-[400px] flex flex-col items-center justify-center text-stone-500 gap-4">
-                <AlertCircle className="w-12 h-12 text-red-500 opacity-50" />
-                <p className="font-medium text-lg">Failed to load products.</p>
+            <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-6">
+                <HugeiconsIcon icon={Alert01Icon} size={40} className="text-red-500/60 mb-4" />
+                <p className="text-[18px] font-medium text-neutral-900">
+                    Unable to load products.
+                </p>
+                <p className="text-[14px] text-neutral-500 mt-1">
+                    Please try again later.
+                </p>
             </div>
         );
     }
 
     return (
-        <div className="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8 py-12 font-sans">
-            <div className="mb-10 flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold text-stone-900 tracking-tight">Discover Products</h1>
-                    <p className="mt-2 text-stone-500 font-medium">Explore our curated collection of premium items.</p>
-                </div>
-                <div className="text-sm font-bold text-stone-400 uppercase tracking-widest bg-stone-50 px-4 py-2 rounded-full border border-stone-100">
-                    {products.length} Items
+        <div className="bg-white min-h-screen font-sans">
+
+            {/* Header (Apple editorial style) */}
+            <div className="max-w-[1100px] mx-auto px-6 pt-20 pb-14">
+                <h1 className="text-[40px] font-semibold text-neutral-900 tracking-tight">
+                    {isVisualSearch ? "Visual Matches." : "Discover."}
+                </h1>
+
+                <p className="mt-3 text-[17px] text-neutral-500 max-w-xl leading-relaxed">
+                    {isVisualSearch
+                        ? "Findings based on visual similarities to your selection."
+                        : "A curated collection of products designed to elevate your everyday experience."}
+                </p>
+                {isVisualSearch && visualDescription && (
+                    <div className="mt-4 text-sm text-neutral-600 bg-neutral-100 p-4 rounded-xl border border-neutral-200 max-w-2xl">
+                        <span className="font-semibold text-neutral-900 italic mr-2 border-r border-neutral-300 pr-2">AI Analysis</span>
+                        {visualDescription}
+                    </div>
+                )}
+
+                <div className="mt-6 text-[13px] text-neutral-400">
+                    {products.length} products
                 </div>
             </div>
 
-            {products.length === 0 ? (
-                <div className="text-center py-20 bg-stone-50 rounded-3xl border border-dashed border-stone-200">
-                    <p className="text-stone-500 font-medium">No products found. Check back later!</p>
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {products.map((product) => (
-                        <ProductCard
-                            key={product._id}
-                            product={product}
-                            onAddToCart={(id: string) => {
-                                // Add to cart functionality could be wired here like in CategoryPage
-                                console.log('Add to cart', id);
-                            }}
-                        />
-                    ))}
-                </div>
-            )}
+            {/* Content */}
+            <div className="max-w-[1100px] mx-auto px-6 pb-20">
+
+                {products.length === 0 ? (
+                    <div className="text-center py-28">
+                        <p className="text-[18px] text-neutral-900 font-medium">
+                            No products available.
+                        </p>
+                        <p className="text-[14px] text-neutral-500 mt-2">
+                            Check back later for new arrivals.
+                        </p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
+
+                        {products?.map((product: any) => (
+                            <div
+                                key={product._id}
+                            >
+                                <ProductCard product={product} />
+                            </div>
+                        ))}
+
+                    </div>
+                )}
+
+            </div>
         </div>
     );
 };

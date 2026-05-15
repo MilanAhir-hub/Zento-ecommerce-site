@@ -10,7 +10,8 @@ import {
     updateUserRole,
     getAllVendors,
     getVendorRequests,
-    handleVendorRequest
+    handleVendorRequest,
+    removeVendor
 } from "../controllers/admin.controller";
 
 const router = express.Router();
@@ -35,6 +36,7 @@ router.put("/users/:id/role", updateUserRole);
 
 // Vendors
 router.get("/vendors", getAllVendors);
+router.post("/vendors/:id/remove", removeVendor);
 
 // Vendor Requests
 router.get("/vendor-requests", getVendorRequests);

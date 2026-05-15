@@ -10,6 +10,15 @@ export interface Product {
     imageUrl: string;
     category: string;
     stock?: number;
+    vendorId?: {
+        _id: string;
+        name: string;
+        email: string;
+        storeName?: string;
+        storeDescription?: string;
+        logo?: string;
+        address?: string;
+    } | string;
 }
 
 interface UseProductsOptions {
@@ -20,25 +29,30 @@ interface UseProductsOptions {
 }
 
 export const useProducts = ({ limit, category, keyword, page }: UseProductsOptions = {}) => {
+    // Normalize keyword: treat empty string as undefined for cache stability
+    const normalizedKeyword = keyword?.trim() === "" ? undefined : keyword;
+
     return useQuery({
-        queryKey: ["products", limit, category, keyword, page],
+        queryKey: ["products", limit, category, normalizedKeyword, page],
 
         queryFn: async () => {
             const params = new URLSearchParams();
 
             if (limit) params.append("limit", limit.toString());
-            if (keyword) params.append("keyword", keyword);
+            if (normalizedKeyword) params.append("keyword", normalizedKeyword);
             if (page) params.append("page", page.toString());
 
             const queryString = params.toString() ? `?${params.toString()}` : "";
 
             let endpoint = `/user/products${queryString}`;
 
-            if (keyword) {
+            if (normalizedKeyword) {
                 endpoint = `/products/search${queryString}`;
 
                 if (category) {
-                    endpoint += `&category=${encodeURIComponent(category)}`;
+                    // Search endpoint might expect different query param structure
+                    const separator = endpoint.includes("?") ? "&" : "?";
+                    endpoint += `${separator}category=${encodeURIComponent(category)}`;
                 }
             } else if (category) {
                 endpoint = `/user/products/category/${category}${queryString}`;

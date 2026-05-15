@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
-import { Loader2 } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Loading03Icon } from "@hugeicons/core-free-icons";
 import useVerifyOTP from "../../hooks/auth/useVerifyOTP";
+import logo from "../../assets/Logo/fashion_logo.png";
 
 const VerifyOTP = () => {
     const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -76,68 +78,83 @@ const VerifyOTP = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[#f8f8f8] py-12 px-4 sm:px-6 lg:px-8 font-sans">
-            <div className="max-w-[440px] w-full bg-white p-8 sm:p-12 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-stone-100">
-                <div className="mb-10 text-center">
-                    <h2 className="text-[28px] font-bold text-stone-900 tracking-tight">
-                        Verify OTP
-                    </h2>
-                    <p className="mt-3 text-[15px] font-medium text-stone-500">
-                        We've sent a 6-digit code to <span className="font-bold text-stone-900">{email}</span>
-                    </p>
-                </div>
+        <div className="min-h-screen flex items-center justify-center bg-[#f5f5f7] relative overflow-hidden font-sans selection:bg-[#0071e3] selection:text-white">
 
-                <form className="space-y-8" onSubmit={handleVerify}>
-                    {error && (
-                        <div className="bg-red-50 text-red-600 text-center p-4 rounded-2xl text-sm font-semibold border border-red-100">
-                            {error}
-                        </div>
-                    )}
+            {/* Softer Background */}
+            <div className="absolute top-[-10%] left-[-10%] w-[35%] h-[35%] bg-[#0071e3]/5 rounded-full blur-[90px]" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-[35%] h-[35%] bg-[#0071e3]/5 rounded-full blur-[90px]" />
 
-                    <div className="flex justify-between gap-2">
-                        {otp.map((digit, index) => (
-                            <input
-                                key={index}
-                                ref={(el) => { inputRefs.current[index] = el; }}
-                                type="text"
-                                maxLength={1}
-                                value={digit}
-                                onChange={(e) => handleChange(index, e.target.value)}
-                                onKeyDown={(e) => handleKeyDown(index, e)}
-                                className="w-full aspect-square text-center text-xl font-bold text-stone-900 border border-stone-200 bg-stone-50/50 rounded-xl focus:outline-none focus:ring-0 focus:border-stone-900 focus:bg-white transition-all"
-                            />
-                        ))}
-                    </div>
+            <div className="relative z-10 max-w-[420px] w-full mx-4">
 
-                    <div className="text-center">
-                        <p className="text-[13px] font-semibold text-stone-500">
-                            Didn't receive the code?{" "}
-                            <Link
-                                to="/forgot-password"
-                                className={`text-stone-900 font-bold hover:text-stone-600 transition-colors ${isPending ? "pointer-events-none opacity-50" : ""}`}
-                            >
-                                Resend
-                            </Link>
+                {/* Card */}
+                <div className="bg-white/80 backdrop-blur-xl p-8 sm:p-12 rounded-[36px] border border-white/40 shadow-[0_10px_40px_rgba(0,0,0,0.06)] transition-all duration-300 hover:scale-[1.01]">
+
+                    {/* Header */}
+                    <div className="mb-10 text-center">
+                        <Link to="/" className="inline-block mb-6 transition-transform hover:scale-105 active:scale-95">
+                            <img src={logo} alt="Logo" className="w-20 h-20 rounded-full object-cover border border-white shadow-sm" />
+                        </Link>
+
+                        <h2 className="text-[30px] font-semibold text-[#1d1d1f] tracking-tight">
+                            Verify OTP
+                        </h2>
+                        <p className="mt-3 text-[14px] text-[#86868b]">
+                            We've sent a 6-digit code to <span className="font-semibold text-[#1d1d1f]">{email}</span>
                         </p>
                     </div>
 
-                    <div>
-                        <button
-                            type="submit"
-                            disabled={isPending}
-                            className="w-full flex items-center justify-center py-4 px-4 border border-transparent text-[15px] font-bold rounded-full text-white bg-stone-900 hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-900 transition-all shadow-md active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed group"
-                        >
-                            {isPending ? (
-                                <>
-                                    <Loader2 className="animate-spin h-5 w-5 mr-3" />
-                                    Verifying...
-                                </>
-                            ) : (
-                                "Verify OTP"
-                            )}
-                        </button>
-                    </div>
-                </form>
+                    <form className="space-y-8" onSubmit={handleVerify}>
+                        {error && (
+                            <div className="bg-[#fff2f2] text-[#ff3b30] text-center p-3 rounded-xl text-[13px] font-medium border border-[#ff3b30]/10">
+                                {error}
+                            </div>
+                        )}
+
+                        <div className="flex justify-between gap-2">
+                            {otp.map((digit, index) => (
+                                <input
+                                    key={index}
+                                    ref={(el) => { inputRefs.current[index] = el; }}
+                                    type="text"
+                                    maxLength={1}
+                                    value={digit}
+                                    onChange={(e) => handleChange(index, e.target.value)}
+                                    onKeyDown={(e) => handleKeyDown(index, e)}
+                                    className="w-full aspect-square text-center text-xl font-semibold text-[#1d1d1f] border border-transparent bg-[#f5f5f7] rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#0071e3]/30 focus:bg-white transition-all"
+                                />
+                            ))}
+                        </div>
+
+                        <div className="text-center">
+                            <p className="text-[13px] text-[#86868b]">
+                                Didn't receive the code?{" "}
+                                <Link
+                                    to="/forgot-password"
+                                    className={`text-[#0071e3] font-medium hover:underline ${isPending ? "pointer-events-none opacity-50" : ""}`}
+                                >
+                                    Resend
+                                </Link>
+                            </p>
+                        </div>
+
+                        <div className="pt-2">
+                            <button
+                                type="submit"
+                                disabled={isPending}
+                                className="w-full py-4 rounded-full bg-[#0071e3]! hover:bg-[#0077ed]! text-white text-[14px] font-semibold transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
+                            >
+                                {isPending ? (
+                                    <>
+                                        <HugeiconsIcon icon={Loading03Icon} size={18} className="animate-spin mr-2" />
+                                        Verifying...
+                                    </>
+                                ) : (
+                                    "Verify OTP"
+                                )}
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     );

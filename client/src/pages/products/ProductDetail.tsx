@@ -1,397 +1,504 @@
-import { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import CardSlider from "../../components/ui/CardSlider";
-import { ChevronRight, Heart, ShoppingCart, ShieldCheck, Truck, RefreshCcw, Sparkles, Send, Star } from "lucide-react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
+import { HugeiconsIcon } from '@hugeicons/react';
+import {
+    ShoppingBag01Icon,
+    SentIcon,
+    Loading03Icon,
+    FavouriteIcon,
+    Store01Icon,
+    ArrowRight01Icon
+} from '@hugeicons/core-free-icons';
+import { useQuery } from "@tanstack/react-query";
+import { useCart } from "../../hooks/cart/useCart";
+import { useWishlist } from "../../hooks/useWishlist";
+import { getCloudinaryUrl } from "../../utils/cloudinaryImage";
+import api from "../../services/api";
+import Button from "../../components/ui/Button";
+import BlurImage from "../../components/ui/BlurImage";
+
+// --- Constants ---
+const PLACEHOLDER_IMAGE = "https://images.unsplash.com/photo-1560393464-5c69a73c5770?q=80&w=800&auto=format&fit=crop";
+const STALE_TIME = 5 * 60 * 1000; // 5 minutes
+
+// --- Types ---
+interface ChatMessage {
+    role: 'user' | 'ai';
+    content: string;
+    timestamp: number;
+}
 
 // --- API Fetchers ---
 const fetchProduct = async (id: string) => {
-    const { data } = await axios.get(`http://localhost:5000/api/products/${id}`);
+    const { data } = await api.get(`/products/${id}`);
     return data.data;
 };
 
 const fetchCategoryProducts = async (category: string) => {
-    const { data } = await axios.get(`http://localhost:5000/api/products/category/${category}?limit=15`);
+    const { data } = await api.get(`/products/category/${category}?limit=15`);
     return data.data;
 };
 
-const submitReview = async (_data: { productId: string, reviewText: string, rating: number }) => {
-    // In a real app, you'd send the JWT token here. For dummy UI purposes right now, we'll mock the submission delay.
-    return new Promise(resolve => setTimeout(resolve, 800));
+const fetchVendorProducts = async (vendorId: string) => {
+    const { data } = await api.get(`/products/vendor/${vendorId}?limit=15`);
+    return data.data;
 };
+
+const ProductDetailSkeleton = () => (
+    <div className="bg-white min-h-screen py-24 flex items-center justify-center">
+        <HugeiconsIcon icon={Loading03Icon} size={32} className="animate-spin text-stone-300" />
+    </div>
+);
 
 const ProductDetail = () => {
     const { id } = useParams<{ id: string }>();
-    const queryClient = useQueryClient();
+    const navigate = useNavigate();
+    const { addToCart, isAddingToCart } = useCart();
+    const { toggleWishlist, isInWishlist } = useWishlist();
+    const chatEndRef = useRef<HTMLDivElement>(null);
+    const chatContainerRef = useRef<HTMLDivElement>(null);
 
     // UI State
     const [activeImage, setActiveImage] = useState(0);
-    const [showReviewInput, setShowReviewInput] = useState(false);
-    const [reviewText, setReviewText] = useState("");
-    const [selectedRating, setSelectedRating] = useState(5);
+    const [quantity, setQuantity] = useState(1);
+
+    // AI Chat State
+    const [aiQuestion, setAiQuestion] = useState("");
+    const [isAiLoading, setIsAiLoading] = useState(false);
+    const [isScrolling, setIsScrolling] = useState(false);
+    const scrollTimeoutRef = useRef<any>(null);
+    const [chatHistory, setChatHistory] = useState<ChatMessage[]>(() => {
+        const saved = localStorage.getItem(`chat_history_${id}`);
+        return saved ? JSON.parse(saved) : [];
+    });
+
+    // Save chat history to localStorage
+    useEffect(() => {
+        if (id && chatHistory.length > 0) {
+            localStorage.setItem(`chat_history_${id}`, JSON.stringify(chatHistory));
+        }
+    }, [chatHistory, id]);
+
+    // Scroll to bottom of chat (Container only)
+    useEffect(() => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTo({
+                top: chatContainerRef.current.scrollHeight,
+                behavior: "smooth"
+            });
+        }
+    }, [chatHistory]);
+
+    const handleChatScroll = () => {
+        setIsScrolling(true);
+        if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+        scrollTimeoutRef.current = setTimeout(() => {
+            setIsScrolling(false);
+        }, 700);
+    };
+
 
     // Queries
     const { data: product, isLoading, isError } = useQuery({
         queryKey: ['product', id],
         queryFn: () => fetchProduct(id!),
         enabled: !!id,
+        staleTime: STALE_TIME,
     });
 
     const { data: relatedProducts } = useQuery({
         queryKey: ['products', 'category', product?.category],
         queryFn: () => fetchCategoryProducts(product!.category),
         enabled: !!product?.category,
+        staleTime: STALE_TIME,
     });
 
-    // Mutation
-    const reviewMutation = useMutation({
-        mutationFn: submitReview,
-        onSuccess: () => {
-            setShowReviewInput(false);
-            setReviewText("");
-            alert("Review submitted successfully! (Mocked)");
-            queryClient.invalidateQueries({ queryKey: ['product', id] });
+    const vendorId = product?.vendorId && typeof product.vendorId === 'object' ? product.vendorId._id : product?.vendorId;
+
+    const { data: vendorProducts } = useQuery({
+        queryKey: ['products', 'vendor', vendorId],
+        queryFn: () => fetchVendorProducts(vendorId as string),
+        enabled: !!vendorId,
+        staleTime: STALE_TIME,
+    });
+
+    const handleAddToCart = async () => {
+        if (!product || isAddingToCart) return;
+        await addToCart({ productId: product._id, quantity });
+    };
+
+    const handleAskAI = async () => {
+        if (!aiQuestion.trim() || !product || isAiLoading) return;
+
+        const newUserMessage: ChatMessage = {
+            role: 'user',
+            content: aiQuestion,
+            timestamp: Date.now()
+        };
+
+        setChatHistory(prev => [...prev, newUserMessage]);
+        setAiQuestion("");
+        setIsAiLoading(true);
+
+        try {
+            const response = await api.post("/ai/product-chat", {
+                productId: product._id,
+                question: aiQuestion,
+                context: {
+                    title: product.title,
+                    description: product.description,
+                    features: product.features,
+                    category: product.category,
+                    price: product.price
+                }
+            });
+
+            if (response.data.success) {
+                const aiMessage: ChatMessage = {
+                    role: 'ai',
+                    content: response.data.answer,
+                    timestamp: Date.now()
+                };
+                setChatHistory(prev => [...prev, aiMessage]);
+            }
+        } catch (err) {
+            console.error("Chat error:", err);
+            const errorMessage: ChatMessage = {
+                role: 'ai',
+                content: "I'm sorry, I'm having trouble connecting right now. Please try again later.",
+                timestamp: Date.now()
+            };
+            setChatHistory(prev => [...prev, errorMessage]);
+        } finally {
+            setIsAiLoading(false);
         }
-    });
+    };
 
-    if (isLoading) {
-        return (
-            <div className="bg-stone-50 min-h-screen py-20 flex justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-stone-500"></div>
-            </div>
-        );
-    }
+    if (isLoading) return <ProductDetailSkeleton />;
 
     if (isError || !product) {
         return (
-            <div className="bg-stone-50 min-h-screen py-20 flex flex-col items-center gap-4 text-stone-500">
-                <ShieldCheck className="w-12 h-12 text-red-500 opacity-50" />
-                <p className="font-medium text-xl">Product not found.</p>
-                <Link to="/" className="text-stone-500 hover:underline">Return to Home</Link>
+            <div className="bg-white min-h-screen py-32 flex flex-col items-center justify-center text-center px-4">
+                <h1 className="text-4xl font-semibold text-[#1d1d1f] mb-4">Product Not Found.</h1>
+                <p className="text-[#86868b] mb-8 max-w-md mx-auto">The product you're looking for is currently unavailable or doesn't exist.</p>
+                <Button onClick={() => navigate("/")} variant="primary" size="lg" className="rounded-full">
+                    Continue Shopping
+                </Button>
             </div>
         );
     }
 
-    // Map backend data to UI requirements. Use fallbacks for complex arrays the standard backend model doesn't have yet.
     const price = product.price || 0;
     const oldPrice = product.oldPrice || 0;
-    const discountPercent = oldPrice > price ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0;
+    const isOutOfStock = !product.stock || product.stock === 0;
 
-    // We only have one image URL from the Pexels seed, so duplicate it for the gallery mock
-    const images = [product.imageUrl, product.imageUrl, product.imageUrl, product.imageUrl];
+    const rawImages: string[] = product.images?.length
+        ? product.images.map((img: { url: string } | string) => typeof img === 'string' ? img : img.url)
+        : product.imageUrl ? [product.imageUrl] : [PLACEHOLDER_IMAGE];
 
-    const mappedRelatedItems = relatedProducts?.filter((p: any) => p._id !== product._id).map((p: any) => ({
+    const mappedRelatedItems = relatedProducts?.filter((p: { _id: string }) => p._id !== product._id).map((p: { _id: string }) => ({
+        ...p,
+        id: p._id
+    })) || [];
+
+    const mappedVendorItems = vendorProducts?.filter((p: { _id: string }) => p._id !== product._id).map((p: { _id: string }) => ({
         ...p,
         id: p._id
     })) || [];
 
     return (
-        <div className="bg-white min-h-screen py-8 font-sans">
-            <div className="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-white min-h-screen font-sans selection:bg-[#0071e3] selection:text-white">
 
-                {/* Breadcrumbs */}
-                <nav className="flex items-center text-sm text-stone-500 mb-8 font-medium">
-                    <Link to="/" className="hover:text-stone-900 transition-colors">Home</Link>
-                    <ChevronRight className="w-4 h-4 mx-2" />
-                    <Link to={`/category/${product.category}`} className="hover:text-stone-900 transition-colors">{product.category}</Link>
-                    <ChevronRight className="w-4 h-4 mx-2" />
-                    <span className="text-stone-900 truncate max-w-[200px] sm:max-w-xs">{product.title}</span>
-                </nav>
+            {/* Minimalist Top Sticky Bar */}
+            <div className="sticky top-[48px] z-40 bg-white/80 backdrop-blur-md border-b border-[#e5e5ea] transition-all">
+                <div className="max-w-[1200px] mx-auto px-6 h-14 flex items-center justify-between">
+                    <span className="text-[#1d1d1f] font-semibold text-sm truncate max-w-[200px] sm:max-w-md md:max-w-lg lg:max-w-xl">{product.title}</span>
+                    <div className="flex items-center gap-4 shrink-0">
+                        <span className="text-[#1d1d1f] text-sm hidden sm:block">₹{price.toLocaleString("en-IN")}</span>
+                        <Button
+                            variant="primary"
+                            size="sm"
+                            onClick={handleAddToCart}
+                            disabled={isOutOfStock || isAddingToCart}
+                            className="rounded-full text-xs font-medium px-4 bg-[#0071e3]! hover:bg-[#0077ed]!"
+                        >
+                            {isAddingToCart ? <HugeiconsIcon icon={Loading03Icon} size={14} className="animate-spin" /> : (isOutOfStock ? "Sold Out" : "Add")}
+                        </Button>
+                    </div>
+                </div>
+            </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 pb-16 border-b border-stone-100">
+            <div className="max-w-[1200px] mx-auto px-6 py-10 lg:py-20 flex flex-col lg:flex-row gap-12 lg:gap-24">
 
-                    {/* LEFT COLUMN: Media Gallery */}
-                    <div className="flex flex-col">
-                        <div className="lg:sticky lg:top-24">
+                {/* Main Image Gallery (Left Column) */}
+                <div className="w-full lg:w-[55%] flex flex-col gap-6">
+                    {/* Main Image */}
+                    <div className="aspect-4/5 bg-[#f5f5f7] rounded-4xl overflow-hidden relative group">
+                        <BlurImage
+                            src={getCloudinaryUrl(rawImages[activeImage], { width: 1200, quality: 'auto', format: 'auto' })}
+                            alt={product.title}
+                            wrapperClassName="w-full h-full"
+                            className="mix-blend-multiply transform transition-transform duration-700 group-hover:scale-105"
+                        />
+                        <button
+                            onClick={() => toggleWishlist(product._id)}
+                            aria-label="Add to wishlist"
+                            className="absolute top-6 right-6 p-3 rounded-full bg-white/50 hover:bg-white backdrop-blur-md transition-all text-[#86868b] hover:text-[#1d1d1f] active:scale-95 shadow-sm"
+                        >
+                            <HugeiconsIcon icon={FavouriteIcon} size={20} className={isInWishlist(product._id) ? "text-[#ff2d55] fill-[#ff2d55]" : ""} />
+                        </button>
+                    </div>
 
-                            {/* Main Image */}
-                            <div className="relative aspect-square bg-white border border-stone-100 rounded-lg overflow-hidden mb-4 flex items-center justify-center group">
-                                <img
-                                    src={images[activeImage]}
-                                    alt={product.title}
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                />
-                                {/* Action Buttons Overlay */}
-                                <div className="absolute top-4 right-4 z-10">
-                                    <button className="bg-white/80 backdrop-blur-sm rounded-full p-3 text-stone-400 hover:text-stone-900 hover:bg-stone-50 transition-all border border-stone-200 active:scale-95">
-                                        <Heart className="w-6 h-6 transition-colors" />
-                                    </button>
-                                </div>
-                                {/* Discount Badge */}
-                                {discountPercent > 0 && (
-                                    <div className="absolute top-4 left-4 z-10 bg-red-500 text-white font-bold text-xs px-3 py-1.5 rounded shadow-sm tracking-wide">
-                                        {discountPercent}% OFF
+                    {/* Image Thumbnails (Standardized 4-column grid) */}
+                    {rawImages.length > 1 && (
+                        <div className="grid grid-cols-4 gap-4 mt-2">
+                            {rawImages.slice(0, 8).map((img, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => setActiveImage(idx)}
+                                    aria-label={`View image ${idx + 1}`}
+                                    className={`aspect-square w-full rounded-2xl overflow-hidden border-2 transition-all ${activeImage === idx ? 'border-[#0071e3] scale-100' : 'border-transparent opacity-60 hover:opacity-100 scale-95 hover:scale-100'} bg-[#f5f5f7] flex items-center justify-center p-2`}
+                                >
+                                    <BlurImage
+                                        src={getCloudinaryUrl(img, { width: 200, quality: 'auto', format: 'auto' })}
+                                        alt=""
+                                        wrapperClassName="w-full h-full bg-transparent"
+                                        className="object-contain mix-blend-multiply"
+                                    />
+                                </button>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* AI Chat Interface (Moved to Left Column) */}
+                    <div className="mt-8 border-t border-[#d2d2d7] pt-8">
+                        <div className="flex items-center gap-3 mb-6 text-[17px] font-semibold text-[#1d1d1f]">
+                            <HugeiconsIcon icon={ArrowRight01Icon} size={18} className="text-[#1d1d1f]" />
+                            Ask Product Concierge
+                        </div>
+
+                        <div className="bg-[#f5f5f7] rounded-[32px] overflow-hidden flex flex-col h-[500px] shadow-sm border border-[#e5e5ea]">
+                            <div
+                                ref={chatContainerRef}
+                                onScroll={handleChatScroll}
+                                className={`flex-1 overflow-y-auto p-6 space-y-4 pb-[20px] whatsapp-chat-scrollbar ${isScrolling ? 'is-scrolling' : ''}`}
+                            >
+                                {chatHistory.length === 0 ? (
+                                    <div className="h-full flex flex-col items-center justify-center text-center px-4">
+                                        <p className="text-[#86868b] text-[15px] font-medium leading-relaxed max-w-[280px]">
+                                            Have questions about compatibility, sizing, or product details?
+                                        </p>
+                                    </div>
+                                ) : (
+                                    chatHistory.map((msg, i) => (
+                                        <div key={i} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'} max-w-full`}>
+                                            <div className={`relative max-w-[85%] rounded-[24px] px-5 py-3 text-[15px] leading-relaxed ${msg.role === 'user'
+                                                ? 'bg-[#0071e3] text-white rounded-br-[4px]'
+                                                : 'bg-white text-[#1d1d1f] rounded-bl-[4px] shadow-xs'
+                                                }`}>
+                                                {msg.content}
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                                {isAiLoading && (
+                                    <div className="flex items-start">
+                                        <div className="bg-white rounded-[24px] rounded-bl-[4px] px-5 py-4 shadow-xs">
+                                            <div className="flex items-center gap-1.5 h-2">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-[#86868b] animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                                                <div className="w-1.5 h-1.5 rounded-full bg-[#86868b] animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                                                <div className="w-1.5 h-1.5 rounded-full bg-[#86868b] animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                                            </div>
+                                        </div>
                                     </div>
                                 )}
+                                <div ref={chatEndRef} />
                             </div>
 
-                            {/* Thumbnails Row */}
-                            <div className="flex gap-3 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden">
-                                {images.map((img, idx) => (
+                            <div className="p-4 bg-white border-t border-[#e5e5ea]">
+                                <div className="flex items-center bg-[#f5f5f7] rounded-full px-5 py-3 focus-within:ring-2 ring-offset-1 focus-within:ring-[#0071e3]/30 transition-all border border-transparent focus-within:border-[#0071e3]/20">
+                                    <input
+                                        type="text"
+                                        value={aiQuestion}
+                                        onChange={(e) => setAiQuestion(e.target.value)}
+                                        onKeyDown={(e) => e.key === 'Enter' && handleAskAI()}
+                                        placeholder="Message Product Expert..."
+                                        className="flex-1 bg-transparent outline-none text-[15px] text-[#1d1d1f] placeholder:text-[#86868b]"
+                                        autoComplete="off"
+                                    />
                                     <button
-                                        key={idx}
-                                        onClick={() => setActiveImage(idx)}
-                                        className={`shrink-0 w-20 h-20 rounded-lg border-2 overflow-hidden transition-all p-1 bg-white ${activeImage === idx ? 'border-stone-500 shadow-sm' : 'border-stone-200 hover:border-stone-300 opacity-70 hover:opacity-100'}`}
+                                        onClick={handleAskAI}
+                                        disabled={isAiLoading || !aiQuestion.trim()}
+                                        className={`ml-2 w-10 h-10 rounded-full flex items-center justify-center transition-colors ${aiQuestion.trim() ? 'bg-[#0071e3] text-white shadow-md' : 'bg-[#e9e9eb] text-[#86868b]'} disabled:opacity-50 active:scale-90`}
+                                        aria-label="Send message"
                                     >
-                                        <img src={img} alt={`Thumbnail ${idx}`} className="w-full h-full object-contain" />
+                                        <HugeiconsIcon icon={SentIcon} size={18} className={aiQuestion.trim() ? "-translate-x-px translate-y-px" : ""} />
                                     </button>
-                                ))}
+                                </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
+                {/* Product Info Section (Right Column) */}
+                <div className="w-full lg:w-[45%] flex flex-col justify-start pb-12">
+                    <p className="text-[#bf4800] font-semibold text-[11px] tracking-wide uppercase mb-3">{product.category}</p>
+                    <h1 className="text-4xl lg:text-[40px] leading-tight font-semibold text-[#1d1d1f] tracking-tight mb-4">
+                        {product.title}
+                    </h1>
+                    <div className="text-2xl text-[#1d1d1f] font-normal mb-8 flex items-end gap-3 tracking-tight">
+                        <span>MRP ₹{price.toLocaleString("en-IN")}</span>
+                        {oldPrice > price && (
+                            <span className="text-lg text-[#86868b] line-through mb-0.5 font-light">₹{oldPrice.toLocaleString("en-IN")}</span>
+                        )}
+                    </div>
 
-                    {/* RIGHT COLUMN: Product Details */}
-                    <div className="flex flex-col pt-6 lg:pt-0">
+                    <div className="h-px w-full bg-[#d2d2d7] my-8"></div>
 
-                        {/* Brand & Title */}
-                        <div className="mb-2">
-                            <span className="text-blue-700 font-bold text-sm uppercase tracking-wider">{product.category}</span>
-                        </div>
-                        <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 leading-tight mb-4">
-                            {product.title}
-                        </h1>
+                    <div className="text-[#1d1d1f] text-base leading-relaxed mb-10 font-medium whitespace-pre-line">
+                        {product.description}
+                    </div>
 
-                        {/* Ratings (Mock) */}
-                        <div className="flex items-center gap-4 mb-6 pb-6 border-b border-stone-100">
-                            <div className="flex items-center bg-stone-100 text-stone-800 px-2 py-1 rounded text-sm font-bold">
-                                4.5 ★
-                            </div>
-                            <span className="text-sm text-stone-500 hover:text-stone-900 cursor-pointer transition-colors">
-                                214 Ratings & Reviews
-                            </span>
-                        </div>
-
-                        {/* Pricing Section */}
-                        <div className="mb-8">
-                            <div className="flex items-end gap-3 mb-2">
-                                <span className="text-4xl font-extrabold text-stone-900">
-                                    ₹{price.toFixed(2)}
-                                </span>
-                                {oldPrice > price && (
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <span className="text-lg text-stone-400 line-through">
-                                            ₹{oldPrice.toFixed(2)}
-                                        </span>
-                                        <span className="text-sm font-bold text-green-600">
-                                            You Save ₹{(oldPrice - price).toFixed(2)}
-                                        </span>
-                                    </div>
-                                )}
-                            </div>
-                            <p className="text-xs text-stone-500">Inclusive of all taxes</p>
-                        </div>
-
-                        {/* Actions (Add to Cart / Buy Now) */}
-                        <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                            <button className="flex-1 flex items-center justify-center border border-stone-900 gap-2 text-stone-900 font-bold text-lg py-4 px-8 rounded-full transition-all hover:bg-stone-50 active:scale-[0.98]">
-                                <ShoppingCart className="w-5 h-5" />
-                                Add to Cart
-                            </button>
-                            <button className="flex-1 flex items-center justify-center border bg-stone-900 gap-2 text-white font-bold text-lg py-4 px-8 rounded-full transition-all hover:bg-black shadow-md active:scale-[0.98]">
-                                Buy Now
-                            </button>
-                        </div>
-
-                        {/* Delivery & Services Snippet */}
-                        <div className="mb-8 space-y-4 py-4 border-y border-stone-100">
-                            <div className="flex items-start gap-4">
-                                <div className="bg-stone-50 flex items-center justify-center w-10 h-10 border border-stone-200 rounded-full shrink-0">
-                                    <Truck className="w-5 h-5 text-stone-700" />
-                                </div>
-                                <div>
-                                    <h4 className="font-bold text-stone-900 text-sm mt-0.5">Free Delivery</h4>
-                                    <p className="text-sm text-stone-500 mt-0.5">Order within 2 hrs for delivery by tomorrow</p>
-                                </div>
-                            </div>
-                            <div className="flex items-start gap-4">
-                                <div className="bg-stone-50 flex items-center justify-center w-10 h-10 border border-stone-200 rounded-full shrink-0">
-                                    <RefreshCcw className="w-5 h-5 text-stone-700" />
-                                </div>
-                                <div>
-                                    <h4 className="font-bold text-stone-900 text-sm mt-0.5">7 Days Replacement</h4>
-                                    <p className="text-sm text-stone-500 mt-0.5">Easy returns if the product is defective</p>
-                                </div>
-                            </div>
-                            <div className="flex items-start gap-4">
-                                <div className="bg-stone-50 flex items-center justify-center w-10 h-10 border border-stone-200 rounded-full shrink-0">
-                                    <ShieldCheck className="w-5 h-5 text-stone-700" />
-                                </div>
-                                <div>
-                                    <h4 className="font-bold text-stone-900 text-sm mt-0.5">1 Year Warranty</h4>
-                                    <p className="text-sm text-stone-500 mt-0.5">Brand warranty against manufacturing defects</p>
-                                </div>
+                    {/* Shopping Actions */}
+                    <div className="flex flex-col gap-6 mb-12">
+                        <div className="flex items-center gap-4">
+                            <span className="text-[#1d1d1f] font-medium text-[15px]">Quantity</span>
+                            <div className="flex items-center bg-[#f5f5f7] rounded-full p-1 border border-[#e5e5ea]">
+                                <button
+                                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                    className="w-10 h-10 rounded-full flex items-center justify-center text-[#1d1d1f] hover:bg-[#e8e8ed] transition text-xl font-light"
+                                    disabled={quantity <= 1}
+                                    aria-label="Decrease quantity"
+                                >-</button>
+                                <span className="w-10 text-center text-[15px] font-medium">{quantity}</span>
+                                <button
+                                    onClick={() => setQuantity(Math.min(product.stock || 99, quantity + 1))}
+                                    className="w-10 h-10 rounded-full flex items-center justify-center text-[#1d1d1f] hover:bg-[#e8e8ed] transition text-xl font-light"
+                                    disabled={quantity >= (product.stock || 99)}
+                                    aria-label="Increase quantity"
+                                >+</button>
                             </div>
                         </div>
 
-                        {/* Product Key Features */}
-                        <div className="mb-8 border-b border-stone-100 pb-8">
-                            <h3 className="text-lg font-bold text-stone-900 mb-4 pb-2">Key Features</h3>
+                        <Button
+                            variant="primary"
+                            size="lg"
+                            onClick={handleAddToCart}
+                            disabled={isOutOfStock || isAddingToCart}
+                            className="w-full rounded-2xl py-4 bg-[#0071e3]! hover:bg-[#0077ed]! text-white flex items-center justify-center gap-2 text-[17px] font-medium transition-all shadow-md active:scale-[0.98]"
+                        >
+                            {isAddingToCart ? <HugeiconsIcon icon={Loading03Icon} className="animate-spin" /> : <HugeiconsIcon icon={ShoppingBag01Icon} />}
+                            {isOutOfStock ? "Currently Unavailable" : "Add to Bag"}
+                        </Button>
+
+                        {product.stock > 0 && product.stock <= 5 && (
+                            <p className="text-xs text-[#bf4800] text-center font-medium mt-[-10px]">Only {product.stock} left in stock. Order soon.</p>
+                        )}
+                    </div>
+
+                    {/* Collapsible Features & AI Chat Details */}
+                    <div className="border-t border-[#d2d2d7] mt-8">
+                        <div className="py-6 border-b border-[#d2d2d7]">
+                            <h3 className="text-[17px] font-semibold text-[#1d1d1f] mb-4">Key Features</h3>
                             <ul className="space-y-3">
-                                {(product.features || [
-                                    "Premium build quality for long-lasting durability.",
-                                    "Designed with modern aesthetics and functionality in mind.",
-                                    "Lightweight and optimized for everyday use.",
-                                    "Manufactured using eco-friendly materials.",
-                                    "1-Year comprehensive warranty included."
-                                ]).map((feature: string, idx: number) => (
-                                    <li key={idx} className="flex items-start">
-                                        <span className="text-stone-400 mr-2 mt-2 min-w-[6px] h-1.5 rounded-full bg-stone-300"></span>
-                                        <span className="text-stone-700 text-sm leading-relaxed">{feature}</span>
+                                {(product.features?.length > 0 ? product.features : [
+                                    "Premium craftsmanship carefully tuned for perfect balance.",
+                                    "Tested to ensure long-lasting durability.",
+                                    "Seamless integration with your daily life."
+                                ]).map((f: string, i: number) => (
+                                    <li key={i} className="text-[#1d1d1f] text-[15px] flex items-start leading-relaxed">
+                                        <span className="mr-3 text-[#86868b]">•</span>
+                                        {f}
                                     </li>
                                 ))}
                             </ul>
                         </div>
-
-                        {/* Description */}
-                        <div className="mb-8 border-b border-stone-100 pb-8">
-                            <h3 className="text-lg font-bold text-stone-900 mb-4 pb-2">Description</h3>
-                            <p className="text-sm text-stone-600 leading-relaxed whitespace-pre-line">
-                                {product.description}
-                            </p>
-                        </div>
-
-                        {/* Specifications Table */}
-                        <div className="pb-4">
-                            <h3 className="text-lg font-bold text-stone-900 mb-4 pb-2">Specifications</h3>
-                            <div className="border-t border-stone-100">
-                                {(product.specifications || [
-                                    { label: "Category", value: product.category },
-                                    { label: "Availability", value: product.stock && product.stock > 0 ? "In Stock" : "Out of Stock" },
-                                    { label: "Delivery", value: "Standard / Express" },
-                                    { label: "Return Policy", value: "7 Days Easy Return" },
-                                    { label: "Condition", value: "Brand New" }
-                                ]).map((spec: any, idx: number) => (
-                                    <div key={idx} className="flex py-3 text-sm border-b border-stone-100">
-                                        <span className="w-1/3 text-stone-500 font-medium">{spec.label}</span>
-                                        <span className="w-2/3 text-stone-900 font-medium">{spec.value}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
                     </div>
-                </div>
 
-                {/* AI Q&A Section */}
-                <div className="py-16 border-b border-stone-100">
-                    <h3 className="text-xl font-bold text-stone-900 mb-2 flex items-center gap-2">
-                        <Sparkles className="w-5 h-5 text-stone-500" />
-                        Get answers of your question
-                    </h3>
-                    <p className="text-stone-500 text-sm mb-6">Ask our AI chatbot anything about this product.</p>
-
-                    <div className="flex items-center gap-3">
-                        <div className="flex-1">
-                            <input
-                                type="text"
-                                placeholder="E.g., Is this bag water resistant?"
-                                className="w-full px-5 py-4 bg-stone-50 border border-stone-200 rounded-full text-base focus:outline-none focus:ring-1 focus:ring-stone-900 focus:border-stone-900 transition-all placeholder:text-stone-400 text-stone-900"
-                            />
-                        </div>
-                        <button className="bg-stone-900 hover:bg-black text-white font-bold px-8 py-4 rounded-full cursor-pointer transition-colors active:scale-95 flex items-center gap-2 shadow-sm">
-                            <span>Ask AI</span>
-                            <Send className="w-4 h-4 ml-1" />
-                        </button>
-                    </div>
-                </div>
-
-                {/* Ratings & Reviews Section */}
-                <div className="py-16 border-b border-stone-100">
-                    <h3 className="text-xl font-bold text-stone-900 mb-8 pb-4">Ratings & Reviews</h3>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-start">
-                        {/* Left Column: Rating Distribution */}
-                        <div>
-                            <div className="flex items-center gap-6 mb-8">
-                                <div className="text-6xl font-extrabold text-stone-900 tracking-tighter">4.5</div>
-                                <div className="flex flex-col gap-1">
-                                    <div className="flex text-stone-900">
-                                        {[1, 2, 3, 4, 5].map((star) => (
-                                            <Star key={star} className="w-5 h-5 fill-current" />
-                                        ))}
-                                    </div>
-                                    <p className="text-stone-500 text-sm font-medium">Based on 214 ratings</p>
-                                </div>
+                    {/* Seller Information Section */}
+                    {product.vendorId && typeof product.vendorId === 'object' && (
+                        <div className="mt-10 pt-8 border-t border-[#d2d2d7]">
+                            <div className="flex items-center gap-3 mb-6 text-[17px] font-semibold text-[#1d1d1f]">
+                                <HugeiconsIcon icon={Store01Icon} size={20} className="text-[#1d1d1f]" />
+                                Seller Information
                             </div>
 
-                            <div className="space-y-3">
-                                {[
-                                    { stars: 5, width: '65%' },
-                                    { stars: 4, width: '20%' },
-                                    { stars: 3, width: '8%' },
-                                    { stars: 2, width: '4%' },
-                                    { stars: 1, width: '3%' }
-                                ].map((bar) => (
-                                    <div key={bar.stars} className="flex items-center text-sm gap-3">
-                                        <div className="w-4 text-stone-900 font-bold text-right">{bar.stars}</div>
-                                        <Star className="w-3.5 h-3.5 text-stone-900 fill-current" />
-                                        <div className="flex-1 bg-stone-100 h-1.5 rounded-full overflow-hidden">
-                                            <div className="bg-stone-900 h-full rounded-full" style={{ width: bar.width }}></div>
+                            <div className="bg-[#f5f5f7] rounded-[32px] p-6 border border-[#e5e5ea] flex flex-col sm:flex-row gap-6 items-start sm:items-center shadow-xs transition-all hover:shadow-sm">
+                                <div className="w-16 h-16 rounded-2xl overflow-hidden bg-white flex items-center justify-center shrink-0 shadow-sm border border-[#d2d2d7]/30">
+                                    {product.vendorId.logo ? (
+                                        <BlurImage
+                                            src={getCloudinaryUrl(product.vendorId.logo, { width: 200, quality: 'auto' })}
+                                            alt={product.vendorId.storeName || "Store"}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="text-2xl font-bold text-[#0071e3]">
+                                            {(product.vendorId.storeName || product.vendorId.name || "S").charAt(0).toUpperCase()}
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Right Column: Write a Review */}
-                        <div className="border-t md:border-t-0 md:border-l border-stone-100 pt-8 md:pt-0 md:pl-16 flex flex-col justify-center h-full">
-                            <h4 className="text-2xl font-bold text-stone-900 mb-2">Review this product</h4>
-                            <p className="text-base text-stone-500 mb-8">Help others make an informed decision!</p>
-
-                            <div className="flex gap-3 mb-8">
-                                {[1, 2, 3, 4, 5].map((star) => (
-                                    <Star
-                                        key={star}
-                                        onClick={() => setSelectedRating(star)}
-                                        className={`w-10 h-10 cursor-pointer transition-colors ${star <= selectedRating
-                                            ? "text-stone-900 fill-stone-900 hover:scale-105"
-                                            : "text-stone-200 hover:text-stone-400 hover:fill-stone-400 hover:scale-105"
-                                            }`}
-                                    />
-                                ))}
-                            </div>
-
-                            {!showReviewInput ? (
-                                <button
-                                    onClick={() => setShowReviewInput(true)}
-                                    className="bg-stone-900 hover:bg-black text-white font-bold py-3.5 px-8 rounded-full transition-colors w-max active:scale-95"
-                                >
-                                    Write a Review
-                                </button>
-                            ) : (
-                                <div className="space-y-5 animate-in fade-in duration-300 w-full">
-                                    <textarea
-                                        rows={4}
-                                        value={reviewText}
-                                        onChange={(e) => setReviewText(e.target.value)}
-                                        placeholder="Put your honest review here..."
-                                        className="w-full px-5 py-4 bg-stone-50 border border-stone-200 rounded-2xl text-base text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-900 focus:border-stone-900 transition-all resize-none"
-                                    ></textarea>
-                                    <button
-                                        disabled={reviewMutation.isPending || !reviewText.trim()}
-                                        onClick={() => reviewMutation.mutate({ productId: id!, reviewText, rating: selectedRating })}
-                                        className="bg-stone-900 hover:bg-black active:bg-stone-800 text-white font-bold py-3.5 px-8 rounded-full transition-colors w-max disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        {reviewMutation.isPending ? "Submitting..." : "Submit Review"}
-                                    </button>
+                                    )}
                                 </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
 
+                                <div className="flex-1">
+                                    <h4 className="text-[19px] font-semibold text-[#1d1d1f] mb-1">
+                                        {product.vendorId.storeName || product.vendorId.name}
+                                    </h4>
+                                    <p className="text-[#86868b] text-[14px] leading-relaxed line-clamp-2">
+                                        {product.vendorId.storeDescription || "A verified premium seller on Zento, committed to delivering high-quality products and exceptional service."}
+                                    </p>
+                                    {product.vendorId.address && (
+                                        <div className="mt-3 flex items-center gap-1.5 text-[13px] text-[#86868b] font-medium">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-[#32d74b]"></span>
+                                            Ships from {product.vendorId.address.split(',').pop()?.trim() || product.vendorId.address}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="rounded-full border-[#d2d2d7] text-[#1d1d1f] hover:bg-white hover:border-[#0071e3] transition-all text-xs font-semibold px-5 h-9 shrink-0"
+                                >
+                                    Visit Store
+                                </Button>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
 
-            {/* You May Also Like Slider */}
+            {/* More from this Seller */}
+            {mappedVendorItems.length > 0 && (
+                <div className="bg-white border-t border-[#e5e5ea]">
+                    <div className="max-w-[1200px] mx-auto px-6 py-16 lg:py-24">
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-12">
+                            <h2 className="text-3xl font-semibold text-[#1d1d1f] tracking-tight">More from this seller</h2>
+                            {product.vendorId && typeof product.vendorId === 'object' && (
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="rounded-full border-[#d2d2d7] text-[#1d1d1f] hover:bg-white hover:border-[#0071e3] transition-all text-xs font-semibold px-6"
+                                >
+                                    View all from {product.vendorId.storeName || "this seller"}
+                                </Button>
+                            )}
+                        </div>
+
+                        <CardSlider
+                            items={mappedVendorItems}
+                            className="py-0!"
+                        />
+                    </div>
+                </div>
+            )}
+
+            {/* Related Products */}
             {mappedRelatedItems.length > 0 && (
-                <div className="pt-16 pb-8">
-                    <CardSlider
-                        title="You may also like"
-                        subtitle="Similar products you might be interested in."
-                        items={mappedRelatedItems}
-                    />
+                <div className="bg-white border-t border-[#e5e5ea]">
+                    <div className="max-w-[1200px] mx-auto px-6 py-16 lg:py-24">
+                        <h2 className="text-3xl font-semibold text-[#1d1d1f] mb-12 tracking-tight text-center">You may also like</h2>
+                        <CardSlider items={mappedRelatedItems} className="py-0!" />
+                    </div>
                 </div>
             )}
         </div>

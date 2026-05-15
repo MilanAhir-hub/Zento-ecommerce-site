@@ -9,6 +9,7 @@ import { Review } from "../models/Review";
 import { Address } from "../models/Address";
 import { Notification } from "../models/Notification";
 import { VendorRequest } from "../models/VendorRequest";
+import { getIO } from "../utils/socket";
 import { AuthRequest } from "../middlewares/auth.middleware";
 
 export const profile = async (req: AuthRequest, res: Response): Promise<void> => {
@@ -67,25 +68,34 @@ export const submitVendorRequest = async (req: AuthRequest, res: Response): Prom
 
         const { storeName, businessType, gstNumber, phoneNumber, storeAddress, bankAccountNumber, ifscCode, storeLogo } = req.body;
 
-        const newRequest = new VendorRequest({
-            user: userId,
-            storeName,
-            businessType,
-            gstNumber,
-            phoneNumber,
-            storeAddress,
-            bankAccountNumber,
-            ifscCode,
-            storeLogo,
-            status: 'pending'
-        });
+        const vendorRequest = await VendorRequest.findOneAndUpdate(
+            { user: userId },
+            {
+                storeName,
+                businessType,
+                gstNumber,
+                phoneNumber,
+                storeAddress,
+                bankAccountNumber,
+                ifscCode,
+                storeLogo,
+                status: 'pending',
+                $unset: { rejectionReason: "" } // Clear rejection reason on re-submit
+            },
+            { new: true, upsert: true, runValidators: true }
+        );
 
-        await newRequest.save();
+        // ⭐ REAL-TIME UPDATE: Notify admin dashboards instantly
+        try {
+            getIO().emit("admin_vendor_request_update");
+        } catch (e) {
+            console.error("Socket emit failed:", e);
+        }
 
         res.status(201).json({
             success: true,
             message: "Vendor request submitted successfully",
-            vendorRequest: newRequest
+            vendorRequest: vendorRequest
         });
     } catch (error: any) {
         res.status(500).json({
@@ -196,9 +206,13 @@ export const getProductByCategory = async (req: Request, res: Response): Promise
             return;
         }
 
-        const filter = {
+        const filter: any = {
             category: { $regex: new RegExp(`^${category}$`, 'i') }
-        }; // Case-insensitive exact match
+        };
+
+        if (req.query.subcategory) {
+            filter.subcategory = { $regex: new RegExp(`^${req.query.subcategory}$`, 'i') };
+        }
 
         const totalProducts = await Product.countDocuments(filter);
         const products = await Product.find(filter)
@@ -445,6 +459,14 @@ export const createOrder = async (req: AuthRequest, res: Response): Promise<void
 
         // 3. Wipe out the user's cart now that orders have successfully processed
         await Cart.findOneAndUpdate({ user: userId }, { $set: { items: [] } });
+
+        // ⭐ REAL-TIME UPDATE
+        try {
+            getIO().emit("admin_order_update");
+            getIO().emit("admin_stats_update");
+        } catch (e) {
+            console.error("Socket emit failed:", e);
+        }
 
         res.status(201).json({ success: true, message: "Order placed successfully", orders: createdOrders });
     } catch (error: any) {
@@ -932,3 +954,103 @@ export const markNotificationsAsRead = async (req: AuthRequest, res: Response): 
     }
 };
 
+// --- SEARCH HISTORY ---
+
+// Get current user's search history
+export const getSearchHistory = async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+        const userId = req.userId;
+        const user = await User.findById(userId).select("searchHistory");
+        res.status(200).json({ success: true, history: user?.searchHistory || [] });
+    } catch (error: any) {
+        res.status(500).json({ success: false, message: error.message || "Internal Server Error" });
+    }
+};
+
+// Add a search term to history
+export const addSearchHistory = async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+        const userId = req.userId;
+        const { keyword } = req.body;
+
+        if (!keyword || typeof keyword !== 'string') {
+            res.status(400).json({ message: "Valid keyword is required" });
+            return;
+        }
+
+        const trimmedKeyword = keyword.trim();
+
+        const user = await User.findById(userId);
+        if (!user) {
+            res.status(404).json({ message: "User not found" });
+            return;
+        }
+
+        let history = user.searchHistory || [];
+        history = history.filter(item => item.toLowerCase() !== trimmedKeyword.toLowerCase());
+        history.unshift(trimmedKeyword);
+        history = history.slice(0, 5); // Keep last 5 searches
+
+        user.searchHistory = history;
+        await user.save();
+
+        res.status(200).json({ success: true, history: user.searchHistory });
+    } catch (error: any) {
+        res.status(500).json({ success: false, message: error.message || "Internal Server Error" });
+    }
+};
+
+// Replace entire history (for sync)
+export const syncSearchHistory = async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+        const userId = req.userId;
+        const { history } = req.body;
+
+        if (!Array.isArray(history)) {
+            res.status(400).json({ message: "Valid history array is required" });
+            return;
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            res.status(404).json({ message: "User not found" });
+            return;
+        }
+
+        // Merge histories and remove duplicates, maintaining order and slicing to 5
+        const existingHistory = user.searchHistory || [];
+        const mergedSet = new Set([...history, ...existingHistory]);
+        const merged = Array.from(mergedSet).slice(0, 5);
+
+        user.searchHistory = merged;
+        await user.save();
+
+        res.status(200).json({ success: true, history: user.searchHistory });
+    } catch (error: any) {
+        res.status(500).json({ success: false, message: error.message || "Internal Server Error" });
+    }
+};
+
+// Remove a specific search keyword
+export const removeSearchHistory = async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+        const userId = req.userId;
+        const { keyword } = req.params;
+
+        const user = await User.findById(userId);
+        if (!user) {
+            res.status(404).json({ message: "User not found" });
+            return;
+        }
+
+        let history = user.searchHistory || [];
+        history = history.filter(item => item !== keyword);
+
+        user.searchHistory = history;
+        await user.save();
+
+        res.status(200).json({ success: true, history: user.searchHistory });
+    } catch (error: any) {
+        res.status(500).json({ success: false, message: error.message || "Internal Server Error" });
+    }
+};
