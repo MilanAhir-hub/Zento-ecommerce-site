@@ -4,6 +4,8 @@ export interface IBanner extends Document {
     vendorId: mongoose.Types.ObjectId;
     title: string;
     subtitle?: string;
+    description?: string;
+    color?: string;
     imageUrl: string;
     imageSource?: "upload" | "ai";
     generatedPrompt?: string;
@@ -31,6 +33,14 @@ const BannerSchema = new Schema<IBanner>(
             trim: true,
         },
         subtitle: {
+            type: String,
+            trim: true,
+        },
+        description: {
+            type: String,
+            trim: true,
+        },
+        color: {
             type: String,
             trim: true,
         },

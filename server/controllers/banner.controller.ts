@@ -8,6 +8,8 @@ export const createBanner = async (req: AuthRequest, res: Response): Promise<voi
         const {
             title,
             subtitle,
+            description,
+            color,
             category,
             subcategory,
             discountType,
@@ -25,10 +27,10 @@ export const createBanner = async (req: AuthRequest, res: Response): Promise<voi
         const vendorId = req.userId;
         const file = req.file;
 
-        if (!title || !category || (!file && !generatedImageUrl)) {
+        if (!title || (!file && !generatedImageUrl)) {
             res.status(400).json({
                 success: false,
-                message: "Title, category and a banner image are required",
+                message: "Title and a banner image are required",
             });
             return;
         }
@@ -43,17 +45,22 @@ export const createBanner = async (req: AuthRequest, res: Response): Promise<voi
                 )
             ).url;
 
+        const thirtyDaysFromNow = new Date();
+        thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+
         const banner = await Banner.create({
             vendorId,
             title,
             subtitle: subtitle || "",
+            description: description || "",
+            color: color || "",
             imageUrl,
-            category,
+            category: category || "General",
             subcategory: subcategory || "",
             discountType: discountType || "Percentage",
             discountValue: Number(discountValue) || 0,
             startDate: new Date(startDate || Date.now()),
-            endDate: new Date(endDate || Date.now()),
+            endDate: new Date(endDate || thirtyDaysFromNow),
             theme: theme || "light",
             priority: Number(priority) || 0,
             isActive: isActive === "false" ? false : true,

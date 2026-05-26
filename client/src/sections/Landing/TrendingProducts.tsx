@@ -23,8 +23,8 @@ const TrendingProducts = () => {
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center py-24 min-h-[400px]">
-                <HugeiconsIcon icon={Loading03Icon} size={32} className="animate-spin text-neutral-400" />
+            <div className="flex items-center justify-center py-28 min-h-[400px]">
+                <HugeiconsIcon icon={Loading03Icon} size={32} className="animate-spin text-[#86868b]" />
             </div>
         );
     }
@@ -32,14 +32,14 @@ const TrendingProducts = () => {
     if (!products || products.length === 0) return null;
 
     return (
-        <section className="py-24 bg-[#fafafa] font-sans relative overflow-hidden">
+        <section className="py-28 bg-[#f5f5f7] font-sans relative overflow-hidden">
             <CardSlider
                 title="Trending Now"
                 subtitle="What everyone's loving right now."
                 items={products}
                 viewAllLink="/shop"
                 viewAllText="See All"
-                className="bg-[#fafafa]"
+                className="bg-[#f5f5f7]"
             />
         </section>
     );

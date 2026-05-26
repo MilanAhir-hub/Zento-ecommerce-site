@@ -10,21 +10,20 @@ export const getButtonStyles = (
     size: ButtonProps['size'] = 'md',
     className: string = ''
 ) => {
-    // Apple-inspired minimalist design
-    const baseStyles = "inline-flex items-center justify-center rounded-full font-medium tracking-normal transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 group";
+    const baseStyles = "inline-flex items-center justify-center rounded-[980px] font-medium tracking-normal transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 group";
 
     const variants = {
-        primary: "bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-600 shadow-sm",
-        secondary: "bg-stone-100 text-stone-900 hover:bg-stone-200 focus-visible:ring-stone-200",
-        outline: "bg-transparent text-stone-900 hover:bg-stone-50 border border-stone-200 focus-visible:ring-stone-300",
-        ghost: "bg-transparent text-stone-900 hover:bg-stone-100 focus-visible:ring-stone-200"
+        primary: "bg-[#0071e3] text-white hover:bg-[#0077ed] focus-visible:ring-[#0071e3] shadow-sm",
+        secondary: "bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e8e8ed] focus-visible:ring-[#d2d2d7]",
+        outline: "bg-transparent text-[#1d1d1f] hover:bg-[#f5f5f7] border border-[#d2d2d7] focus-visible:ring-[#d2d2d7]",
+        ghost: "bg-transparent text-[#1d1d1f] hover:bg-[#f5f5f7] focus-visible:ring-[#d2d2d7]"
     };
 
     const sizes = {
-        sm: "px-3 py-1.5 text-sm",
-        md: "px-5 py-2.5 text-sm",
-        lg: "px-6 py-3 text-base",
-        icon: "p-2 aspect-square"
+        sm: "px-4 py-2 text-[13px]",
+        md: "px-5 py-2.5 text-[14px]",
+        lg: "px-6 py-3 text-[15px]",
+        icon: "p-2.5 aspect-square"
     };
 
     return `${baseStyles} ${variants[variant!]} ${sizes[size!]} ${className}`;

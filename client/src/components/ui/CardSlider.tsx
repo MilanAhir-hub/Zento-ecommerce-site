@@ -48,30 +48,28 @@ const CardSlider = <T,>({
     };
 
     return (
-        <section className={`py-12 font-sans overflow-hidden bg-white ${className}`}>
-            <div className="max-w-[1100px] mx-auto px-6 relative">
+        <section className={`py-16 font-sans overflow-hidden ${className}`}>
+            <div className="max-w-[1200px] mx-auto px-6 relative">
 
-                {/* Header */}
-                <div className="flex items-end justify-between mb-8">
+                <div className="flex items-end justify-between mb-10">
 
                     <div>
-                        <h2 className="text-[30px] sm:text-[36px] font-semibold text-neutral-900 tracking-tight leading-tight">
+                        <h2 className="text-[32px] sm:text-[40px] font-semibold text-[#1d1d1f] tracking-tight leading-[1.1]">
                             {title}.
                         </h2>
 
                         {subtitle && (
-                            <p className="mt-2 text-[15px] text-neutral-500 max-w-xl leading-relaxed">
+                            <p className="mt-3 text-[17px] text-[#86868b] max-w-xl leading-[1.5]">
                                 {subtitle}
                             </p>
                         )}
                     </div>
 
-                    {/* Desktop View All */}
                     <div className="hidden sm:flex items-center gap-6 pb-2">
                         {viewAllLink && (
                             <Link
                                 to={viewAllLink}
-                                className="text-[12px] font-bold text-[#0071e3] tracking-wide hover:underline transition"
+                                className="text-[13px] font-semibold text-[#0071e3] tracking-wide hover:underline transition-all duration-200"
                             >
                                 {viewAllText}
                             </Link>
@@ -79,17 +77,15 @@ const CardSlider = <T,>({
                     </div>
                 </div>
 
-                {/* Slider Container */}
                 <div className="relative -mx-2 group/slider">
 
-                    {/* Navigation Buttons (Apple Style) */}
                     <button
                         ref={prevRef}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 
-                        h-10 w-10 flex items-center justify-center rounded-full 
-                        bg-white/90 backdrop-blur-md border border-neutral-200/50 shadow-md
-                        text-neutral-800 opacity-0 group-hover/slider:opacity-100 
-                        transition-all duration-300 hover:bg-white active:scale-95
+                        className="absolute left-2 top-1/2 -translate-y-1/2 z-20 
+                        h-11 w-11 flex items-center justify-center rounded-full 
+                        bg-white/95 backdrop-blur-md border border-[#d2d2d7]/50 shadow-[0_4px_12px_rgba(0,0,0,0.08)]
+                        text-[#1d1d1f] opacity-0 group-hover/slider:opacity-100 
+                        transition-all duration-300 hover:bg-white hover:shadow-[0_6px_16px_rgba(0,0,0,0.12)] active:scale-95
                         disabled:hidden cursor-pointer"
                     >
                         <HugeiconsIcon icon={ArrowLeft01Icon} size={18} />
@@ -97,11 +93,11 @@ const CardSlider = <T,>({
 
                     <button
                         ref={nextRef}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 
-                        h-10 w-10 flex items-center justify-center rounded-full 
-                        bg-white/90 backdrop-blur-md border border-neutral-200/50 shadow-md
-                        text-neutral-800 opacity-0 group-hover/slider:opacity-100 
-                        transition-all duration-300 hover:bg-white active:scale-95
+                        className="absolute right-2 top-1/2 -translate-y-1/2 z-20 
+                        h-11 w-11 flex items-center justify-center rounded-full 
+                        bg-white/95 backdrop-blur-md border border-[#d2d2d7]/50 shadow-[0_4px_12px_rgba(0,0,0,0.08)]
+                        text-[#1d1d1f] opacity-0 group-hover/slider:opacity-100 
+                        transition-all duration-300 hover:bg-white hover:shadow-[0_6px_16px_rgba(0,0,0,0.12)] active:scale-95
                         disabled:hidden cursor-pointer"
                     >
                         <HugeiconsIcon icon={ArrowRight01Icon} size={18} />
@@ -110,24 +106,22 @@ const CardSlider = <T,>({
                     <Swiper
                         modules={[Navigation]}
                         onInit={(swiper) => {
-                            // @ts-ignore
                             swiper.params.navigation.prevEl = prevRef.current;
-                            // @ts-ignore
                             swiper.params.navigation.nextEl = nextRef.current;
                             swiper.navigation.init();
                             swiper.navigation.update();
                         }}
                         slidesPerView="auto"
-                        spaceBetween={20}
+                        spaceBetween={24}
                         slidesPerGroup={1}
                         speed={600}
                         grabCursor={true}
-                        className="pb-8!"
+                        className="pb-10!"
                         breakpoints={{
-                            320: { slidesPerView: 1.25, spaceBetween: 16 },
+                            320: { slidesPerView: 1.2, spaceBetween: 16 },
                             640: { slidesPerView: 2.25, spaceBetween: 20 },
                             1024: { slidesPerView: 3.25, spaceBetween: 24 },
-                            1280: { slidesPerView: 4, spaceBetween: 28 },
+                            1280: { slidesPerView: 4, spaceBetween: 24 },
                         }}
                     >
                         {items.map((item, idx) => (
@@ -138,12 +132,11 @@ const CardSlider = <T,>({
                     </Swiper>
                 </div>
 
-                {/* Mobile View All */}
                 {viewAllLink && (
-                    <div className="mt-4 sm:hidden">
+                    <div className="mt-2 sm:hidden">
                         <Link
                             to={viewAllLink}
-                            className="text-[13px] font-semibold text-[#0071e3]"
+                            className="text-[14px] font-semibold text-[#0071e3]"
                         >
                             {viewAllText} →
                         </Link>

@@ -74,18 +74,17 @@ export const ProductCard = ({ product }: { product: Product }) => {
         >
             <div
                 className="
-                flex flex-col items-center text-center pb-6
-                transition-all duration-300
-                border-3 border-gray-200 rounded-4xl
-                hover:border-gray-300
+                flex flex-col items-center text-center pb-8
+                transition-all duration-400
+                border border-[#e5e5e5] rounded-[24px]
+                hover:border-[#d2d2d7] hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)]
                 ease-out
                 overflow-hidden
                 bg-white
-                p-4
+                p-5
             "
             >
-                {/* Image Container with Consistent Padding for Centering */}
-                <div className="w-full aspect-square bg-[#fafafa] rounded-[28px] overflow-hidden p-6 flex items-center justify-center">
+                <div className="w-full aspect-square bg-[#f5f5f7] rounded-[20px] overflow-hidden p-5 flex items-center justify-center relative">
                     <BlurImage
                         src={getCloudinaryUrl(product.imageUrl, {
                             width: 600,
@@ -102,12 +101,11 @@ export const ProductCard = ({ product }: { product: Product }) => {
                         "
                     />
 
-                    {/* Wishlist Heart Button - Visible on Hover */}
                     <button
                         onClick={handleWishlistToggle}
                         className={`
-                            absolute top-4 right-4 p-2.5 rounded-full 
-                            bg-white/70 backdrop-blur-md shadow-sm
+                            absolute top-3 right-3 p-2.5 rounded-full 
+                            bg-white/90 backdrop-blur-md shadow-[0_2px_8px_rgba(0,0,0,0.08)]
                             transition-all duration-300 transform
                             opacity-0 translate-y-2
                             group-hover:opacity-100 group-hover:translate-y-0
@@ -119,39 +117,38 @@ export const ProductCard = ({ product }: { product: Product }) => {
                         <HugeiconsIcon
                             icon={FavouriteIcon}
                             size={18}
-                            className={`transition-colors duration-300 ${isInWishlist(product._id) ? "text-[#ff2d55] fill-[#ff2d55]" : "text-gray-400 group-hover:text-gray-600"
+                            className={`transition-colors duration-300 ${isInWishlist(product._id) ? "text-[#ff2d55] fill-[#ff2d55]" : "text-[#86868b] group-hover:text-[#1d1d1f]"
                                 }`}
                         />
                     </button>
                 </div>
-                {/* Title and Price Container (Fixed height for alignment) */}
-                <div className="mt-5 w-full flex flex-col items-center justify-start h-[75px] px-2">
+
+                <div className="mt-6 w-full flex flex-col items-center justify-start h-[72px] px-1">
                     <h3 className="
-                        text-[15px] font-medium text-neutral-900
-                        line-clamp-2 leading-snug
+                        text-[15px] font-medium text-[#1d1d1f]
+                        line-clamp-2 leading-[1.4]
                         transition-colors duration-300
-                        group-hover:text-neutral-700
+                        group-hover:text-[#0071e3]
                     ">
                         {product.title}
                     </h3>
 
                     <p className="
-                        mt-1.5 text-[15px] text-neutral-600
+                        mt-2 text-[16px] font-semibold text-[#1d1d1f]
                         transition-colors duration-300
                     ">
                         ₹{product.price.toLocaleString("en-IN")}
                     </p>
                 </div>
 
-                {/* CTA */}
                 <button
                     onClick={handleAddToCart}
                     disabled={isAddingToCart}
                     className="
-                        mt-6 w-full bg-[#0071e3] text-white text-[14px] font-semibold
-                        py-3 px-6 rounded-full
+                        mt-5 w-full bg-[#0071e3] text-white text-[14px] font-semibold
+                        py-3 px-6 rounded-[980px]
                         transition-all duration-300
-                        hover:bg-[#005bb5] hover:shadow-lg hover:shadow-[#0071e3]/20
+                        hover:bg-[#0077ed] hover:shadow-[0_4px_12px_rgba(0,113,227,0.3)]
                         active:scale-[0.98]
                         disabled:opacity-50
                         cursor-pointer

@@ -12,7 +12,7 @@ if (!apiKey) {
 
 const genAI = new GoogleGenerativeAI(apiKey);
 
-let discoveredModelName: string = "gemini-1.5-flash";
+let discoveredModelName: string = "gemini-2.5-flash";
 
 /**
  * Returns the Gemini generative model instance.
