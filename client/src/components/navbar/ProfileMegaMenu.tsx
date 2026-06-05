@@ -1,6 +1,8 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/authContext';
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowRight01Icon, Logout03Icon } from "@hugeicons/core-free-icons";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/authContext";
 
 interface ProfileMegaMenuProps {
     isVisible: boolean;
@@ -9,182 +11,313 @@ interface ProfileMegaMenuProps {
     onItemClick: () => void;
 }
 
-const ProfileMegaMenu: React.FC<ProfileMegaMenuProps> = ({
+const EASE = [0.22, 1, 0.36, 1] as const;
+
+const ProfileMegaMenu = ({
     isVisible,
     onMouseEnter,
     onMouseLeave,
-    onItemClick
-}) => {
+    onItemClick,
+}: ProfileMegaMenuProps) => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+    const prefersReduced = useReducedMotion();
 
     const handleLogout = async () => {
         try {
             await logout();
             onItemClick();
-            navigate('/login');
+            navigate("/login");
         } catch (error) {
             console.error("Logout failed", error);
         }
     };
 
-    const navSections = user ? [
-        {
-            title: "Manage Account",
-            links: [
-                { label: "Profile Info", to: "/user/personal-info" },
-                { label: "Order History", to: "/user/orders" },
-                { label: "Settings", to: "/user/settings" },
-                { label: "Notifications", to: "/user/notifications" },
-            ]
+    const navSections = user
+        ? [
+              {
+                  title: "Account",
+                  links: [
+                      { label: "Profile", to: "/user/personal-info" },
+                      { label: "Orders", to: "/user/orders" },
+                      { label: "Settings", to: "/user/settings" },
+                      { label: "Notifications", to: "/user/notifications" },
+                  ],
+              },
+              {
+                  title: "Saved",
+                  links: [
+                      { label: "Wishlist", to: "/user/wishlist" },
+                      { label: "Addresses", to: "/user/addresses" },
+                  ],
+              },
+              {
+                  title: "Support",
+                  links: [
+                      { label: "Help Center", to: "/help" },
+                      { label: "Guide", to: "/guide" },
+                  ],
+              },
+          ]
+        : [
+              {
+                  title: "Support",
+                  links: [
+                      { label: "Help Center", to: "/help" },
+                      { label: "Guide", to: "/guide" },
+                      { label: "Track Order", to: "/track-order" },
+                      { label: "Returns", to: "/returns" },
+                  ],
+              },
+              {
+                  title: "Discover",
+                  links: [
+                      { label: "Store Locator", to: "/stores" },
+                      { label: "Gift Cards", to: "/gift-cards" },
+                      { label: "Contact", to: "/contact" },
+                  ],
+              },
+          ];
+
+    const panelVariants = {
+        hidden: { opacity: 0, y: prefersReduced ? 0 : -6 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: {
+                duration: prefersReduced ? 0 : 0.45,
+                ease: EASE,
+                when: "beforeChildren",
+                staggerChildren: prefersReduced ? 0 : 0.03,
+                delayChildren: prefersReduced ? 0 : 0.08,
+            },
         },
-        {
-            title: "Collections",
-            links: [
-                { label: "Wishlist", to: "/user/wishlist" },
-                { label: "Saved Addresses", to: "/user/addresses" },
-            ]
+        exit: {
+            opacity: 0,
+            y: prefersReduced ? 0 : -4,
+            transition: { duration: prefersReduced ? 0 : 0.18, ease: EASE },
         },
-        {
-            title: "Support",
-            links: [
-                { label: "Help Center", to: "/help" },
-                { label: "Zento Guide", to: "/guide" },
-            ]
-        }
-    ] : [
-        {
-            title: "Support & Help",
-            links: [
-                { label: "Help Center", to: "/help" },
-                { label: "Zento Guide", to: "/guide" },
-                { label: "Track Order", to: "/track-order" },
-                { label: "Returns & Exchanges", to: "/returns" },
-            ]
+    };
+
+    const childVariants = {
+        hidden: { opacity: 0, y: prefersReduced ? 0 : 8 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: { duration: prefersReduced ? 0 : 0.45, ease: EASE },
         },
-        {
-            title: "Quick Links",
-            links: [
-                { label: "Store Locator", to: "/stores" },
-                { label: "Gift Cards", to: "/gift-cards" },
-                { label: "Contact Us", to: "/contact" },
-            ]
-        }
-    ];
+    };
 
     return (
-        <div
-            className={`absolute left-0 right-0 top-[48px] w-full bg-white border-b border-gray-200 transition-all duration-300 ease-in-out z-40 overflow-hidden ${isVisible ? 'max-h-[550px] opacity-100 py-12' : 'max-h-0 opacity-0 py-0'
-                }`}
-            onMouseEnter={onMouseEnter}
-            onMouseLeave={onMouseLeave}
-        >
-            <div className="max-w-[1300px] mx-auto px-6">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+        <AnimatePresence>
+            {isVisible && (
+                <motion.div
+                    key="profile-mega"
+                    onMouseEnter={onMouseEnter}
+                    onMouseLeave={onMouseLeave}
+                    variants={panelVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    className="
+                        absolute left-0 right-0 top-full mt-3 w-full
+                        bg-white/95 backdrop-blur-md
+                        border-y border-[#E5E5E5]
+                        shadow-[0_24px_60px_-20px_rgba(0,0,0,0.15)]
+                        overflow-hidden
+                        z-40
+                    "
+                    role="region"
+                    aria-label="Account"
+                >
+                    <div className="max-w-[1440px] mx-auto px-4 md:px-10 py-10 md:py-12">
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
+                            {/* Identity / Sign-in */}
+                            <motion.div variants={childVariants} className="md:col-span-4">
+                                <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#767676] mb-6 flex items-center gap-2">
+                                    <span>{user ? "Signed In" : "Account"}</span>
+                                    <span className="h-px flex-1 bg-[#E5E5E5]" />
+                                </h3>
 
-                    {/* Left Section: User Identity or Login CTA */}
-                    <div className="col-span-1">
-                        <h3 className="text-[12px] font-semibold text-gray-500 uppercase tracking-wider mb-6">
-                            {user ? 'My Account' : 'Welcome to Zento'}
-                        </h3>
-                        {user ? (
-                            <div className="space-y-1">
-                                <h2 className="text-2xl font-bold text-gray-900 tracking-tight leading-tight">
-                                    {user.name}
-                                </h2>
-                                <p className="text-sm text-gray-500 font-medium">{user.email}</p>
+                                {user ? (
+                                    <div className="space-y-2">
+                                        <p className="text-[26px] font-light text-[#000000] tracking-[0.01em] leading-tight text-balance">
+                                            {user.name}
+                                        </p>
+                                        <p className="text-[13px] text-[#767676] break-all">
+                                            {user.email}
+                                        </p>
 
-                                {(user.role === 'vendor' || user.role === 'admin') ? (
-                                    <Link
-                                        to={user.role === 'admin' ? "/admin/dashboard" : "/vendor/overview"}
-                                        onClick={onItemClick}
-                                        className="inline-block mt-4 text-[13px] font-semibold text-[#0071e3] hover:underline"
-                                    >
-                                        Open {user.role === 'admin' ? "Admin" : "Seller"} Dashboard
-                                    </Link>
-                                ) : (
-                                    <Link
-                                        to="/apply-seller"
-                                        onClick={onItemClick}
-                                        className="inline-block mt-4 text-[13px] font-semibold text-[#0071e3] hover:underline"
-                                    >
-                                        Become a Retailer
-                                    </Link>
-                                )}
-                            </div>
-                        ) : (
-                            <div className="space-y-4">
-                                <p className="text-sm text-gray-500 font-medium">
-                                    Sign in for a better experience, track your orders and manage preferences.
-                                </p>
-                                <div className="flex flex-col gap-3 pt-2">
-                                    <Link
-                                        to="/login"
-                                        onClick={onItemClick}
-                                        className="inline-flex items-center justify-center px-4 py-2 text-[13px] font-semibold text-white bg-black rounded-full hover:bg-gray-800 transition-colors w-fit"
-                                    >
-                                        Sign In
-                                    </Link>
-                                    <p className="text-[12px] text-gray-500">
-                                        New customer? <Link to="/register" onClick={onItemClick} className="text-[#0071e3] hover:underline">Create account</Link>
-                                    </p>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Right Section: Navigation Segments */}
-                    <div className="col-span-3">
-                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-8">
-                            {navSections.map((section, idx) => (
-                                <div key={idx} className="space-y-6">
-                                    <h4 className="text-[12px] font-semibold text-gray-500 uppercase tracking-wider mb-6">
-                                        {section.title}
-                                    </h4>
-                                    <div className="flex flex-col gap-y-1">
-                                        {section.links.map((link, lIdx) => (
+                                        {user.role === "vendor" || user.role === "admin" ? (
                                             <Link
-                                                key={lIdx}
-                                                to={link.to}
+                                                to={
+                                                    user.role === "admin"
+                                                        ? "/admin/dashboard"
+                                                        : "/vendor/overview"
+                                                }
                                                 onClick={onItemClick}
-                                                className="text-sm text-gray-600 hover:text-black transition-colors py-1"
+                                                className="
+                                                    group/dash
+                                                    inline-flex items-center gap-2 mt-4
+                                                    text-[12px] font-medium uppercase tracking-[0.14em]
+                                                    text-[#000000] underline-offset-4
+                                                    hover:underline
+                                                    transition-colors duration-200
+                                                "
                                             >
-                                                {link.label}
+                                                Open {user.role === "admin" ? "Admin" : "Seller"}{" "}
+                                                Dashboard
+                                                <HugeiconsIcon
+                                                    icon={ArrowRight01Icon}
+                                                    size={14}
+                                                    className="-translate-x-1 group-hover/dash:translate-x-0 transition-transform duration-300"
+                                                />
                                             </Link>
-                                        ))}
+                                        ) : (
+                                            <Link
+                                                to="/apply-seller"
+                                                onClick={onItemClick}
+                                                className="
+                                                    group/dash
+                                                    inline-flex items-center gap-2 mt-4
+                                                    text-[12px] font-medium uppercase tracking-[0.14em]
+                                                    text-[#000000] underline-offset-4
+                                                    hover:underline
+                                                    transition-colors duration-200
+                                                "
+                                            >
+                                                Become a Retailer
+                                                <HugeiconsIcon
+                                                    icon={ArrowRight01Icon}
+                                                    size={14}
+                                                    className="-translate-x-1 group-hover/dash:translate-x-0 transition-transform duration-300"
+                                                />
+                                            </Link>
+                                        )}
                                     </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        <p className="text-[14px] text-[#222222] leading-relaxed max-w-xs">
+                                            Sign in to track orders, save items, and check out
+                                            faster.
+                                        </p>
+                                        <Link
+                                            to="/login"
+                                            onClick={onItemClick}
+                                            className="
+                                                inline-flex items-center justify-center
+                                                h-11 px-7
+                                                bg-[#000000] text-white
+                                                border border-[#000000]
+                                                text-[11px] font-medium uppercase tracking-[0.14em]
+                                                hover:bg-white hover:text-[#000000]
+                                                transition-colors duration-300
+                                                focus-visible:outline focus-visible:outline-1
+                                                focus-visible:outline-offset-2 focus-visible:outline-[#000000]
+                                            "
+                                        >
+                                            Sign In
+                                        </Link>
+                                        <p className="text-[12px] text-[#767676]">
+                                            New here?{" "}
+                                            <Link
+                                                to="/register"
+                                                onClick={onItemClick}
+                                                className="text-[#000000] underline underline-offset-4 hover:no-underline"
+                                            >
+                                                Create an account
+                                            </Link>
+                                        </p>
+                                    </div>
+                                )}
+                            </motion.div>
 
-                {/* Footer Section */}
-                <div className="mt-12 pt-8 border-t border-gray-100 flex gap-12">
-                    <div>
-                        <h4 className="text-[11px] font-medium text-gray-400 uppercase mb-4 tracking-widest">
-                            {user ? 'Account Actions' : 'Support'}
-                        </h4>
-                        <div className="flex gap-8 items-center">
-                            {user ? (
+                            {/* Sections */}
+                            <motion.div
+                                variants={childVariants}
+                                className="md:col-span-8 grid grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-8"
+                            >
+                                {navSections.map((section) => (
+                                    <section key={section.title}>
+                                        <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#767676] mb-4">
+                                            {section.title}
+                                        </h3>
+                                        <ul className="space-y-2">
+                                            {section.links.map((link) => (
+                                                <li key={link.to}>
+                                                    <Link
+                                                        to={link.to}
+                                                        onClick={onItemClick}
+                                                        className="
+                                                            group/link
+                                                            flex items-center justify-between
+                                                            py-1
+                                                            text-[14px] text-[#222222] hover:text-[#000000]
+                                                            transition-colors duration-200
+                                                        "
+                                                    >
+                                                        <span>{link.label}</span>
+                                                        <HugeiconsIcon
+                                                            icon={ArrowRight01Icon}
+                                                            size={12}
+                                                            className="text-[#9a9a9a] -translate-x-1 opacity-0 group-hover/link:translate-x-0 group-hover/link:opacity-100 transition-[transform,opacity] duration-300"
+                                                        />
+                                                    </Link>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </section>
+                                ))}
+                            </motion.div>
+                        </div>
+
+                        {user && (
+                            <motion.div
+                                variants={childVariants}
+                                className="
+                                    mt-10 pt-6 border-t border-[#E5E5E5]
+                                    flex flex-wrap items-center gap-x-8 gap-y-3
+                                "
+                            >
                                 <button
+                                    type="button"
                                     onClick={handleLogout}
-                                    className="text-sm font-medium hover:underline text-rose-600"
+                                    className="
+                                        group/out
+                                        inline-flex items-center gap-2
+                                        text-[12px] font-medium uppercase tracking-[0.14em]
+                                        text-[#000000]
+                                        underline-offset-4 hover:underline
+                                        transition-colors duration-200
+                                    "
                                 >
+                                    <HugeiconsIcon
+                                        icon={Logout03Icon}
+                                        size={14}
+                                        className="text-[#767676] group-hover/out:text-[#000000] transition-colors duration-200"
+                                    />
                                     Sign Out
                                 </button>
-                            ) : null}
-                            <Link to="/about" onClick={onItemClick} className="text-sm font-medium hover:underline text-gray-900">
-                                Privacy Policy
-                            </Link>
-                            <Link to="/help" onClick={onItemClick} className="text-sm font-medium hover:underline text-gray-900">
-                                Global Support
-                            </Link>
-                        </div>
+                                <Link
+                                    to="/about"
+                                    onClick={onItemClick}
+                                    className="text-[12px] font-medium uppercase tracking-[0.14em] text-[#000000] underline-offset-4 hover:underline transition-colors duration-200"
+                                >
+                                    Privacy
+                                </Link>
+                                <Link
+                                    to="/help"
+                                    onClick={onItemClick}
+                                    className="text-[12px] font-medium uppercase tracking-[0.14em] text-[#000000] underline-offset-4 hover:underline transition-colors duration-200"
+                                >
+                                    Support
+                                </Link>
+                            </motion.div>
+                        )}
                     </div>
-                </div>
-            </div>
-        </div>
+                </motion.div>
+            )}
+        </AnimatePresence>
     );
 };
 

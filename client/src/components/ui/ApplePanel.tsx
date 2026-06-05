@@ -1,103 +1,143 @@
-import React, { useEffect, useCallback, useRef } from 'react';
-import { HugeiconsIcon } from '@hugeicons/react';
-import { Cancel01Icon } from '@hugeicons/core-free-icons';
+import { useEffect, useCallback, useRef, useId } from "react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon } from "@hugeicons/core-free-icons";
 
 interface ApplePanelProps {
     isOpen: boolean;
     onClose: () => void;
-    position?: 'center' | 'right';
+    position?: "center" | "right";
     children: React.ReactNode;
     title?: string;
     showCloseButton?: boolean;
-    maxWidth?: string; // e.g., 'max-w-md', 'max-w-2xl'
+    maxWidth?: string;
+    ariaLabel?: string;
 }
 
 const ApplePanel: React.FC<ApplePanelProps> = ({
     isOpen,
     onClose,
-    position = 'center',
+    position = "center",
     children,
     title,
     showCloseButton = true,
-    maxWidth = 'max-w-lg'
+    maxWidth = "max-w-lg",
+    ariaLabel,
 }) => {
     const panelRef = useRef<HTMLDivElement>(null);
+    const previousFocusRef = useRef<HTMLElement | null>(null);
+    const titleId = useId();
 
-    // --- ACCESSIBILITY: ESC KEY ---
-    const handleKeyDown = useCallback((e: KeyboardEvent) => {
-        if (e.key === 'Escape') onClose();
-    }, [onClose]);
+    // ESC to close + scroll lock
+    const handleKeyDown = useCallback(
+        (e: KeyboardEvent) => {
+            if (e.key === "Escape") onClose();
+        },
+        [onClose]
+    );
 
-    // --- ACCESSIBILITY: SCROLL LOCK & FOCUS ---
     useEffect(() => {
         if (isOpen) {
-            document.body.style.overflow = 'hidden';
-            window.addEventListener('keydown', handleKeyDown);
+            previousFocusRef.current = document.activeElement as HTMLElement | null;
+            document.body.style.overflow = "hidden";
+            window.addEventListener("keydown", handleKeyDown);
         } else {
-            document.body.style.overflow = 'unset';
-            window.removeEventListener('keydown', handleKeyDown);
+            document.body.style.overflow = "";
+            window.removeEventListener("keydown", handleKeyDown);
         }
         return () => {
-            document.body.style.overflow = 'unset';
-            window.removeEventListener('keydown', handleKeyDown);
+            document.body.style.overflow = "";
+            window.removeEventListener("keydown", handleKeyDown);
         };
     }, [isOpen, handleKeyDown]);
 
-    // --- CLICK OUTSIDE HANDLER ---
+    // Restore focus on close
+    useEffect(() => {
+        if (!isOpen && previousFocusRef.current) {
+            previousFocusRef.current.focus();
+        }
+    }, [isOpen]);
+
     const handleBackdropClick = (e: React.MouseEvent) => {
         if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
             onClose();
         }
     };
 
-    if (!isOpen && !panelRef.current) return null;
-
     return (
         <div
-            className={`fixed inset-0 z-100 flex transition-all duration-500 ease-in-out ${position === 'center' ? 'items-center justify-center p-4' : 'justify-end'
-                } ${isOpen ? 'visible' : 'invisible'}`}
+            className={[
+                "fixed inset-0 z-[100]",
+                "flex",
+                position === "center" ? "items-center justify-center p-4" : "justify-end",
+                "transition-opacity duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]",
+                isOpen ? "visible opacity-100" : "invisible opacity-0",
+            ].join(" ")}
         >
-            {/* Backdrop with official Apple-style blur */}
+            {/* Backdrop */}
             <div
-                className={`absolute inset-0 bg-black/20 backdrop-blur-xl transition-opacity duration-500 ease-in-out ${isOpen ? 'opacity-100' : 'opacity-0'
-                    }`}
+                className="absolute inset-0 bg-[#000000]/30"
                 onClick={handleBackdropClick}
                 aria-hidden="true"
             />
 
-            {/* Panel Content */}
+            {/* Panel */}
             <div
                 ref={panelRef}
-                className={`relative bg-white shadow-2xl transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] overflow-hidden flex flex-col ${position === 'center'
-                    ? `w-full ${maxWidth} rounded-[32px] ${isOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-4'}`
-                    : `h-full w-full max-w-[480px] rounded-l-[32px] ${isOpen ? 'translate-x-0' : 'translate-x-full'}`
-                    }`}
                 role="dialog"
                 aria-modal="true"
+                aria-labelledby={title ? titleId : undefined}
+                aria-label={!title ? ariaLabel : undefined}
+                className={[
+                    "relative bg-white",
+                    "border border-[#E5E5E5]",
+                    "rounded-none",
+                    "flex flex-col",
+                    "transition-transform duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]",
+                    position === "center"
+                        ? `w-full ${maxWidth} max-h-[90vh] ${isOpen ? "opacity-100 scale-100" : "opacity-0 scale-[0.98]"}`
+                        : `h-full w-full max-w-[420px] ${isOpen ? "translate-x-0" : "translate-x-full"}`,
+                ].join(" ")}
             >
                 {/* Header */}
                 {(title || showCloseButton) && (
-                    <div className="flex items-center justify-between px-8 py-6 shrink-0 border-b border-gray-50/50">
+                    <div className="flex items-center justify-between px-6 md:px-8 h-16 shrink-0 border-b border-[#E5E5E5]">
                         {title ? (
-                            <h2 className="text-[20px] font-semibold text-[#1d1d1f] tracking-tight">
+                            <h2
+                                id={titleId}
+                                className="
+                                    text-[14px] font-medium uppercase
+                                    tracking-[0.1em]
+                                    text-[#000000]
+                                "
+                            >
                                 {title}
                             </h2>
-                        ) : <div />}
+                        ) : (
+                            <span />
+                        )}
 
                         {showCloseButton && (
                             <button
+                                type="button"
                                 onClick={onClose}
-                                className="h-8 w-8 flex items-center justify-center rounded-full bg-[#f5f5f7] hover:bg-[#e8e8ed] text-[#1d1d1f] transition-all active:scale-90"
                                 aria-label="Close panel"
+                                className="
+                                    w-9 h-9
+                                    inline-flex items-center justify-center
+                                    text-[#222222] hover:text-[#000000]
+                                    transition-colors duration-200
+                                    focus-visible:outline focus-visible:outline-1
+                                    focus-visible:outline-offset-2 focus-visible:outline-[#000000]
+                                "
                             >
-                                <HugeiconsIcon icon={Cancel01Icon} size={18} />
+                                <HugeiconsIcon icon={Cancel01Icon} size={18} aria-hidden="true" />
                             </button>
                         )}
                     </div>
                 )}
 
                 {/* Body */}
-                <div className="flex-1 overflow-y-auto px-8 py-6 custom-scrollbar">
+                <div className="flex-1 overflow-y-auto overscroll-contain px-6 md:px-8 py-6">
                     {children}
                 </div>
             </div>

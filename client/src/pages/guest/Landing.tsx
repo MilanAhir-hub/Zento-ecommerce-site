@@ -1,23 +1,29 @@
-import FeaturedProducts from "../../sections/Landing/FeaturedProducts";
 import Hero from "../../sections/Landing/Hero";
-import Trust from "../../sections/Landing/Trust";
-import CallToAction from "../../sections/Landing/CallToAction";
-import CategorySliders from "../../sections/Landing/CategorySliders";
-import Recommended from "../../sections/Landing/Recommended";
-import TrendingProducts from "../../sections/Landing/TrendingProducts";
-import RecentlyViewed from "../../sections/Landing/RecentlyViewed";
+import BrandTicker from "../../sections/Landing/BrandTicker";
+import CategoryGrid from "../../sections/Landing/CategoryGrid";
+import FashionFilm from "../../sections/Landing/FashionFilm";
+import EditorialGrid from "../../sections/Landing/EditorialGrid";
+import { useLenis } from "../../hooks/motion/useLenis";
+import { useScrollTriggerSync } from "../../hooks/motion/useScrollTriggerSync";
 
+/**
+ * Home Page (Guest Landing).
+ *
+ * Initializes Lenis smooth scrolling and the GSAP/ScrollTrigger sync loop
+ * for the duration of this page only. When the user navigates away the
+ * hooks tear down cleanly so the rest of the app retains native scrolling.
+ */
 const GuestLandingPage = () => {
+    useLenis();
+    useScrollTriggerSync();
+
     return (
         <>
             <Hero />
-            <CategorySliders />
-            <FeaturedProducts />
-            <Recommended />
-            <TrendingProducts />
-            <RecentlyViewed />
-            <Trust />
-            <CallToAction />
+            <BrandTicker />
+            <CategoryGrid />
+            <FashionFilm />
+            <EditorialGrid />
         </>
     );
 };

@@ -23,32 +23,32 @@ export const ProductCard = ({ product }: { product: Product }) => {
     const navigate = useNavigate();
 
     const isProductInCart = cart?.items?.some(
-        (item) => item.product._id === product._id
+        (item) => item.product?._id === product._id
     );
+    const inWishlist = isInWishlist(product._id);
 
     const handleProductClick = () => {
         log({
             productId: product._id,
-            action: 'view',
-            price: product.price
+            action: "view",
+            price: product.price,
         });
     };
 
     const handleAddToCart = async (e: React.MouseEvent) => {
         e.preventDefault();
-        e.stopPropagation(); //without this when button click, parent will click automatically
+        e.stopPropagation();
 
         if (!isAuthenticated) {
             navigate("/auth/login");
             return;
         }
 
-        // Log the interaction
         log({
             productId: product._id,
-            action: 'add_to_cart',
+            action: "add_to_cart",
             price: product.price,
-            quantity: 1
+            quantity: 1,
         });
 
         await addToCart({ productId: product._id });
@@ -66,101 +66,127 @@ export const ProductCard = ({ product }: { product: Product }) => {
         await toggleWishlist(product._id);
     };
 
+    const priceFormatted = new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency: "INR",
+        maximumFractionDigits: 0,
+    }).format(product.price);
+
     return (
         <Link
             to={`/products/${product._id}`}
             onClick={handleProductClick}
-            className="group block relative"
+            className="group block relative focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-[#000000]"
+            aria-label={`${product.title}, ${priceFormatted}`}
         >
+            {/* Image Container */}
             <div
                 className="
-                flex flex-col items-center text-center pb-6
-                transition-all duration-300
-                border-3 border-gray-200 rounded-4xl
-                hover:border-gray-300
-                ease-out
-                overflow-hidden
-                bg-white
-                p-4
-            "
+                    relative w-full
+                    bg-[#F9F9F9]
+                    overflow-hidden
+                "
             >
-                {/* Image Container with Consistent Padding for Centering */}
-                <div className="w-full aspect-square bg-[#fafafa] rounded-[28px] overflow-hidden p-6 flex items-center justify-center">
-                    <BlurImage
-                        src={getCloudinaryUrl(product.imageUrl, {
-                            width: 600,
-                            quality: "auto",
-                            format: "auto",
-                        })}
-                        alt={product.title}
-                        wrapperClassName="w-full h-full bg-transparent"
-                        className="
-                            object-contain
-                            transition-transform duration-700 
-                            ease-[cubic-bezier(0.22,1,0.36,1)]
-                            group-hover:scale-105
-                        "
-                    />
-
-                    {/* Wishlist Heart Button - Visible on Hover */}
-                    <button
-                        onClick={handleWishlistToggle}
-                        className={`
-                            absolute top-4 right-4 p-2.5 rounded-full 
-                            bg-white/70 backdrop-blur-md shadow-sm
-                            transition-all duration-300 transform
-                            opacity-0 translate-y-2
-                            group-hover:opacity-100 group-hover:translate-y-0
-                            hover:bg-white hover:scale-110 active:scale-95
-                            z-10
-                        `}
-                        aria-label={isInWishlist(product._id) ? "Remove from wishlist" : "Add to wishlist"}
-                    >
-                        <HugeiconsIcon
-                            icon={FavouriteIcon}
-                            size={18}
-                            className={`transition-colors duration-300 ${isInWishlist(product._id) ? "text-[#ff2d55] fill-[#ff2d55]" : "text-gray-400 group-hover:text-gray-600"
-                                }`}
-                        />
-                    </button>
-                </div>
-                {/* Title and Price Container (Fixed height for alignment) */}
-                <div className="mt-5 w-full flex flex-col items-center justify-start h-[75px] px-2">
-                    <h3 className="
-                        text-[15px] font-medium text-neutral-900
-                        line-clamp-2 leading-snug
-                        transition-colors duration-300
-                        group-hover:text-neutral-700
-                    ">
-                        {product.title}
-                    </h3>
-
-                    <p className="
-                        mt-1.5 text-[15px] text-neutral-600
-                        transition-colors duration-300
-                    ">
-                        ₹{product.price.toLocaleString("en-IN")}
-                    </p>
-                </div>
-
-                {/* CTA */}
-                <button
-                    onClick={handleAddToCart}
-                    disabled={isAddingToCart}
+                <BlurImage
+                    src={getCloudinaryUrl(product.imageUrl, {
+                        width: 600,
+                        quality: "auto",
+                        format: "auto",
+                    })}
+                    alt={product.title}
+                    width={600}
+                    height={800}
+                    aspectRatio="3/4"
+                    wrapperClassName="aspect-[3/4]"
                     className="
-                        mt-6 w-full bg-[#0071e3] text-white text-[14px] font-semibold
-                        py-3 px-6 rounded-full
-                        transition-all duration-300
-                        hover:bg-[#005bb5] hover:shadow-lg hover:shadow-[#0071e3]/20
-                        active:scale-[0.98]
-                        disabled:opacity-50
-                        cursor-pointer
+                        object-cover
+                        transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]
+                        group-hover:scale-[1.04]
+                    "
+                />
+
+                {/* Wishlist Heart Button */}
+                <button
+                    type="button"
+                    onClick={handleWishlistToggle}
+                    aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
+                    aria-pressed={inWishlist}
+                    className={`
+                        absolute top-3 right-3
+                        w-9 h-9
+                        inline-flex items-center justify-center
+                        bg-white border border-[#E5E5E5]
+                        rounded-full
+                        opacity-0 translate-y-1
+                        group-hover:opacity-100 group-hover:translate-y-0
+                        focus-visible:opacity-100 focus-visible:translate-y-0
+                        transition-[opacity,transform,background-color] duration-200
+                        hover:bg-[#000000] hover:border-[#000000]
+                        active:scale-95
+                    `}
+                >
+                    <HugeiconsIcon
+                        icon={FavouriteIcon}
+                        size={16}
+                        aria-hidden="true"
+                        className={
+                            inWishlist
+                                ? "text-[#BC0000] fill-[#BC0000]"
+                                : "text-[#222222] group-hover:text-white"
+                        }
+                    />
+                </button>
+            </div>
+
+            {/* Title & Price */}
+            <div className="mt-4 px-1">
+                <h3
+                    className="
+                        text-[14px] font-normal tracking-[0.02em]
+                        text-[#000000]
+                        leading-snug
+                        line-clamp-2
+                        underline-offset-4
+                        group-hover:underline
+                        transition-colors duration-200
                     "
                 >
-                    {isProductInCart ? "Added" : isAddingToCart ? "Adding..." : "Add to Bag"}
-                </button>
+                    {product.title}
+                </h3>
 
+                <p
+                    className="
+                        mt-1.5
+                        text-[14px] font-medium tabular-nums
+                        text-[#222222]
+                    "
+                >
+                    {priceFormatted}
+                </p>
             </div>
+
+            {/* Add to Bag */}
+            <button
+                type="button"
+                onClick={handleAddToCart}
+                disabled={isAddingToCart}
+                className="
+                    mt-4 w-full h-11
+                    inline-flex items-center justify-center
+                    bg-[#000000] text-white
+                    border border-[#000000]
+                    rounded-none
+                    text-[11px] font-medium uppercase tracking-[0.12em]
+                    hover:bg-white hover:text-[#000000]
+                    active:scale-[0.98]
+                    disabled:opacity-40 disabled:cursor-not-allowed
+                    transition-[background-color,color] duration-200
+                    focus-visible:outline focus-visible:outline-1
+                    focus-visible:outline-offset-2 focus-visible:outline-[#000000]
+                "
+            >
+                {isProductInCart ? "Added to Bag" : isAddingToCart ? "Adding…" : "Add to Bag"}
+            </button>
         </Link>
     );
 };
