@@ -15,7 +15,6 @@ import AddProduct from "./sections/vendor/AddProduct";
 import Orders from "./sections/vendor/Orders";
 import Analytics from "./sections/vendor/Analytics";
 import Settings from "./sections/vendor/Settings";
-import AddBanner from "./sections/vendor/AddBanner.tsx";
 
 const VendorDashboard = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -34,9 +33,6 @@ const VendorDashboard = () => {
             return "add-product";
         }
 
-        if (pathname.startsWith("/vendor/banners/add")) {
-            return "add-banner";
-        }
 
         const pathParts = pathname.split("/").filter(Boolean);
         return pathParts[pathParts.length - 1] || "overview";
@@ -87,7 +83,6 @@ const VendorDashboard = () => {
                         <Route path="/orders" element={<Orders />} />
                         <Route path="/analytics" element={<Analytics />} />
                         <Route path="/settings" element={<Settings />} />
-                        <Route path="/banners/add" element={<AddBanner />} />
                     </Routes>
                 </div>
 

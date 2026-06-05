@@ -7,7 +7,6 @@ import { AuthRequest } from "../middlewares/auth.middleware";
 import { generateAIResponse } from "../services/ai/chatService";
 import { generateDescription, improveDescription } from "../services/ai/descriptionService";
 import { enhanceImageWithAI } from "../services/ai/imageEnhancementService";
-import { generateBannerImage } from "../services/ai/bannerImageService";
 import { uploadToCloudinary } from "../middlewares/upload.middleware";
 import { generateImageEmbedding, searchProductsByVector } from "../services/ai/visualSearchService";
 
@@ -280,89 +279,6 @@ export const processVendorImage = async (req: Request, res: Response): Promise<v
         res.status(500).json({
             success: false,
             message: error.message || "Failed to enhance image."
-        });
-    }
-};
-
-/**
- * POST /api/vendor/ai/generate-banner
- * Body: { title, subtitle, category, subcategory, discountType, discountValue, startDate, endDate, theme, customPrompt }
- *
- * Generates a vendor banner image from structured form data using Google's text-to-image flow.
- */
-export const generateAIVendorBanner = async (req: AuthRequest, res: Response): Promise<void> => {
-    try {
-        console.log("➡️ [REQUEST] POST /api/vendor/ai/generate-banner");
-
-        const vendorId = req.userId;
-        if (!vendorId) {
-            res.status(401).json({
-                success: false,
-                message: "Unauthorized",
-            });
-            return;
-        }
-
-        const {
-            title,
-            subtitle,
-            category,
-            subcategory,
-            discountType,
-            discountValue,
-            startDate,
-            endDate,
-            theme,
-            customPrompt,
-        } = req.body;
-
-        if (!title || !category) {
-            res.status(400).json({
-                success: false,
-                message: "Title and category are required to generate a banner.",
-            });
-            return;
-        }
-
-        if (customPrompt && String(customPrompt).trim().length > 500) {
-            res.status(400).json({
-                success: false,
-                message: "Optional AI prompt must be 500 characters or less.",
-            });
-            return;
-        }
-
-        const generatedBanner = await generateBannerImage({
-            title: String(title),
-            subtitle: subtitle ? String(subtitle) : "",
-            category: String(category),
-            subcategory: subcategory ? String(subcategory) : "",
-            discountType: discountType ? String(discountType) : "Percentage",
-            discountValue: discountValue ? String(discountValue) : "",
-            startDate: startDate ? String(startDate) : "",
-            endDate: endDate ? String(endDate) : "",
-            theme: theme ? String(theme) : "light",
-            customPrompt: customPrompt ? String(customPrompt) : "",
-        });
-
-        const uploadResult = await uploadToCloudinary(
-            generatedBanner.imageBuffer,
-            "zento/banners/ai-generated",
-            `${vendorId}_${Date.now()}_ai_banner`
-        );
-
-        res.status(200).json({
-            success: true,
-            imageUrl: uploadResult.url,
-            prompt: generatedBanner.prompt,
-            model: generatedBanner.model,
-            notes: generatedBanner.textResponse,
-        });
-    } catch (error: any) {
-        console.error("AI Vendor Banner error:", error.message || error);
-        res.status(500).json({
-            success: false,
-            message: error.message || "Failed to generate banner image.",
         });
     }
 };

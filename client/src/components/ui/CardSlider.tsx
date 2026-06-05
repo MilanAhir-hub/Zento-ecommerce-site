@@ -108,28 +108,30 @@ const CardSlider = <T,>({
                         )}
                     </div>
 
-                    {viewAllLink && (
-                        <Link
-                            to={viewAllLink}
-                            className="
-                                hidden sm:inline-flex
-                                text-[11px] font-medium uppercase
-                                tracking-[0.12em]
-                                text-[#000000]
-                                underline-offset-4
-                                hover:underline
-                                transition-colors duration-200
-                                focus-visible:outline focus-visible:outline-1
-                                focus-visible:outline-offset-2 focus-visible:outline-[#000000]
-                            "
-                        >
-                            {viewAllText}
-                        </Link>
-                    )}
-                </header>
+                    {
+                        viewAllLink && (
+                            <Link
+                                to={viewAllLink}
+                                className="
+                                    hidden sm:inline-flex
+                                    text-[11px] font-medium uppercase
+                                    tracking-[0.12em]
+                                    text-[#000000]
+                                    underline-offset-4
+                                    hover:underline
+                                    transition-colors duration-200
+                                    focus-visible:outline focus-visible:outline-1
+                                    focus-visible:outline-offset-2 focus-visible:outline-[#000000]
+                                "
+                            >
+                                {viewAllText}
+                            </Link>
+                        )
+                    }
+                </header >
 
                 {/* Slider */}
-                <div className="relative">
+                < div className="relative" >
                     <Swiper
                         modules={[Navigation]}
                         onSwiper={setSwiperInstance}
@@ -206,9 +208,8 @@ const CardSlider = <T,>({
                     >
                         <HugeiconsIcon icon={ArrowRight01Icon} size={18} aria-hidden="true" />
                     </button>
-                </div>
+                </div >
 
-                {/* Mobile View All */}
                 {viewAllLink && (
                     <div className="mt-6 sm:hidden">
                         <Link
@@ -231,8 +232,8 @@ const CardSlider = <T,>({
                         </Link>
                     </div>
                 )}
-            </div>
-        </section>
+            </div >
+        </section >
     );
 };
 

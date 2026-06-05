@@ -22,8 +22,7 @@ import {
 import {
     generateAIProductDescription,
     improveAIProductDescription,
-    processVendorImage,
-    generateAIVendorBanner
+    processVendorImage
 } from "../controllers/ai.controller";
 
 const router = express.Router();
@@ -63,6 +62,5 @@ router.get("/banners", getBanners);
 router.post("/ai/generate-description", generateAIProductDescription);
 router.post("/ai/improve-description", improveAIProductDescription);
 router.post("/ai/enhance-image", upload.single("image"), processVendorImage);
-router.post("/ai/generate-banner", generateAIVendorBanner);
 
 export default router;

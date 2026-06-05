@@ -1,29 +1,17 @@
-import { useRef } from "react";
-import { Link } from "react-router-dom";
 import { useProducts } from "../../hooks/products/useProducts";
-import { ProductCard } from "../../components/ui/ProductCard";
-import Button from "../../components/ui/Button";
+import CardSlider from "../../components/ui/CardSlider";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowLeft01Icon, ArrowRight01Icon, Alert01Icon } from "@hugeicons/core-free-icons";
+import { Alert01Icon } from "@hugeicons/core-free-icons";
 
 const FeaturedProducts = () => {
-    // Replace manual api fetching and state with useQuery hook
     const { data: products = [], isLoading, isError } = useProducts({ limit: 10 });
-    const scrollContainerRef = useRef<HTMLDivElement>(null);
-
-    const scroll = (direction: 'left' | 'right') => {
-        if (scrollContainerRef.current) {
-            const scrollAmount = direction === 'left' ? -400 : 400;
-            scrollContainerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-        }
-    };
 
     if (isLoading) {
         return (
-            <section className="py-16 bg-white">
-                <div className="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8">
+            <section className="py-20 bg-white">
+                <div className="max-w-[1200px] mx-auto px-6">
                     <div className="h-[400px] flex items-center justify-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-stone-900"></div>
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1d1d1f]"></div>
                     </div>
                 </div>
             </section>
@@ -32,9 +20,9 @@ const FeaturedProducts = () => {
 
     if (isError) {
         return (
-            <section className="py-16 bg-white">
-                <div className="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="h-[400px] flex flex-col items-center justify-center text-stone-500 gap-4">
+            <section className="py-20 bg-white">
+                <div className="max-w-[1200px] mx-auto px-6">
+                    <div className="h-[400px] flex flex-col items-center justify-center text-[#86868b] gap-4">
                         <HugeiconsIcon icon={Alert01Icon} className="w-12 h-12 text-red-500 opacity-50" />
                         <p className="font-medium text-lg">Failed to load featured products.</p>
                     </div>
@@ -46,72 +34,13 @@ const FeaturedProducts = () => {
     if (products.length === 0) return null;
 
     return (
-        <section className="py-20 bg-white font-sans overflow-hidden">
-            <div className="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8">
-
-                {/* Section Header */}
-                <div className="flex items-end justify-between mb-10">
-                    <div>
-                        <h2 className="text-3xl sm:text-4xl font-extrabold text-stone-900 tracking-tight">
-                            Featured Highlights
-                        </h2>
-                        <p className="mt-3 text-stone-500 font-medium max-w-xl">
-                            Handpicked premium selections carefully curated just for you.
-                        </p>
-                    </div>
-
-                    {/* Navigation Arrows */}
-                    <div className="hidden sm:flex items-center gap-3">
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => scroll('left')}
-                            className="h-12 w-12 bg-white text-stone-600 hover:text-stone-900 shadow-sm"
-                            aria-label="Scroll left"
-                        >
-                            <HugeiconsIcon icon={ArrowLeft01Icon} size={24} />
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => scroll('right')}
-                            className="h-12 w-12 bg-white text-stone-600 hover:text-stone-900 shadow-sm"
-                            aria-label="Scroll right"
-                        >
-                            <HugeiconsIcon icon={ArrowRight01Icon} size={24} />
-                        </Button>
-                    </div>
-                </div>
-
-                <div
-                    ref={scrollContainerRef}
-                    className="flex overflow-x-auto gap-8 sm:gap-10 pb-8 -mx-4 px-4 sm:mx-0 sm:px-0 hide-scrollbar snap-x snap-mandatory"
-                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                >
-                    {products.map((product) => (
-                        <div key={product._id} className="flex-none w-[300px] sm:w-[340px] md:w-[360px] snap-start">
-                            <ProductCard product={product} />
-                        </div>
-                    ))}
-                </div>
-
-                {/* Mobile View All button */}
-                <div className="mt-4 sm:hidden text-center border-t border-stone-100 pt-6">
-                    <Link to="/products" className="inline-flex items-center text-sm font-bold text-stone-900 uppercase tracking-widest hover:text-stone-600 transition-colors">
-                        View All Products <HugeiconsIcon icon={ArrowRight01Icon} size={16} className="ml-1" />
-                    </Link>
-                </div>
-            </div>
-
-            {/* Inject CSS to hide scrollbar for webkit browsers */}
-            <style>
-                {`
-                .hide-scrollbar::-webkit-scrollbar {
-                    display: none;
-                }
-                `}
-            </style>
-        </section>
+        <CardSlider
+            title="Featured Highlights"
+            subtitle="Handpicked premium selections carefully curated just for you."
+            items={products}
+            viewAllLink="/products"
+            viewAllText="View All Products"
+        />
     );
 };
 

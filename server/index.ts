@@ -1,6 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
 dotenv.config();
+console.log("🔍 [DEBUG] HF_TOKEN loaded from process.env:", process.env.HF_TOKEN ? `Yes (length: ${process.env.HF_TOKEN.trim().length})` : "No (undefined)");
+
 
 import cors from "cors";
 import cookieParser from "cookie-parser";

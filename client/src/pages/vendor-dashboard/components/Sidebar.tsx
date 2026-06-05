@@ -17,7 +17,6 @@ export const sidebarMenu = [
     { id: 'add-product', label: 'Add Product', icon: PlusSignCircleIcon, path: '/vendor/products/add' },
     { id: 'orders', label: 'Orders', icon: ShoppingBag01Icon, path: '/vendor/orders' },
     { id: 'analytics', label: 'Analytics', icon: Analytics01Icon, path: '/vendor/analytics' },
-    { id: 'add-banner', label: 'Create Banner', icon: PlusSignCircleIcon, path: '/vendor/banners/add' },
 ];
 
 interface SidebarProps {

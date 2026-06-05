@@ -57,6 +57,8 @@ export interface VendorBanner {
     vendorId: string;
     title: string;
     subtitle?: string;
+    description?: string;
+    color?: string;
     imageUrl: string;
     imageSource?: "upload" | "ai";
     generatedPrompt?: string;
@@ -74,10 +76,9 @@ export interface VendorBanner {
 
 export const getVendorDashboardStats = async (): Promise<VendorDashboardStats> => {
     const response = await api.get('/vendor/dashboard-stats');
-    // Map backend response structure to our interface
     if (response.data.success && response.data.stats) {
         return {
-            totalSales: response.data.stats.totalOrders, // Using totalOrders as temporary mapping for "sales"
+            totalSales: response.data.stats.totalOrders,
             activeProducts: response.data.stats.totalProducts,
             newOrders: response.data.stats.pendingOrders,
             totalRevenue: response.data.stats.totalRevenue,
