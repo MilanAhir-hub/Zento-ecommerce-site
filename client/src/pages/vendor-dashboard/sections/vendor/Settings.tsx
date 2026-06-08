@@ -195,7 +195,7 @@ const Settings = () => {
                     <div>
                         <p className="text-sm font-semibold text-[#1d1d1f]">Financial Security</p>
                         <p className="text-[12px] text-[#86868b] mt-0.5">
-                            Payment accounts and secondary settings are managed via Zento Secure Financial Portal.
+                            Payment accounts and secondary settings are managed via Novara Secure Financial Portal.
                         </p>
                     </div>
                 </div>

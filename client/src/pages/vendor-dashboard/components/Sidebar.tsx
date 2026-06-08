@@ -60,7 +60,7 @@ const Sidebar = ({ user, handleLogout, isOpen, onClose }: SidebarProps) => {
                 }`}>
                 <div className="p-6 flex flex-col flex-1">
                     <div className="flex items-center justify-between mb-10 px-2">
-                        <span className="text-[22px] font-semibold tracking-tight text-[#1d1d1f]">Zento <span className="text-[#86868b] font-normal">Sellers</span></span>
+                        <span className="text-[22px] font-semibold tracking-tight text-[#1d1d1f]">Novara <span className="text-[#86868b] font-normal">Sellers</span></span>
 
                         {/* Close button for mobile */}
                         <button

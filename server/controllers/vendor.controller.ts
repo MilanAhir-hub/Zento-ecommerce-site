@@ -231,7 +231,7 @@ export const getVendorProducts = async (req: AuthRequest, res: Response): Promis
 
         // Pagination logic
         const page = parseInt(req.query.page as string) || 1;
-        const limit = parseInt(req.query.limit as string) || 10;
+        const limit = parseInt(req.query.limit as string) || 1000;
         const skip = (page - 1) * limit;
 
         // Filtering logic setup
@@ -290,7 +290,7 @@ export const getVendorOrders = async (req: AuthRequest, res: Response): Promise<
         const vendorId = req.userId;
 
         const page = parseInt(req.query.page as string) || 1;
-        const limit = parseInt(req.query.limit as string) || 10;
+        const limit = parseInt(req.query.limit as string) || 1000;
         const skip = (page - 1) * limit;
 
         const filter: any = { vendorId };

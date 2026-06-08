@@ -71,7 +71,7 @@ const AdminDashboard = () => {
             {/* Sidebar */}
             <aside className="w-72 bg-white/80 backdrop-blur-xl border-r border-[#d2d2d7]/30 hidden md:flex flex-col sticky top-0 h-screen">
                 <div className="h-20 flex items-center px-8">
-                    <span className="text-[22px] font-bold tracking-tight text-[#1d1d1f]">Zento <span className="text-[#0071e3]">Admin</span></span>
+                    <span className="text-[22px] font-bold tracking-tight text-[#1d1d1f]">Novara <span className="text-[#0071e3]">Admin</span></span>
                 </div>
 
                 <nav className="flex-1 px-4 py-4 space-y-8 overflow-y-auto custom-scrollbar">
