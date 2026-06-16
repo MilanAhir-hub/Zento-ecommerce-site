@@ -68,7 +68,7 @@ const BrandTicker = () => {
 
     return (
         <div
-            className="w-full bg-[#F9F9F9] border-b border-[#E5E5E5] py-6 overflow-hidden select-none"
+            className="w-full bg-[#F9F9F9] py-6 overflow-hidden select-none"
             aria-label="Featured brands"
         >
             <div className="relative w-full flex items-center">

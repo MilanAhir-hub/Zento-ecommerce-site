@@ -215,9 +215,9 @@ const PublicNavbar = () => {
                                                 className={`
                                                     group/cat relative
                                                     h-full inline-flex items-center
-                                                    text-[11px] font-semibold uppercase
-                                                    tracking-[0.15em]
-                                                    transition-colors duration-300
+                                                    text-[11px] font-medium uppercase
+                                                    tracking-[0.12em]
+                                                    transition-colors duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]
                                                     ${
                                                         isActive
                                                             ? "text-[#000000]"
@@ -228,6 +228,10 @@ const PublicNavbar = () => {
                                                 `}
                                             >
                                                 <span>{cat.name}</span>
+                                                {/* Active indicator line */}
+                                                {isActive && (
+                                                    <span className="absolute bottom-0 left-0 right-0 h-px bg-[#000000]" />
+                                                )}
                                             </Link>
                                         </li>
                                     );
@@ -466,14 +470,14 @@ const PublicNavbar = () => {
                                                     py-4
                                                     text-[14px] font-medium uppercase tracking-[0.12em]
                                                     text-[#222222] hover:text-[#000000]
-                                                    transition-colors duration-200
+                                                    transition-colors duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]
                                                 "
                                             >
                                                 <span>{cat.name}</span>
                                                 <HugeiconsIcon
                                                     icon={Search01Icon}
                                                     size={14}
-                                                    className="text-[#9a9a9a] -rotate-45 opacity-0 group-hover/mob:opacity-100 transition-opacity duration-200"
+                                                    className="text-[#9a9a9a] -rotate-45 opacity-0 group-hover/mob:opacity-100 transition-opacity duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]"
                                                 />
                                             </Link>
                                         </motion.li>

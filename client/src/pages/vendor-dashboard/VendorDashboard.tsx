@@ -46,7 +46,7 @@ const VendorDashboard = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#f5f5f7] flex font-sans text-[#1d1d1f] selection:bg-[#0071e3] selection:text-white">
+        <div className="min-h-screen bg-[#FFFFFF] flex font-sans text-[#222222] selection:bg-brand-black selection:text-brand-white">
             {/* Sidebar component */}
             <Sidebar
                 activeSection={activeSection}
@@ -89,7 +89,8 @@ const VendorDashboard = () => {
                 {/* Floating Action Button (Mobile Only) */}
                 <button
                     onClick={() => navigate('/vendor/products/add')}
-                    className="fixed bottom-8 right-6 lg:hidden bg-[#1d1d1f] text-white w-14 h-14 rounded-full flex items-center justify-center shadow-xl active:scale-95 transition-all z-40"
+                    className="fixed bottom-8 right-6 lg:hidden bg-brand-black text-brand-white border border-brand-black w-14 h-14 rounded-none flex items-center justify-center hover:bg-brand-white hover:text-brand-black active:scale-95 transition-all duration-default ease-editorial z-40"
+                    aria-label="Add Product"
                 >
                     <HugeiconsIcon icon={PlusSignCircleIcon} size={24} />
                 </button>

@@ -16,16 +16,6 @@ const Orders = () => {
     const [searchQuery, setSearchQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
 
-    const getStatusStyles = (status: string) => {
-        switch (status) {
-            case 'Pending': return 'bg-[#fffbeb] text-[#92400e] border-[#fef3c7]';
-            case 'Shipped': return 'bg-[#eff6ff] text-[#1d4ed8] border-[#dbeafe]';
-            case 'Delivered': return 'bg-[#f0fdf4] text-[#166534] border-[#dcfce7]';
-            case 'Cancelled': return 'bg-[#fef2f2] text-[#b91c1c] border-[#fee2e2]';
-            default: return 'bg-[#f5f5f7] text-[#86868b] border-[#e5e5ea]';
-        }
-    };
-
     const handleStatusChange = async (id: string, status: string) => {
         try {
             await updateStatusMutation.mutateAsync({ id, status });
@@ -50,8 +40,10 @@ const Orders = () => {
     if (isLoading) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[420px] gap-4">
-                <HugeiconsIcon icon={Loading03Icon} size={26} className="animate-spin text-[#0071e3]" />
-                <p className="text-[#86868b] text-sm">Loading orders…</p>
+                <HugeiconsIcon icon={Loading03Icon} size={22} className="animate-spin text-black" />
+                <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-gray-400">
+                    Loading orders
+                </span>
             </div>
         );
     }
@@ -59,13 +51,16 @@ const Orders = () => {
     // ERROR
     if (isError) {
         return (
-            <div className="bg-white border border-[#e5e5ea] p-10 rounded-[28px] text-center space-y-4 shadow-sm">
-                <HugeiconsIcon icon={Alert01Icon} size={26} className="text-[#ff3b30] mx-auto" />
-                <h3 className="text-[#1d1d1f] font-semibold">Unable to load orders</h3>
-                <p className="text-[#86868b] text-sm">{(error as any)?.message}</p>
+            <div className="border border-gray-200 p-12 text-center">
+                <HugeiconsIcon icon={Alert01Icon} size={32} className="text-gray-300 mx-auto mb-6" />
+                <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-gray-400 block mb-3">
+                    Error
+                </span>
+                <h3 className="text-[20px] font-light text-black mb-3">Unable to load orders</h3>
+                <p className="text-[14px] text-gray-500 mb-8">{(error as any)?.message}</p>
                 <button
                     onClick={() => refetch()}
-                    className="px-6 py-2 rounded-full bg-[#1d1d1f] text-white text-sm"
+                    className="px-8 py-3 bg-black text-white text-[11px] font-medium uppercase tracking-[0.15em] hover:bg-gray-900 transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]"
                 >
                     Retry
                 </button>
@@ -74,40 +69,48 @@ const Orders = () => {
     }
 
     return (
-        <div className="space-y-12 animate-in fade-in duration-700 pb-20">
+        <div className="space-y-12 pb-20">
 
             {/* HEADER */}
             <div>
-                <h2 className="text-[36px] font-semibold text-[#1d1d1f] tracking-tight">
+                <div className="w-12 h-px bg-black mb-6" />
+                <h2 className="text-[32px] md:text-[40px] font-light text-black tracking-[0.02em]">
                     Orders
                 </h2>
-                <p className="text-[#86868b] text-[15px] mt-1">
+                <p className="text-[13px] text-gray-500 font-normal mt-2">
                     {orders?.length || 0} total orders
                 </p>
             </div>
 
-            {/* MAIN CARD */}
-            <div className="relative rounded-[36px] border border-black/5 bg-gradient-to-b from-white to-[#f5f5f7] shadow-[0_10px_60px_-20px_rgba(0,0,0,0.08)] overflow-hidden">
+            {/* FILTER BAR */}
+            <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center justify-between">
 
-                {/* glow */}
-                <div className="absolute -top-20 -right-20 w-72 h-72 bg-[#0071e3]/10 blur-3xl rounded-full"></div>
-
-                {/* FILTER BAR */}
-                <div className="p-6 flex flex-col md:flex-row gap-4 border-b border-[#f0f0f0]">
-
-                    {/* SEARCH */}
-                    <div className="relative flex-1 group">
-                        <HugeiconsIcon icon={Search01Icon} size={16}
-                            className="absolute left-4 top-1/2 -translate-y-1/2 text-[#86868b] group-focus-within:text-[#0071e3]" />
-                        <input
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Search orders"
-                            className="w-full pl-10 pr-4 py-3 rounded-full bg-white border border-[#e5e5ea] text-sm outline-none focus:ring-4 focus:ring-[#0071e3]/10"
+                {/* SEARCH */}
+                <div className="relative w-full max-w-xs group">
+                    <div className="absolute inset-y-0 left-0 pl-1 flex items-center pointer-events-none">
+                        <HugeiconsIcon
+                            icon={Search01Icon}
+                            size={15}
+                            className="text-gray-400 group-focus-within:text-black transition-colors duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]"
                         />
                     </div>
+                    <label htmlFor="order-search" className="sr-only">
+                        Search orders
+                    </label>
+                    <input
+                        id="order-search"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search orders..."
+                        className="w-full pl-7 pr-3 py-2 bg-transparent border-0 border-b border-gray-200 text-black placeholder:text-gray-300 focus:outline-none focus:border-black transition-colors duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] font-normal text-xs tracking-[0.12em] uppercase"
+                    />
+                </div>
 
-                    {/* FILTER */}
+                {/* STATUS FILTER */}
+                <div className="flex items-center gap-3">
+                    <span className="text-[11px] font-medium uppercase tracking-[0.12em] text-gray-400">
+                        Filter:
+                    </span>
                     <Select
                         value={statusFilter}
                         onChange={(val) => setStatusFilter(val)}
@@ -116,86 +119,129 @@ const Orders = () => {
                             { value: "pending", label: "Pending" },
                             { value: "shipped", label: "Shipped" },
                             { value: "delivered", label: "Delivered" },
-                            { value: "cancelled", label: "Cancelled" }
+                            { value: "cancelled", label: "Cancelled" },
                         ]}
-                        className="w-[160px]"
+                        className="w-[130px]"
+                        triggerClassName="!h-9 !text-[12px]"
                     />
                 </div>
+            </div>
 
                 {/* TABLE */}
                 <div className="hidden lg:block">
                     {filteredOrders.length > 0 ? (
-                        <table className="w-full">
-                            <thead className="text-xs text-[#86868b] uppercase border-b">
-                                <tr>
-                                    <th className="px-8 py-4 text-left">Order</th>
-                                    <th>Customer</th>
-                                    <th>Items</th>
-                                    <th>Total</th>
-                                    <th>Status</th>
-                                    <th className="text-right px-8">Update</th>
-                                </tr>
-                            </thead>
+                        <div>
+                            {/* Table Header */}
+                            <div className="grid grid-cols-12 gap-4 pb-4 border-b border-gray-200">
+                                <div className="col-span-2 text-[11px] font-medium uppercase tracking-[0.15em] text-gray-400">
+                                    Order
+                                </div>
+                                <div className="col-span-3 text-[11px] font-medium uppercase tracking-[0.15em] text-gray-400">
+                                    Customer
+                                </div>
+                                <div className="col-span-2 text-[11px] font-medium uppercase tracking-[0.15em] text-gray-400 text-center">
+                                    Items
+                                </div>
+                                <div className="col-span-2 text-[11px] font-medium uppercase tracking-[0.15em] text-gray-400 text-center">
+                                    Total
+                                </div>
+                                <div className="col-span-3 text-[11px] font-medium uppercase tracking-[0.15em] text-gray-400 text-right">
+                                    Status
+                                </div>
+                            </div>
 
-                            <tbody>
-                                {filteredOrders.map(o => (
-                                    <tr key={o._id} className="hover:bg-white/60 transition">
-                                        <td className="px-8 py-5 font-semibold">
-                                            #{o._id.slice(-6).toUpperCase()}
-                                        </td>
+                            {/* Table Rows */}
+                            {filteredOrders.map((o) => (
+                                <div
+                                    key={o._id}
+                                    className="grid grid-cols-12 gap-4 items-center py-5 border-b border-gray-100 hover:bg-[#F9F9F9] transition-colors duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                                >
+                                    {/* Order ID */}
+                                    <div className="col-span-2 text-[14px] font-medium tabular-nums text-black">
+                                        #{o._id.slice(-6).toUpperCase()}
+                                    </div>
 
-                                        <td className="text-sm">
-                                            <p className="font-semibold">{o.user.name}</p>
-                                            <p className="text-[#86868b]">{o.user.email}</p>
-                                        </td>
+                                    {/* Customer */}
+                                    <div className="col-span-3">
+                                        <p className="text-[14px] font-normal text-black">{o.user.name}</p>
+                                        <p className="text-[12px] text-gray-500">{o.user.email}</p>
+                                    </div>
 
-                                        <td className="text-center">{o.items.length}</td>
-                                        <td className="text-center font-medium">₹{o.totalAmount}</td>
+                                    {/* Items */}
+                                    <div className="col-span-2 text-center text-[14px] tabular-nums text-black">
+                                        {o.items.length}
+                                    </div>
 
-                                        <td className="text-center">
-                                            <span className={`px-3 py-1 text-xs rounded-full border ${getStatusStyles(o.status)}`}>
-                                                {o.status}
-                                            </span>
-                                        </td>
+                                    {/* Total */}
+                                    <div className="col-span-2 text-center text-[14px] font-medium tabular-nums text-black">
+                                        ₹{o.totalAmount.toLocaleString("en-IN")}
+                                    </div>
 
-                                        <td className="px-8 text-right">
-                                            <Select
-                                                value={o.status}
-                                                onChange={(val) => handleStatusChange(o._id, val)}
-                                                options={["Pending", "Shipped", "Delivered", "Cancelled"]}
-                                                className="w-[120px]"
-                                            />
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                    {/* Status Update */}
+                                    <div className="col-span-3 flex justify-end">
+                                        <Select
+                                            value={o.status}
+                                            onChange={(val) => handleStatusChange(o._id, val)}
+                                            options={["Pending", "Shipped", "Delivered", "Cancelled"]}
+                                            className="w-[120px]"
+                                            triggerClassName="!h-9 !text-[12px]"
+                                        />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     ) : (
                         <div className="py-24 text-center">
-                            <HugeiconsIcon icon={ShoppingBag01Icon} size={40} className="mx-auto text-gray-300 mb-4" />
-                            <h3 className="text-lg font-semibold">No orders yet</h3>
-                            <p className="text-[#86868b] text-sm mt-2">
-                                Orders will appear here
+                            <div className="w-16 h-16 border border-gray-200 flex items-center justify-center mx-auto mb-6">
+                                <HugeiconsIcon icon={ShoppingBag01Icon} size={24} className="text-gray-300" />
+                            </div>
+                            <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-gray-400 block mb-3">
+                                No orders
+                            </span>
+                            <h3 className="text-[20px] font-light text-black mb-3">
+                                {searchQuery ? "No orders found" : "No orders yet"}
+                            </h3>
+                            <p className="text-[14px] text-gray-500">
+                                {searchQuery ? "Try a different search term" : "Orders will appear here once customers start purchasing."}
                             </p>
                         </div>
                     )}
                 </div>
 
                 {/* MOBILE */}
-                <div className="lg:hidden p-4 space-y-4">
-                    {filteredOrders.map(o => (
-                        <div key={o._id} className="bg-white p-4 rounded-2xl shadow-sm">
-                            <div className="flex justify-between">
-                                <p className="font-semibold">#{o._id.slice(-6)}</p>
-                                <span className="text-xs">{o.status}</span>
+                <div className="lg:hidden space-y-0">
+                    {filteredOrders.map((o) => (
+                        <div key={o._id} className="py-5 border-b border-gray-100">
+                            <div className="flex justify-between items-start mb-2">
+                                <p className="text-[14px] font-medium tabular-nums text-black">
+                                    #{o._id.slice(-6).toUpperCase()}
+                                </p>
+                                <Select
+                                    value={o.status}
+                                    onChange={(val) => handleStatusChange(o._id, val)}
+                                    options={["Pending", "Shipped", "Delivered", "Cancelled"]}
+                                    className="w-[110px]"
+                                    triggerClassName="!h-8 !text-[11px]"
+                                />
                             </div>
-                            <p className="text-sm text-gray-500 mt-1">{o.user.name}</p>
-                            <p className="text-sm mt-2">₹{o.totalAmount}</p>
+                            <p className="text-[13px] text-gray-500">{o.user.name}</p>
+                            <div className="flex justify-between items-center mt-2">
+                                <span className="text-[13px] tabular-nums text-gray-500">
+                                    {o.items.length} items
+                                </span>
+                                <span className="text-[14px] font-medium tabular-nums text-black">
+                                    ₹{o.totalAmount.toLocaleString("en-IN")}
+                                </span>
+                            </div>
                         </div>
                     ))}
+                    {filteredOrders.length === 0 && (
+                        <div className="py-12 text-center">
+                            <p className="text-[14px] text-gray-500">No orders found</p>
+                        </div>
+                    )}
                 </div>
             </div>
-        </div>
     );
 };
 

@@ -296,7 +296,7 @@ const SearchMenu = ({ isVisible, onClose }: SearchMenuProps) => {
                     exit="exit"
                     className="
                         absolute left-0 right-0 top-full
-                        w-full bg-white/95 backdrop-blur-md
+                        w-full bg-white
                         border-b border-[#E5E5E5]
                         shadow-[0_24px_60px_-20px_rgba(0,0,0,0.18)]
                         z-40 overflow-hidden
@@ -426,10 +426,9 @@ const SearchMenu = ({ isVisible, onClose }: SearchMenuProps) => {
                                     >
                                         <h3
                                             id="recent-searches-heading"
-                                            className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#767676] mb-4 flex items-center gap-2"
+                                            className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#767676] mb-4"
                                         >
-                                            <span>Recent</span>
-                                            <span className="h-px flex-1 bg-[#E5E5E5]" />
+                                            Recent
                                         </h3>
                                         {searchHistory.length > 0 ? (
                                             <ul className="space-y-1">
@@ -492,10 +491,9 @@ const SearchMenu = ({ isVisible, onClose }: SearchMenuProps) => {
                                     >
                                         <h3
                                             id="suggestions-heading"
-                                            className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#767676] mb-4 flex items-center gap-2"
+                                            className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#767676] mb-4"
                                         >
-                                            <span>Discover</span>
-                                            <span className="h-px flex-1 bg-[#E5E5E5]" />
+                                            Discover
                                         </h3>
                                         <ul className="grid grid-cols-2 md:grid-cols-2 gap-x-8 gap-y-2">
                                             {QUICK_LINKS.map((item) => (
@@ -535,20 +533,19 @@ const SearchMenu = ({ isVisible, onClose }: SearchMenuProps) => {
                                 >
                                     <h3
                                         id="results-heading"
-                                        className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#767676] mb-5 flex items-center gap-2"
+                                        className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#767676] mb-5"
                                     >
                                         {isSearching ? (
-                                            <span>Searching…</span>
+                                            "Searching…"
                                         ) : (
-                                            <span>
+                                            <>
                                                 {searchResults?.length ?? 0} result
                                                 {searchResults?.length === 1 ? "" : "s"} for{" "}
                                                 <span className="text-[#000000] normal-case tracking-normal font-medium">
                                                     “{trimmedTerm}”
                                                 </span>
-                                            </span>
+                                            </>
                                         )}
-                                        <span className="h-px flex-1 bg-[#E5E5E5]" />
                                     </h3>
 
                                     {isSearching ? (
@@ -643,7 +640,7 @@ const SearchMenu = ({ isVisible, onClose }: SearchMenuProps) => {
                         <motion.div
                             variants={childVariants}
                             className="
-                                mt-10 pt-4 border-t border-[#E5E5E5]
+                                mt-10 pt-4
                                 flex flex-wrap items-center gap-x-6 gap-y-2
                                 text-[11px] font-medium uppercase tracking-[0.12em] text-[#9a9a9a]
                             "

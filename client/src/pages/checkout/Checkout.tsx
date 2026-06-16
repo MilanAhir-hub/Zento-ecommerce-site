@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useCart } from "../../hooks/cart/useCart";
 import { useAuth } from "../../context/authContext";
 import toast from "react-hot-toast";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Loading03Icon, Shield01Icon } from "@hugeicons/core-free-icons";
+import { Loading03Icon, Shield01Icon, ArrowRight01Icon, LockIcon } from "@hugeicons/core-free-icons";
 import Button from "../../components/ui/Button";
+import BlurImage from "../../components/ui/BlurImage";
+import { getCloudinaryUrl } from "../../utils/cloudinaryImage";
 
 import { createRazorpayOrder, verifyRazorpayPayment } from "../../services/payment.api";
 import { loadRazorpayScript } from "../../utils/loadRazorpay";
@@ -29,10 +31,11 @@ const Checkout = () => {
     }, [isAuthenticated, isAuthLoading, navigate]);
 
     // Derived cart values
-    const items = cart?.items || [];
+    const items = (cart?.items || []).filter((item) => item && item.product);
     const subtotal = items.reduce((t, i) => t + i.product.price * i.quantity, 0);
     const shipping = subtotal > 50000 || subtotal === 0 ? 0 : 500;
     const total = subtotal + shipping;
+    const itemCount = items.reduce((t, i) => t + i.quantity, 0);
 
     const handlePayment = async () => {
         if (!user) {
@@ -48,7 +51,6 @@ const Checkout = () => {
         setIsProcessing(true);
 
         try {
-            // 1. Load Razorpay Script Dynamically
             const isLoaded = await loadRazorpayScript();
             if (!isLoaded) {
                 toast.error("Razorpay SDK failed to load. Are you online?");
@@ -56,7 +58,6 @@ const Checkout = () => {
                 return;
             }
 
-            // 2. Create Order from Backend
             const orderResponse = await createRazorpayOrder(total);
             if (!orderResponse.success) {
                 toast.error("Could not create order.");
@@ -64,12 +65,11 @@ const Checkout = () => {
                 return;
             }
 
-            // 3. Initialize Razorpay Options
             const options = {
-                key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_XXXXXXXXX", // Replace with env variable in production
+                key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_XXXXXXXXX",
                 amount: orderResponse.amount,
                 currency: orderResponse.currency,
-                name: "TogetherBuy",
+                name: "NOVARA",
                 description: "Purchase Transaction",
                 order_id: orderResponse.orderId,
                 handler: async function (response: any) {
@@ -82,9 +82,8 @@ const Checkout = () => {
                         );
 
                         if (verifyResult.success) {
-                            toast.success("Payment Successful! 🎉");
-                            // TODO: Clear cart & redirect to success page
-                            navigate("/user/home");
+                            toast.success("Payment Successful!");
+                            navigate("/user/orders");
                         } else {
                             toast.error("Payment Verification Failed.");
                         }
@@ -96,11 +95,11 @@ const Checkout = () => {
                 prefill: {
                     name: user.name || "Customer",
                     email: user.email || "",
-                    contact: "" // Can fetch from generic profile config if available
+                    contact: "",
                 },
                 theme: {
-                    color: "#0071e3" // Apple style blue
-                }
+                    color: "#000000",
+                },
             };
 
             const paymentObject = new window.Razorpay(options);
@@ -111,7 +110,6 @@ const Checkout = () => {
             });
 
             paymentObject.open();
-
         } catch (error: any) {
             console.error("Checkout Error:", error);
             toast.error("Something went wrong during checkout.");
@@ -123,82 +121,238 @@ const Checkout = () => {
     if (isAuthLoading || isCartLoading) {
         return (
             <div className="flex items-center justify-center min-h-[60vh]">
-                <HugeiconsIcon icon={Loading03Icon} size={22} className="animate-spin text-[#86868b]" />
+                <div className="flex flex-col items-center gap-4">
+                    <HugeiconsIcon icon={Loading03Icon} size={22} className="animate-spin text-black" />
+                    <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-gray-400">
+                        Preparing checkout
+                    </span>
+                </div>
             </div>
         );
     }
 
     if (items.length === 0) {
         return (
-            <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
-                <h1 className="text-[22px] font-semibold text-[#1d1d1f] mb-2">Cart is empty</h1>
-                <p className="text-[14px] text-[#6e6e73] mb-6">You cannot checkout an empty cart.</p>
-                <Button onClick={() => navigate("/products")} className="px-5 py-2.5 rounded-full bg-[#0071e3]! text-white text-[13px]">
-                    Return to Shop
-                </Button>
+            <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
+                <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-gray-400 mb-4">
+                    Empty Bag
+                </span>
+                <h1 className="text-[28px] md:text-[36px] font-light text-black mb-4">
+                    Nothing to checkout
+                </h1>
+                <p className="text-[14px] text-gray-500 mb-10 max-w-sm">
+                    Your bag is empty. Discover our collection and add pieces that speak to your personal aesthetic.
+                </p>
+                <Link
+                    to="/products"
+                    className="text-[11px] font-medium uppercase tracking-[0.15em] text-black pb-2 border-b border-black hover:border-transparent transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                >
+                    Begin Shopping
+                </Link>
             </div>
         );
     }
 
     return (
-        <div className="max-w-[800px] mx-auto px-4 py-10 space-y-10">
-            <h1 className="text-[28px] font-semibold text-[#1d1d1f]">Checkout</h1>
+        <div className="max-w-[1200px] mx-auto px-4 md:px-10 py-12 md:py-16">
+            {/* Breadcrumb */}
+            <nav className="flex items-center text-[11px] font-medium text-gray-400 mb-10 tracking-[0.12em] uppercase">
+                <Link to="/" className="hover:text-black transition-colors duration-200">Home</Link>
+                <HugeiconsIcon icon={ArrowRight01Icon} size={10} className="mx-2 opacity-40" />
+                <Link to="/cart" className="hover:text-black transition-colors duration-200">Bag</Link>
+                <HugeiconsIcon icon={ArrowRight01Icon} size={10} className="mx-2 opacity-40" />
+                <span className="text-black">Checkout</span>
+            </nav>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            {/* Editorial Divider */}
+            <div className="w-12 h-px bg-black mb-6" />
+
+            {/* Header */}
+            <header className="mb-12 md:mb-16">
+                <h1 className="text-[36px] md:text-[48px] font-light text-black tracking-[0.02em] mb-2">
+                    Checkout
+                </h1>
+                <p className="text-[13px] text-gray-500 font-normal">
+                    {itemCount} {itemCount === 1 ? 'piece' : 'pieces'} selected
+                </p>
+            </header>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
                 {/* Order Summary */}
-                <div className="bg-[#f5f5f7] p-6 rounded-2xl">
-                    <h2 className="text-[18px] font-medium mb-4">Order Summary</h2>
-                    <div className="space-y-4 mb-6 text-[14px]">
+                <div className="lg:col-span-7">
+                    {/* Summary Header */}
+                    <div className="mb-8">
+                        <span className="text-[10px] font-medium uppercase tracking-[0.25em] text-gray-400 block mb-3">
+                            Order Summary
+                        </span>
+                        <div className="h-px bg-black w-8" />
+                    </div>
+
+                    {/* Items List */}
+                    <div className="space-y-0">
                         {items.map((item) => (
-                            <div key={item.product._id} className="flex justify-between text-[#1d1d1f]">
-                                <span>{item.quantity} x {item.product.title.substring(0, 25)}...</span>
-                                <span>₹{(item.product.price * item.quantity).toLocaleString("en-IN")}</span>
+                            <div key={item.product._id} className="flex gap-5 py-6 border-b border-gray-100 last:border-b-0">
+                                {/* Image */}
+                                <div className="w-20 h-28 bg-[#F9F9F9] overflow-hidden shrink-0">
+                                    <BlurImage
+                                        src={getCloudinaryUrl(item.product.imageUrl || "", { width: 200 })}
+                                        alt={item.product.title}
+                                        wrapperClassName="w-full h-full"
+                                        className="object-cover"
+                                    />
+                                </div>
+
+                                {/* Details */}
+                                <div className="flex-1 min-w-0 flex flex-col justify-between">
+                                    <div>
+                                        <Link
+                                            to={`/products/${item.product._id}`}
+                                            className="text-[14px] font-normal text-black line-clamp-1 hover:underline underline-offset-4 transition-all duration-200"
+                                        >
+                                            {item.product.title}
+                                        </Link>
+                                        <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-gray-400 mt-1">
+                                            {item.product.category}
+                                        </p>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[12px] text-gray-500">Qty: {item.quantity}</span>
+                                        <span className="text-[14px] font-medium tabular-nums text-black">
+                                            ₹{(item.product.price * item.quantity).toLocaleString("en-IN")}
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         ))}
                     </div>
 
-                    <div className="border-t border-[#d2d2d7] pt-4 space-y-2 text-[14px]">
-                        <div className="flex justify-between text-[#6e6e73]">
-                            <span>Subtotal</span>
-                            <span>₹{subtotal.toLocaleString("en-IN")}</span>
-                        </div>
-                        <div className="flex justify-between text-[#6e6e73]">
-                            <span>Shipping</span>
-                            <span>{shipping === 0 ? "Free" : `₹${shipping}`}</span>
-                        </div>
-                        <div className="flex justify-between font-medium text-[#1d1d1f] text-[18px] pt-4">
-                            <span>Total to Pay</span>
-                            <span>₹{total.toLocaleString("en-IN")}</span>
-                        </div>
+                    {/* Back to bag */}
+                    <div className="mt-8 pt-6">
+                        <Link
+                            to="/cart"
+                            className="text-[11px] font-medium uppercase tracking-[0.15em] text-black pb-1 border-b border-black hover:border-transparent transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                        >
+                            Return to Bag
+                        </Link>
                     </div>
                 </div>
 
-                {/* Payment Action */}
-                <div className="flex flex-col justify-center space-y-6">
-                    <div className="flex items-center gap-2 text-[#0071e3]">
-                        <HugeiconsIcon icon={Shield01Icon} size={20} />
-                        <span className="text-[14px] font-medium">Safe & Secure Payment</span>
+                {/* Payment Column */}
+                <div className="lg:col-span-5">
+                    <div className="lg:sticky lg:top-32">
+                        {/* Summary Header */}
+                        <div className="mb-8">
+                            <span className="text-[10px] font-medium uppercase tracking-[0.25em] text-gray-400 block mb-3">
+                                Payment Summary
+                            </span>
+                            <div className="h-px bg-black w-8" />
+                        </div>
+
+                        {/* Price Breakdown */}
+                        <div className="space-y-4 mb-8">
+                            <div className="flex justify-between text-[13px]">
+                                <span className="text-gray-500 font-normal">Subtotal</span>
+                                <span className="font-medium tabular-nums">₹{subtotal.toLocaleString("en-IN")}</span>
+                            </div>
+
+                            <div className="flex justify-between text-[13px]">
+                                <span className="text-gray-500 font-normal">Shipping</span>
+                                <span className="font-medium">
+                                    {shipping === 0 ? (
+                                        <span className="text-black">Complimentary</span>
+                                    ) : (
+                                        <span className="tabular-nums">₹{shipping.toLocaleString("en-IN")}</span>
+                                    )}
+                                </span>
+                            </div>
+
+                            {shipping > 0 && (
+                                <p className="text-[11px] text-gray-400 font-normal italic">
+                                    Complimentary shipping on orders above ₹50,000
+                                </p>
+                            )}
+
+                            {/* Divider */}
+                            <div className="h-px bg-gray-200 my-6" />
+
+                            <div className="flex justify-between items-baseline">
+                                <span className="text-[14px] font-medium text-black uppercase tracking-[0.08em]">
+                                    Total
+                                </span>
+                                <span className="text-[24px] font-medium tabular-nums text-black">
+                                    ₹{total.toLocaleString("en-IN")}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Security Note */}
+                        <div className="flex items-center gap-3 mb-8 p-4 border border-gray-200">
+                            <HugeiconsIcon icon={LockIcon} size={16} className="text-gray-400 shrink-0" />
+                            <p className="text-[12px] text-gray-500 font-normal">
+                                Your payment is encrypted and secure. We never store your card details.
+                            </p>
+                        </div>
+
+                        {/* Pay Button */}
+                        <Button
+                            onClick={handlePayment}
+                            disabled={isProcessing}
+                            className="w-full h-14 bg-black text-white text-[11px] font-medium uppercase tracking-[0.15em] hover:bg-gray-900 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] flex items-center justify-center gap-2"
+                        >
+                            {isProcessing ? (
+                                <>
+                                    <HugeiconsIcon icon={Loading03Icon} size={16} className="animate-spin" />
+                                    Processing...
+                                </>
+                            ) : (
+                                <>
+                                    <HugeiconsIcon icon={Shield01Icon} size={16} />
+                                    Pay ₹{total.toLocaleString("en-IN")}
+                                </>
+                            )}
+                        </Button>
+
+                        {/* Trust Indicators */}
+                        <div className="mt-8 pt-8 border-t border-gray-100 space-y-4">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 border border-gray-200 flex items-center justify-center shrink-0">
+                                    <span className="text-[10px] font-medium">SSL</span>
+                                </div>
+                                <p className="text-[11px] text-gray-400 font-normal">
+                                    256-bit SSL encryption
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 border border-gray-200 flex items-center justify-center shrink-0">
+                                    <span className="text-[10px] font-medium">PCI</span>
+                                </div>
+                                <p className="text-[11px] text-gray-400 font-normal">
+                                    PCI DSS compliant gateway
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 border border-gray-200 flex items-center justify-center shrink-0">
+                                    <span className="text-[10px] font-medium">RET</span>
+                                </div>
+                                <p className="text-[11px] text-gray-400 font-normal">
+                                    14-day return policy
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Payment Methods */}
+                        <div className="mt-8 pt-8 border-t border-gray-100">
+                            <span className="text-[11px] font-medium uppercase tracking-[0.12em] text-gray-400 block mb-4">
+                                Accepted Methods
+                            </span>
+                            <div className="flex items-center gap-3 text-[12px] text-gray-500">
+                                <span className="px-3 py-1 border border-gray-200 font-medium">UPI</span>
+                                <span className="px-3 py-1 border border-gray-200 font-medium">Cards</span>
+                                <span className="px-3 py-1 border border-gray-200 font-medium">Net Banking</span>
+                                <span className="px-3 py-1 border border-gray-200 font-medium">Wallets</span>
+                            </div>
+                        </div>
                     </div>
-
-                    <p className="text-[13px] text-[#6e6e73] leading-relaxed">
-                        By proceeding to pay, you will be redirected to Razorpay's secure checkout gateway.
-                        Your payment details are fully encrypted.
-                    </p>
-
-                    <Button
-                        onClick={handlePayment}
-                        disabled={isProcessing}
-                        className="w-full py-4 rounded-full bg-[#0071e3]! text-white font-medium text-[15px] flex justify-center items-center gap-2 transition hover:bg-[#005bb5]"
-                    >
-                        {isProcessing ? (
-                            <>
-                                <HugeiconsIcon icon={Loading03Icon} size={18} className="animate-spin" />
-                                Processing...
-                            </>
-                        ) : (
-                            `Pay ₹${total.toLocaleString("en-IN")}`
-                        )}
-                    </Button>
                 </div>
             </div>
         </div>

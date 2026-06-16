@@ -38,7 +38,7 @@ const CategoryBar = ({
                             className="
                                 text-[20px] md:text-[24px]
                                 font-medium uppercase
-                                tracking-[0.1em]
+                                tracking-[0.12em]
                                 text-[#000000]
                                 leading-tight
                                 text-balance
@@ -53,6 +53,7 @@ const CategoryBar = ({
                                     text-[14px] text-[#767676]
                                     max-w-xl
                                     leading-relaxed
+                                    font-normal
                                 "
                             >
                                 {subtitle}

@@ -211,7 +211,9 @@ export const getProductByCategory = async (req: Request, res: Response): Promise
         };
 
         if (req.query.subcategory) {
-            filter.subcategory = { $regex: new RegExp(`^${req.query.subcategory}$`, 'i') };
+            // Handle both dash format (from URL) and space format (from database)
+            const subcategoryValue = (req.query.subcategory as string).replace(/-/g, ' ');
+            filter.subcategory = { $regex: new RegExp(`^${subcategoryValue}$`, 'i') };
         }
 
         const totalProducts = await Product.countDocuments(filter);

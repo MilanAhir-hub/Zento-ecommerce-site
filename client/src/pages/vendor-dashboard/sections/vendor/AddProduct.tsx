@@ -206,25 +206,25 @@ const AddProduct = () => {
     if (isLoadingProduct) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[500px] space-y-6">
-                <div className="animate-spin text-[#0071e3]">
+                <div className="animate-spin text-brand-black">
                     <HugeiconsIcon icon={Loading03Icon} size={32} />
                 </div>
-                <p className="text-[#86868b] font-medium tracking-tight">Preparing product studio...</p>
+                <p className="text-gray-muted font-medium tracking-tight">Preparing product studio...</p>
             </div>
         );
     }
 
     if (isEditMode && !productData) {
         return (
-            <div className="max-w-[600px] mx-auto mt-20 p-12 bg-white rounded-[40px] border border-black/5 text-center shadow-sm">
-                <div className="w-16 h-16 bg-[#fff2f2] rounded-full flex items-center justify-center mx-auto mb-6">
-                    <HugeiconsIcon icon={Alert01Icon} size={32} className="text-[#d60000]" />
+            <div className="max-w-[600px] mx-auto mt-20 p-12 bg-white rounded-none border border-[#E5E5E5] text-center">
+                <div className="w-16 h-16 bg-gray-bg border border-[#E5E5E5] rounded-none flex items-center justify-center mx-auto mb-6">
+                    <HugeiconsIcon icon={Alert01Icon} size={32} className="text-accent-sale" />
                 </div>
-                <h3 className="text-2xl font-semibold text-[#1d1d1f]">Product Not Found</h3>
-                <p className="text-[#86868b] mt-2 mb-8 text-[15px]">We couldn't retrieve the details for this product.</p>
+                <h3 className="text-2xl font-semibold text-brand-black uppercase tracking-wider">Product Not Found</h3>
+                <p className="text-gray-muted mt-2 mb-8 text-[15px]">We couldn't retrieve the details for this product.</p>
                 <button
                     onClick={() => navigate('/vendor/products')}
-                    className="px-8 py-3 bg-[#1d1d1f] text-white rounded-full text-sm font-semibold"
+                    className="px-8 py-3 bg-brand-black text-brand-white border border-brand-black rounded-none text-xs font-semibold uppercase tracking-widest hover:bg-brand-white hover:text-brand-black transition-colors"
                 >
                     Back to Collection
                 </button>
@@ -234,15 +234,15 @@ const AddProduct = () => {
 
     if (success) {
         return (
-            <div className="bg-white p-12 lg:p-24 rounded-[48px] border border-black/3 flex flex-col items-center justify-center text-center space-y-8 shadow-[0_2px_60px_-15px_rgba(0,0,0,0.06)] min-h-[500px] animate-in zoom-in duration-500">
-                <div className="w-24 h-24 bg-[#f2fbf4] rounded-full flex items-center justify-center shadow-inner">
-                    <HugeiconsIcon icon={Tick02Icon} size={48} className="text-[#1a7d32]" />
+            <div className="bg-white p-12 lg:p-24 rounded-none border border-[#E5E5E5] flex flex-col items-center justify-center text-center space-y-8 min-h-[500px]">
+                <div className="w-24 h-24 bg-gray-bg border border-[#E5E5E5] rounded-none flex items-center justify-center">
+                    <HugeiconsIcon icon={Tick02Icon} size={48} className="text-brand-black" />
                 </div>
                 <div className="space-y-3">
-                    <h2 className="text-[34px] font-semibold text-[#1d1d1f] tracking-tight">
+                    <h2 className="text-[34px] font-semibold text-brand-black tracking-tight uppercase">
                         Successfully {isEditMode ? 'Updated' : 'Created'}
                     </h2>
-                    <p className="text-[#86868b] text-[18px] font-medium max-w-[320px] mx-auto leading-relaxed">
+                    <p className="text-gray-muted text-[18px] max-w-[320px] mx-auto leading-relaxed">
                         Your product is now {isEditMode ? 'live' : 'available'} in the store. Redirecting you...
                     </p>
                 </div>
@@ -255,10 +255,10 @@ const AddProduct = () => {
 
             {/* HEADER */}
             <div>
-                <h2 className="text-[38px] font-semibold text-[#1d1d1f] tracking-tight">
+                <h2 className="text-[32px] font-medium uppercase tracking-widest text-brand-black">
                     {isEditMode ? "Refine Product" : "Create Product"}
                 </h2>
-                <p className="text-[#6e6e73] text-[16px] mt-1">
+                <p className="text-gray-muted text-[16px] mt-1">
                     {isEditMode
                         ? "Fine-tune your product experience."
                         : "Craft something customers will love."}
@@ -267,7 +267,7 @@ const AddProduct = () => {
 
             {/* ERROR */}
             {error && (
-                <div className="bg-[#fff2f2] border border-[#ffe5e5] px-5 py-4 rounded-2xl text-sm text-[#d60000]">
+                <div className="bg-[#ffe5e5] border border-accent-sale px-5 py-4 rounded-none text-sm text-accent-sale">
                     {error}
                 </div>
             )}
@@ -275,14 +275,14 @@ const AddProduct = () => {
             <form className="space-y-10" onSubmit={handleSubmit}>
 
                 {/* MEDIA SECTION */}
-                <div className="relative rounded-[32px] border border-black/5 bg-gradient-to-b from-white to-[#f5f5f7] p-8 shadow-[0_10px_50px_-15px_rgba(0,0,0,0.08)] group">
+                <div className="relative rounded-none border border-[#E5E5E5] bg-white p-8">
 
                     <div className="flex justify-between items-center mb-6">
                         <div>
-                            <h3 className="text-[18px] font-semibold text-[#1d1d1f]">Product Media</h3>
-                            <p className="text-sm text-[#86868b]">Upload up to {MAX_IMAGES} high-quality images</p>
+                            <h3 className="text-[18px] font-semibold text-brand-black uppercase tracking-wider">Product Media</h3>
+                            <p className="text-sm text-gray-muted">Upload up to {MAX_IMAGES} high-quality images</p>
                         </div>
-                        <span className="text-xs bg-white/50 backdrop-blur-sm border border-black/5 px-3 py-1 rounded-full font-semibold text-[#1d1d1f]">
+                        <span className="text-xs bg-white border border-[#E5E5E5] px-3 py-1 rounded-none font-semibold text-brand-black">
                             {imagePreviews.length}/{MAX_IMAGES}
                         </span>
                     </div>
@@ -291,16 +291,16 @@ const AddProduct = () => {
                         {imagePreviews.map((src, i) => (
                             <div
                                 key={i}
-                                className={`relative group aspect-square rounded-2xl overflow-hidden border-2 transition-all duration-300 ${i === 0 ? 'border-[#0071e3] shadow-md shadow-[#0071e3]/10' : 'border-[#e5e5ea]'}`}
+                                className={`relative group aspect-square rounded-none overflow-hidden border transition-all duration-default ease-editorial ${i === 0 ? 'border-brand-black' : 'border-[#E5E5E5]'}`}
                             >
                                 <img
                                     src={src}
-                                    className="w-full h-full object-cover group-hover:scale-110 transition duration-700"
+                                    className="w-full h-full object-cover group-hover:scale-105 transition duration-700"
                                     alt={`Product preview ${i + 1}`}
                                 />
 
                                 {i === 0 && (
-                                    <div className="absolute top-2 left-2 bg-[#0071e3] text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-lg z-10">
+                                    <div className="absolute top-2 left-2 bg-brand-black text-brand-white text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-none z-10">
                                         Primary
                                     </div>
                                 )}
@@ -313,7 +313,7 @@ const AddProduct = () => {
                                         title="AI Background Removal & Optimization"
                                         disabled={enhancingIndex !== null}
                                         onClick={() => handleEnhance(i)}
-                                        className="w-7 h-7 bg-[#0071e3] text-white rounded-full flex items-center justify-center hover:bg-[#0077ED] shadow-md transition-colors"
+                                        className="w-7 h-7 bg-white border border-[#E5E5E5] text-brand-black rounded-none flex items-center justify-center hover:bg-brand-black hover:text-brand-white transition-colors duration-default ease-editorial cursor-pointer"
                                     >
                                         <HugeiconsIcon icon={MagicWand01Icon} size={14} />
                                     </button>
@@ -323,7 +323,7 @@ const AddProduct = () => {
                                         type="button"
                                         title="Remove Image"
                                         onClick={() => handleRemoveImage(i)}
-                                        className="w-7 h-7 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-red-500 hover:text-white shadow-md transition-colors text-[#1d1d1f]"
+                                        className="w-7 h-7 bg-white border border-[#E5E5E5] text-accent-sale rounded-none flex items-center justify-center hover:bg-accent-sale hover:text-white transition-colors duration-default ease-editorial cursor-pointer"
                                     >
                                         <HugeiconsIcon icon={Cancel01Icon} size={14} />
                                     </button>
@@ -332,8 +332,8 @@ const AddProduct = () => {
                                 {/* LOADING OVERLAY */}
                                 {enhancingIndex === i && (
                                     <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center z-30 animate-in fade-in duration-300">
-                                        <HugeiconsIcon icon={Loading03Icon} size={24} className="text-[#0071e3] animate-spin mb-2" />
-                                        <span className="text-[10px] font-bold text-[#1d1d1f] uppercase tracking-tighter">AI Processing...</span>
+                                        <HugeiconsIcon icon={Loading03Icon} size={24} className="text-brand-black animate-spin mb-2" />
+                                        <span className="text-[10px] font-bold text-brand-black uppercase tracking-tighter">AI Processing...</span>
                                     </div>
                                 )}
                             </div>
@@ -343,10 +343,10 @@ const AddProduct = () => {
                             <button
                                 type="button"
                                 onClick={() => fileInputRef.current?.click()}
-                                className="aspect-square rounded-2xl border-2 border-dashed border-[#d2d2d7] flex flex-col items-center justify-center gap-2 hover:border-[#0071e3] hover:bg-white transition-all bg-[#f5f5f7]/50"
+                                className="aspect-square rounded-none border border-dashed border-[#767676] flex flex-col items-center justify-center gap-2 hover:border-brand-black hover:bg-gray-bg transition-colors bg-white cursor-pointer"
                             >
-                                <HugeiconsIcon icon={ImageAdd01Icon} size={24} className="text-[#86868b]" />
-                                <span className="text-[10px] font-bold text-[#86868b] uppercase tracking-wider">Add Image</span>
+                                <HugeiconsIcon icon={ImageAdd01Icon} size={24} className="text-gray-muted" />
+                                <span className="text-[10px] font-bold text-gray-muted uppercase tracking-wider">Add Image</span>
                             </button>
                         )}
                     </div>
@@ -361,25 +361,25 @@ const AddProduct = () => {
                     />
                 </div>
 
-                {/* 🍎 DETAILS */}
-                <div className="bg-white rounded-[32px] border border-black/5 p-8 space-y-8 shadow-sm">
-                    <h3 className="text-[18px] font-semibold text-[#1d1d1f]">Specifications</h3>
+                {/* DETAILS */}
+                <div className="bg-white rounded-none border border-[#E5E5E5] p-8 space-y-8">
+                    <h3 className="text-[18px] font-semibold text-brand-black uppercase tracking-wider">Specifications</h3>
 
                     <div className="grid md:grid-cols-2 gap-x-8 gap-y-6">
                         <div className="space-y-1.5">
-                            <label className="text-[13px] font-semibold text-[#1d1d1f] ml-1">Product Title</label>
+                            <label className="text-[11px] font-semibold uppercase tracking-widest text-[#222222] ml-1">Product Title</label>
                             <input
                                 name="title"
                                 required
                                 value={formData.title}
                                 onChange={handleChange}
                                 placeholder="iPhone 15 Pro, etc."
-                                className="w-full bg-[#f5f5f7] px-4 py-3 rounded-xl outline-none focus:ring-4 focus:ring-[#0071e3]/5 transition-all"
+                                className="w-full bg-white border border-[#E5E5E5] px-4 py-3 rounded-none outline-none focus:border-brand-black transition-colors text-sm"
                             />
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="text-[13px] font-semibold text-[#1d1d1f] ml-1">Retail Price (₹)</label>
+                            <label className="text-[11px] font-semibold uppercase tracking-widest text-[#222222] ml-1">Retail Price (₹)</label>
                             <input
                                 type="number"
                                 name="price"
@@ -387,12 +387,12 @@ const AddProduct = () => {
                                 value={formData.price}
                                 onChange={handleChange}
                                 placeholder="0.00"
-                                className="w-full bg-[#f5f5f7] px-4 py-3 rounded-xl outline-none focus:ring-4 focus:ring-[#0071e3]/5 transition-all"
+                                className="w-full bg-white border border-[#E5E5E5] px-4 py-3 rounded-none outline-none focus:border-brand-black transition-colors text-sm"
                             />
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="text-[13px] font-semibold text-[#1d1d1f] ml-1">Stock Level</label>
+                            <label className="text-[11px] font-semibold uppercase tracking-widest text-[#222222] ml-1">Stock Level</label>
                             <input
                                 type="number"
                                 name="stock"
@@ -400,7 +400,7 @@ const AddProduct = () => {
                                 value={formData.stock}
                                 onChange={handleChange}
                                 placeholder="Units available"
-                                className="w-full bg-[#f5f5f7] px-4 py-3 rounded-xl outline-none focus:ring-4 focus:ring-[#0071e3]/5 transition-all"
+                                className="w-full bg-white border border-[#E5E5E5] px-4 py-3 rounded-none outline-none focus:border-brand-black transition-colors text-sm"
                             />
                         </div>
 
@@ -428,16 +428,16 @@ const AddProduct = () => {
                         />
                     </div>
 
-                    {/* 🍎 AI SECTION */}
+                    {/* AI SECTION */}
                     <div className="space-y-4 pt-4">
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                            <h4 className="text-[13px] font-semibold text-[#1d1d1f] ml-1">Marketing Description</h4>
+                            <h4 className="text-[11px] font-semibold uppercase tracking-widest text-[#222222] ml-1">Marketing Description</h4>
 
-                            <div className="flex items-center gap-2 p-1 bg-[#f5f5f7] rounded-full border border-black/5">
+                            <div className="flex items-center gap-2 p-1 bg-white rounded-none border border-[#E5E5E5]">
                                 <select
                                     value={aiTone}
                                     onChange={(e) => setAiTone(e.target.value)}
-                                    className="text-[10px] font-bold bg-white px-3 py-1.5 rounded-full outline-none border-none uppercase tracking-tight text-[#1d1d1f]"
+                                    className="text-[10px] font-bold bg-white px-3 py-1.5 rounded-none outline-none border border-[#E5E5E5] uppercase tracking-tight text-brand-black"
                                 >
                                     <option value="professional">Professional</option>
                                     <option value="minimalist">Minimal</option>
@@ -456,7 +456,7 @@ const AddProduct = () => {
                                         });
                                         if (desc) setFormData(prev => ({ ...prev, description: desc }));
                                     }}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1d1d1f] text-white rounded-full hover:bg-black transition-all disabled:opacity-40 text-[10px] font-bold uppercase tracking-tight"
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-black text-brand-white rounded-none hover:bg-brand-white hover:text-brand-black border border-brand-black transition-colors disabled:opacity-40 text-[10px] font-bold uppercase tracking-tight cursor-pointer"
                                 >
                                     {isAILoading ? <HugeiconsIcon icon={Loading03Icon} size={12} className="animate-spin" /> : <HugeiconsIcon icon={SparklesIcon} size={12} />}
                                     <span>Generate</span>
@@ -469,7 +469,7 @@ const AddProduct = () => {
                                         const desc = await improve(formData.description);
                                         if (desc) setFormData(prev => ({ ...prev, description: desc }));
                                     }}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-[#1d1d1f] rounded-full hover:bg-gray-100 transition-all disabled:opacity-40 text-[10px] font-bold uppercase tracking-tight border border-black/5 shadow-sm"
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-brand-black rounded-none hover:bg-brand-black hover:text-brand-white transition-colors disabled:opacity-40 text-[10px] font-bold uppercase tracking-tight border border-[#E5E5E5] cursor-pointer"
                                 >
                                     {isAILoading ? <HugeiconsIcon icon={Loading03Icon} size={12} className="animate-spin" /> : <HugeiconsIcon icon={MagicWand01Icon} size={12} />}
                                     <span>Polish</span>
@@ -484,17 +484,17 @@ const AddProduct = () => {
                             rows={6}
                             required
                             placeholder="Craft a story for your product..."
-                            className="w-full bg-[#f5f5f7] px-5 py-4 rounded-2xl outline-none focus:ring-4 focus:ring-[#0071e3]/5 focus:bg-white transition-all text-sm leading-relaxed"
+                            className="w-full bg-white border border-[#E5E5E5] px-5 py-4 rounded-none outline-none focus:border-brand-black transition-colors text-sm leading-relaxed"
                         />
                     </div>
                 </div>
 
-                {/* 🍎 ACTIONS */}
+                {/* ACTIONS */}
                 <div className="flex justify-end items-center gap-6 pt-4">
                     <button
                         type="button"
                         onClick={() => navigate('/vendor/products')}
-                        className="text-sm font-semibold text-[#6e6e73] hover:text-[#1d1d1f] transition-colors"
+                        className="text-sm font-semibold text-gray-muted hover:text-brand-black transition-colors cursor-pointer"
                     >
                         Discard Changes
                     </button>
@@ -502,7 +502,7 @@ const AddProduct = () => {
                     <button
                         type="submit"
                         disabled={isSaving}
-                        className="px-12 py-3.5 rounded-full bg-[#0071e3] text-white text-sm font-semibold shadow-xl shadow-[#0071e3]/20 hover:bg-[#0077ED] transition-all active:scale-[0.98] disabled:opacity-50 min-w-[200px] flex items-center justify-center gap-2"
+                        className="px-12 py-3.5 rounded-none bg-brand-black text-brand-white border border-brand-black text-xs font-semibold uppercase tracking-widest hover:bg-brand-white hover:text-brand-black transition-all duration-default ease-editorial disabled:opacity-50 min-w-[200px] flex items-center justify-center gap-2 cursor-pointer"
                     >
                         {isSaving ? (
                             <>

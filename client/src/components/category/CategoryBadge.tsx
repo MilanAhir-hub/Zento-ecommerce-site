@@ -30,8 +30,7 @@ const CategoryBadge = ({ name, image, onClick }: CategoryBadgeProps) => {
                 py-3 px-2
                 bg-transparent
                 border border-transparent
-                rounded-none
-                transition-[background-color,border-color] duration-200
+                transition-[background-color,border-color] duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]
                 hover:bg-[#F9F9F9] hover:border-[#E5E5E5]
                 focus-visible:outline focus-visible:outline-1
                 focus-visible:outline-offset-2 focus-visible:outline-[#000000]
@@ -44,7 +43,7 @@ const CategoryBadge = ({ name, image, onClick }: CategoryBadgeProps) => {
                     bg-white
                     border border-[#E5E5E5]
                     rounded-full
-                    transition-[transform,border-color] duration-200
+                    transition-[transform,border-color] duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]
                     group-hover:border-[#000000]
                     group-hover:scale-[1.04]
                 "
@@ -60,7 +59,7 @@ const CategoryBadge = ({ name, image, onClick }: CategoryBadgeProps) => {
                         w-7 h-7 md:w-8 md:h-8
                         object-contain
                         opacity-80
-                        transition-[opacity,transform,filter] duration-200
+                        transition-[opacity,transform,filter] duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]
                         group-hover:opacity-100
                     "
                 />
@@ -70,12 +69,12 @@ const CategoryBadge = ({ name, image, onClick }: CategoryBadgeProps) => {
                 className="
                     text-[11px] md:text-[12px]
                     font-medium uppercase
-                    tracking-[0.1em]
+                    tracking-[0.12em]
                     text-[#222222] group-hover:text-[#000000]
                     text-center
                     leading-tight
                     line-clamp-1
-                    transition-colors duration-200
+                    transition-colors duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]
                 "
             >
                 {name}

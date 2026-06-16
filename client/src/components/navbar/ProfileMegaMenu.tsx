@@ -120,9 +120,9 @@ const ProfileMegaMenu = ({
                     animate="visible"
                     exit="exit"
                     className="
-                        absolute left-0 right-0 top-full mt-3 w-full
-                        bg-white/95 backdrop-blur-md
-                        border-y border-[#E5E5E5]
+                        absolute left-0 right-0 top-full w-full
+                        bg-white
+                        border-b border-[#E5E5E5]
                         shadow-[0_24px_60px_-20px_rgba(0,0,0,0.15)]
                         overflow-hidden
                         z-40

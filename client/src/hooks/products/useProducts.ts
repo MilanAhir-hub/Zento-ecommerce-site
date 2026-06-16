@@ -24,16 +24,17 @@ export interface Product {
 interface UseProductsOptions {
     limit?: number;
     category?: string;
+    subcategory?: string;
     keyword?: string;
     page?: number;
 }
 
-export const useProducts = ({ limit, category, keyword, page }: UseProductsOptions = {}) => {
+export const useProducts = ({ limit, category, subcategory, keyword, page }: UseProductsOptions = {}) => {
     // Normalize keyword: treat empty string as undefined for cache stability
     const normalizedKeyword = keyword?.trim() === "" ? undefined : keyword;
 
     return useQuery({
-        queryKey: ["products", limit, category, normalizedKeyword, page],
+        queryKey: ["products", limit, category, subcategory, normalizedKeyword, page],
 
         queryFn: async () => {
             const params = new URLSearchParams();
@@ -41,6 +42,7 @@ export const useProducts = ({ limit, category, keyword, page }: UseProductsOptio
             if (limit) params.append("limit", limit.toString());
             if (normalizedKeyword) params.append("keyword", normalizedKeyword);
             if (page) params.append("page", page.toString());
+            if (subcategory) params.append("subcategory", subcategory);
 
             const queryString = params.toString() ? `?${params.toString()}` : "";
 

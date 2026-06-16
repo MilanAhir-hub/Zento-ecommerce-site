@@ -149,8 +149,7 @@ const EditorialGrid = () => {
                             className={`
                                 editorial-card group relative overflow-hidden
                                 bg-stone-100
-                                border-r border-b border-[#E5E5E5]
-                                last:border-r-0 ${item.className}
+                                ${item.className}
                             `}
                         >
                             {/* Image wrapper — taller than card so the

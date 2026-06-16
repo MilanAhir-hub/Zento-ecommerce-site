@@ -6,7 +6,8 @@ import {
     Delete01Icon,
     PackageIcon,
     Loading03Icon,
-    Alert01Icon
+    Alert01Icon,
+    ArrowRight01Icon,
 } from "@hugeicons/core-free-icons";
 import { useVendorProducts, useDeleteVendorProduct } from "../../../../hooks/vendor/useVendorHooks";
 import { useState } from "react";
@@ -18,14 +19,6 @@ const Products = () => {
     const [searchQuery, setSearchQuery] = useState("");
     const navigate = useNavigate();
 
-    const getStatusStyles = (status?: string) => {
-        switch (status) {
-            case 'Active': return 'bg-[#f2fbf4] text-[#1a7d32] border-[#dcfce7]';
-            case 'Out of Stock': return 'bg-[#fff2f2] text-[#d60000] border-[#ffe5e5]';
-            default: return 'bg-[#f5f5f7] text-[#86868b] border-[#e5e5ea]';
-        }
-    };
-
     const handleDelete = async (id: string, name: string) => {
         if (window.confirm(`Delete "${name}"?`)) {
             try {
@@ -36,16 +29,16 @@ const Products = () => {
         }
     };
 
-    const filteredProducts = products?.filter(p =>
-        p.title.toLowerCase().includes(searchQuery.toLowerCase())
-    ) || [];
+    const filteredProducts = products?.filter((p) => p.title.toLowerCase().includes(searchQuery.toLowerCase())) || [];
 
     // LOADING
     if (isLoading) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[420px] gap-4">
-                <HugeiconsIcon icon={Loading03Icon} size={26} className="animate-spin text-[#0071e3]" />
-                <p className="text-[#86868b] text-sm">Loading your products…</p>
+                <HugeiconsIcon icon={Loading03Icon} size={22} className="animate-spin text-black" />
+                <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-gray-400">
+                    Loading products
+                </span>
             </div>
         );
     }
@@ -53,13 +46,16 @@ const Products = () => {
     // ERROR
     if (isError) {
         return (
-            <div className="bg-white border border-[#e5e5ea] p-10 rounded-[28px] text-center space-y-4 shadow-sm">
-                <HugeiconsIcon icon={Alert01Icon} size={26} className="text-[#ff3b30] mx-auto" />
-                <h3 className="text-[#1d1d1f] font-semibold">Unable to load products</h3>
-                <p className="text-[#86868b] text-sm">{(error as any)?.message}</p>
+            <div className="border border-gray-200 p-12 text-center">
+                <HugeiconsIcon icon={Alert01Icon} size={32} className="text-gray-300 mx-auto mb-6" />
+                <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-gray-400 block mb-3">
+                    Error
+                </span>
+                <h3 className="text-[20px] font-light text-black mb-3">Unable to load products</h3>
+                <p className="text-[14px] text-gray-500 mb-8">{(error as any)?.message}</p>
                 <button
                     onClick={() => refetch()}
-                    className="px-6 py-2 rounded-full bg-[#1d1d1f] text-white text-sm"
+                    className="px-8 py-3 bg-black text-white text-[11px] font-medium uppercase tracking-[0.15em] hover:bg-gray-900 transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]"
                 >
                     Retry
                 </button>
@@ -68,151 +64,204 @@ const Products = () => {
     }
 
     return (
-        <div className="space-y-10 animate-in fade-in duration-700 pb-10">
-
+        <div className="space-y-10 pb-10">
             {/* HEADER */}
-            <div className="flex justify-between items-end">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6">
                 <div>
-                    <h2 className="text-[36px] font-semibold text-[#1d1d1f] tracking-tight">
+                    <div className="w-12 h-px bg-black mb-6" />
+                    <h2 className="text-[32px] md:text-[40px] font-light text-black tracking-[0.02em]">
                         Products
                     </h2>
-                    <p className="text-[#86868b] text-[15px] mt-1">
-                        {products?.length || 0} items in your store
+                    <p className="text-[13px] text-gray-500 font-normal mt-2">
+                        {products?.length || 0} {products?.length === 1 ? 'item' : 'items'} in your store
                     </p>
                 </div>
 
                 <button
-                    onClick={() => navigate('/vendor/products/add')}
-                    className="flex items-center gap-2 px-6 py-3 rounded-full bg-[#0071e3] text-white text-sm font-medium shadow-lg shadow-[#0071e3]/20 hover:bg-[#0077ED] active:scale-[0.97]"
+                    onClick={() => navigate("/vendor/products/add")}
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-black text-white text-[11px] font-medium uppercase tracking-[0.15em] hover:bg-gray-900 active:scale-[0.98] transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]"
                 >
-                    <HugeiconsIcon icon={PlusSignIcon} size={16} />
+                    <HugeiconsIcon icon={PlusSignIcon} size={14} />
                     Add Product
                 </button>
             </div>
 
-            {/* MAIN CARD */}
-            <div className="relative rounded-[36px] border border-black/5 bg-gradient-to-b from-white to-[#f5f5f7] shadow-[0_10px_60px_-20px_rgba(0,0,0,0.08)] overflow-hidden">
-
-                {/* glow */}
-                <div className="absolute -top-20 -right-20 w-72 h-72 bg-[#0071e3]/10 blur-3xl rounded-full"></div>
-
-                {/* SEARCH */}
-                <div className="p-6 border-b border-[#f0f0f0]">
-                    <div className="relative max-w-md group">
-                        <HugeiconsIcon
-                            icon={Search01Icon}
-                            size={16}
-                            className="absolute left-4 top-1/2 -translate-y-1/2 text-[#86868b] group-focus-within:text-[#0071e3]"
-                        />
-                        <input
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Search products"
-                            className="w-full pl-10 pr-4 py-3 rounded-full bg-white border border-[#e5e5ea] focus:ring-4 focus:ring-[#0071e3]/10 outline-none text-sm"
-                        />
-                    </div>
+            {/* SEARCH */}
+            <div className="relative max-w-xs group">
+                <div className="absolute inset-y-0 left-0 pl-1 flex items-center pointer-events-none">
+                    <HugeiconsIcon
+                        icon={Search01Icon}
+                        size={15}
+                        className="text-gray-400 group-focus-within:text-black transition-colors duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                    />
                 </div>
+                <label htmlFor="product-search" className="sr-only">
+                    Search products
+                </label>
+                <input
+                    id="product-search"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search products..."
+                    className="w-full pl-7 pr-3 py-2 bg-transparent border-0 border-b border-gray-200 text-black placeholder:text-gray-300 focus:outline-none focus:border-black transition-colors duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] font-normal text-xs tracking-[0.12em] uppercase"
+                />
+            </div>
 
-                {/* TABLE */}
-                <div className="hidden lg:block">
-                    {filteredProducts.length > 0 ? (
-                        <table className="w-full">
-                            <thead>
-                                <tr className="text-[#86868b] text-xs uppercase border-b border-[#f0f0f0]">
-                                    <th className="text-left px-8 py-4">Product</th>
-                                    <th className="px-4">Price</th>
-                                    <th className="px-4">Stock</th>
-                                    <th className="px-4">Status</th>
-                                    <th className="text-right px-8">Actions</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                {filteredProducts.map((p) => (
-                                    <tr key={p._id} className="border-b border-[#f5f5f7] hover:bg-white/60 transition">
-                                        <td className="px-8 py-5">
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-14 h-14 rounded-2xl bg-[#f5f5f7] overflow-hidden flex items-center justify-center">
-                                                    {p.imageUrl ? (
-                                                        <img src={p.imageUrl} className="w-full h-full object-cover" />
-                                                    ) : (
-                                                        <HugeiconsIcon icon={PackageIcon} size={22} />
-                                                    )}
-                                                </div>
-                                                <div>
-                                                    <p className="font-semibold text-[#1d1d1f] text-sm">{p.title}</p>
-                                                    <p className="text-xs text-[#86868b]">{p.category}</p>
-                                                </div>
-                                            </div>
-                                        </td>
-
-                                        <td className="text-center font-medium">₹{p.price}</td>
-                                        <td className="text-center">{p.stock}</td>
-
-                                        <td className="text-center">
-                                            <span className={`px-3 py-1 text-xs rounded-full border ${getStatusStyles(p.stock > 0 ? 'Active' : 'Out of Stock')}`}>
-                                                {p.stock > 0 ? 'Active' : 'Out of Stock'}
-                                            </span>
-                                        </td>
-
-                                        <td className="px-8 text-right">
-                                            <div className="flex justify-end gap-2">
-                                                <button
-                                                    onClick={() => navigate(`/vendor/products/edit/${p._id}`)}
-                                                    className="w-9 h-9 rounded-full hover:bg-[#f5f5f7]"
-                                                >
-                                                    <HugeiconsIcon icon={PencilEdit01Icon} size={16} />
-                                                </button>
-
-                                                <button
-                                                    onClick={() => handleDelete(p._id, p.title)}
-                                                    className="w-9 h-9 rounded-full hover:bg-[#fff2f2] text-red-500"
-                                                >
-                                                    <HugeiconsIcon icon={Delete01Icon} size={16} />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    ) : (
-                        <div className="py-24 text-center">
-                            <HugeiconsIcon icon={PackageIcon} size={40} className="mx-auto text-gray-300 mb-4" />
-                            <h3 className="text-lg font-semibold text-[#1d1d1f]">
-                                {searchQuery ? "No results found" : "No products yet"}
-                            </h3>
-                            <p className="text-[#86868b] text-sm mt-2">
-                                {searchQuery ? "Try another search" : "Start building your store"}
-                            </p>
-
-                            {!searchQuery && (
-                                <button
-                                    onClick={() => navigate('/vendor/products/add')}
-                                    className="mt-6 px-6 py-3 bg-[#1d1d1f] text-white rounded-full text-sm"
-                                >
-                                    Add Product
-                                </button>
-                            )}
-                        </div>
-                    )}
-                </div>
-
-                {/* MOBILE */}
-                <div className="lg:hidden p-4 space-y-4">
-                    {filteredProducts.map((p) => (
-                        <div key={p._id} className="bg-white p-4 rounded-2xl shadow-sm">
-                            <div className="flex justify-between">
-                                <div>
-                                    <p className="font-semibold">{p.title}</p>
-                                    <p className="text-sm text-gray-500">₹{p.price}</p>
-                                </div>
-                                <span className="text-xs">{p.stock > 0 ? 'Active' : 'Out of Stock'}</span>
+            {/* PRODUCTS LIST */}
+            {filteredProducts.length > 0 ? (
+                <div>
+                    {/* Desktop Table */}
+                    <div className="hidden lg:block">
+                        {/* Table Header */}
+                        <div className="grid grid-cols-12 gap-4 pb-4 border-b border-gray-200">
+                            <div className="col-span-5 text-[11px] font-medium uppercase tracking-[0.15em] text-gray-400">
+                                Product
+                            </div>
+                            <div className="col-span-2 text-[11px] font-medium uppercase tracking-[0.15em] text-gray-400 text-center">
+                                Price
+                            </div>
+                            <div className="col-span-2 text-[11px] font-medium uppercase tracking-[0.15em] text-gray-400 text-center">
+                                Stock
+                            </div>
+                            <div className="col-span-3 text-[11px] font-medium uppercase tracking-[0.15em] text-gray-400 text-right">
+                                Actions
                             </div>
                         </div>
-                    ))}
+
+                        {/* Table Rows */}
+                        {filteredProducts.map((p) => (
+                            <div
+                                key={p._id}
+                                className="grid grid-cols-12 gap-4 items-center py-5 border-b border-gray-100 hover:bg-[#F9F9F9] transition-colors duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                            >
+                                {/* Product */}
+                                <div className="col-span-5 flex items-center gap-4">
+                                    <div className="w-14 h-14 bg-[#F9F9F9] overflow-hidden shrink-0">
+                                        {p.imageUrl ? (
+                                            <img src={p.imageUrl} className="w-full h-full object-cover" alt={p.title} />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center">
+                                                <HugeiconsIcon icon={PackageIcon} size={20} className="text-gray-300" />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="min-w-0">
+                                        <p className="text-[14px] font-normal text-black truncate">{p.title}</p>
+                                        <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-gray-400 mt-0.5">
+                                            {p.category}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Price */}
+                                <div className="col-span-2 text-center text-[14px] font-medium tabular-nums text-black">
+                                    ₹{p.price.toLocaleString("en-IN")}
+                                </div>
+
+                                {/* Stock */}
+                                <div className="col-span-2 text-center">
+                                    <span className={`text-[13px] tabular-nums ${p.stock > 0 ? "text-black" : "text-gray-400"}`}>
+                                        {p.stock || 0}
+                                    </span>
+                                </div>
+
+                                {/* Actions */}
+                                <div className="col-span-3 flex justify-end gap-2">
+                                    <button
+                                        onClick={() => navigate(`/vendor/products/edit/${p._id}`)}
+                                        className="w-9 h-9 flex items-center justify-center text-gray-400 hover:text-black transition-colors duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                                        aria-label="Edit product"
+                                    >
+                                        <HugeiconsIcon icon={PencilEdit01Icon} size={16} />
+                                    </button>
+                                    <button
+                                        onClick={() => handleDelete(p._id, p.title)}
+                                        className="w-9 h-9 flex items-center justify-center text-gray-400 hover:text-[#BC0000] transition-colors duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                                        aria-label="Delete product"
+                                    >
+                                        <HugeiconsIcon icon={Delete01Icon} size={16} />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Mobile List */}
+                    <div className="lg:hidden space-y-0">
+                        {filteredProducts.map((p) => (
+                            <div
+                                key={p._id}
+                                className="flex gap-4 py-5 border-b border-gray-100"
+                            >
+                                <div className="w-16 h-20 bg-[#F9F9F9] overflow-hidden shrink-0">
+                                    {p.imageUrl ? (
+                                        <img src={p.imageUrl} className="w-full h-full object-cover" alt={p.title} />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center">
+                                            <HugeiconsIcon icon={PackageIcon} size={20} className="text-gray-300" />
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="flex-1 min-w-0 flex flex-col justify-between">
+                                    <div>
+                                        <p className="text-[14px] font-normal text-black truncate">{p.title}</p>
+                                        <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-gray-400 mt-0.5">
+                                            {p.category}
+                                        </p>
+                                    </div>
+                                    <div className="flex items-center justify-between mt-2">
+                                        <span className="text-[14px] font-medium tabular-nums text-black">
+                                            ₹{p.price.toLocaleString("en-IN")}
+                                        </span>
+                                        <div className="flex items-center gap-1">
+                                            <button
+                                                onClick={() => navigate(`/vendor/products/edit/${p._id}`)}
+                                                className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-black transition-colors duration-200"
+                                                aria-label="Edit product"
+                                            >
+                                                <HugeiconsIcon icon={PencilEdit01Icon} size={14} />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(p._id, p.title)}
+                                                className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-[#BC0000] transition-colors duration-200"
+                                                aria-label="Delete product"
+                                            >
+                                                <HugeiconsIcon icon={Delete01Icon} size={14} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
-            </div>
+            ) : (
+                /* Empty State */
+                <div className="py-24 text-center">
+                    <div className="w-16 h-16 border border-gray-200 flex items-center justify-center mx-auto mb-6">
+                        <HugeiconsIcon icon={PackageIcon} size={24} className="text-gray-300" />
+                    </div>
+                    <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-gray-400 block mb-3">
+                        {searchQuery ? "No results" : "Empty collection"}
+                    </span>
+                    <h3 className="text-[20px] font-light text-black mb-3">
+                        {searchQuery ? "No products found" : "No products yet"}
+                    </h3>
+                    <p className="text-[14px] text-gray-500 mb-8 max-w-sm mx-auto">
+                        {searchQuery ? "Try a different search term" : "Start building your store by adding your first product."}
+                    </p>
+
+                    {!searchQuery && (
+                        <button
+                            onClick={() => navigate("/vendor/products/add")}
+                            className="inline-flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.15em] text-black pb-2 border-b border-black hover:border-transparent transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                        >
+                            Add your first product
+                            <HugeiconsIcon icon={ArrowRight01Icon} size={14} />
+                        </button>
+                    )}
+                </div>
+            )}
         </div>
     );
 };

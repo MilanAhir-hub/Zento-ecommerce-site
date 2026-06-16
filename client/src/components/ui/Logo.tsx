@@ -16,12 +16,12 @@ const Logo = ({ to = "/", className = "", variant = "default", onClick }: LogoPr
             to={to}
             aria-label="Novara — Home"
             onClick={onClick}
-            className={`inline-flex items-baseline gap-[2px] ${colorClass} ${className}`}
+            className={`inline-flex items-baseline ${colorClass} ${className}`}
         >
             <span
                 className="
                     font-sans text-[20px] font-medium uppercase
-                    tracking-[0.18em] leading-none
+                    tracking-[0.28em] leading-none
                     select-none
                 "
             >

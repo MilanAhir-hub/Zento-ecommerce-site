@@ -17,21 +17,21 @@ const Analytics = () => {
     if (statsLoading || topLoading) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[420px] gap-4">
-                <HugeiconsIcon icon={Loading03Icon} size={26} className="animate-spin text-[#0071e3]" />
-                <p className="text-[#86868b] text-sm">Analyzing performance…</p>
+                <HugeiconsIcon icon={Loading03Icon} size={26} className="animate-spin text-brand-black" />
+                <p className="text-gray-muted text-sm">Analyzing performance…</p>
             </div>
         );
     }
 
     if (statsError || topError) {
         return (
-            <div className="bg-white border border-[#e5e5ea] p-10 rounded-[28px] text-center space-y-4 shadow-sm">
-                <HugeiconsIcon icon={Alert01Icon} size={26} className="text-[#ff3b30] mx-auto" />
-                <h3 className="text-[#1d1d1f] font-semibold">Analytics unavailable</h3>
-                <p className="text-[#86868b] text-sm">{((statsErr || topErr) as any)?.message}</p>
+            <div className="bg-white border border-[#E5E5E5] p-10 rounded-none text-center space-y-4">
+                <HugeiconsIcon icon={Alert01Icon} size={26} className="text-accent-sale mx-auto" />
+                <h3 className="text-brand-black font-semibold uppercase tracking-wider">Analytics unavailable</h3>
+                <p className="text-gray-muted text-sm">{((statsErr || topErr) as any)?.message}</p>
                 <button
                     onClick={() => refetch()}
-                    className="px-6 py-2 rounded-full bg-[#1d1d1f] text-white text-sm"
+                    className="px-6 py-3 bg-brand-black text-brand-white text-xs font-semibold uppercase tracking-widest border border-brand-black hover:bg-brand-white hover:text-brand-black transition-colors duration-default ease-editorial rounded-none cursor-pointer"
                 >
                     Retry
                 </button>
@@ -67,10 +67,10 @@ const Analytics = () => {
 
             {/* HEADER */}
             <div>
-                <h2 className="text-[36px] font-semibold text-[#1d1d1f] tracking-tight">
+                <h2 className="text-[32px] font-medium uppercase tracking-widest text-brand-black">
                     Analytics
                 </h2>
-                <p className="text-[#86868b] text-[15px] mt-1">
+                <p className="text-gray-muted text-[14px] mt-1">
                     Insights into your store performance
                 </p>
             </div>
@@ -79,73 +79,70 @@ const Analytics = () => {
             <div className="grid md:grid-cols-3 gap-6">
                 {analyticsStats.map((s, i) => (
                     <div key={i}
-                        className="bg-white rounded-[28px] p-6 border border-black/5 shadow-sm hover:shadow-md transition">
+                        className="bg-white rounded-none p-6 border border-[#E5E5E5] hover:border-brand-black transition-colors duration-default ease-editorial">
 
                         <div className="flex justify-between items-center mb-4">
-                            <HugeiconsIcon icon={s.icon} size={22} />
-                            <span className="text-green-600 text-xs font-medium">
+                            <HugeiconsIcon icon={s.icon} size={22} className="text-brand-black" />
+                            <span className="text-[#1a7d32] text-xs font-semibold tabular-nums">
                                 {s.trend}
                             </span>
                         </div>
 
-                        <p className="text-sm text-[#86868b]">{s.label}</p>
-                        <h3 className="text-2xl font-semibold">{s.value}</h3>
+                        <p className="text-xs text-gray-muted uppercase tracking-widest">{s.label}</p>
+                        <h3 className="text-2xl font-medium text-brand-black mt-1 tabular-nums">{s.value}</h3>
                     </div>
                 ))}
             </div>
 
             {/* CHART */}
-            <div className="relative rounded-[32px] border border-black/5 bg-gradient-to-b from-white to-[#f5f5f7] p-10 text-center">
-
-                <div className="absolute -top-20 -right-20 w-72 h-72 bg-[#0071e3]/10 blur-3xl rounded-full"></div>
-
+            <div className="relative rounded-none border border-[#E5E5E5] bg-gray-bg p-10 text-center">
                 <HugeiconsIcon icon={Analytics01Icon} size={40} className="mx-auto text-gray-300 mb-4" />
 
-                <h3 className="text-lg font-semibold text-[#1d1d1f]">
+                <h3 className="text-lg font-semibold text-brand-black uppercase tracking-wider">
                     Performance Visualization
                 </h3>
 
-                <p className="text-[#86868b] text-sm mt-2 max-w-md mx-auto">
+                <p className="text-gray-muted text-sm mt-2 max-w-md mx-auto">
                     Charts will appear here as your store gathers more data.
                 </p>
             </div>
 
             {/* TOP PRODUCTS */}
             <div>
-                <h3 className="text-xl font-semibold mb-6">Top Products</h3>
+                <h3 className="text-lg font-semibold uppercase tracking-wider mb-6 text-brand-black">Top Products</h3>
 
                 {topProducts && topProducts.length > 0 ? (
                     <div className="grid md:grid-cols-3 gap-6">
                         {topProducts.map((p: any, i: number) => (
                             <div key={i}
-                                className="bg-white p-6 rounded-[28px] border border-black/5 shadow-sm hover:shadow-md transition">
+                                className="bg-white p-6 rounded-none border border-[#E5E5E5] hover:border-brand-black transition-colors duration-default ease-editorial">
 
                                 <div className="flex justify-between mb-4">
-                                    <div className="w-16 h-16 bg-[#f5f5f7] rounded-xl overflow-hidden flex items-center justify-center">
+                                    <div className="w-16 h-16 bg-gray-bg border border-[#E5E5E5] rounded-none overflow-hidden flex items-center justify-center shrink-0">
                                         {p.imageUrl ? (
-                                            <img src={p.imageUrl} className="w-full h-full object-cover" />
+                                            <img src={p.imageUrl} className="w-full h-full object-cover" alt={p.title} />
                                         ) : (
-                                            <HugeiconsIcon icon={PackageIcon} size={22} />
+                                            <HugeiconsIcon icon={PackageIcon} size={22} className="text-gray-muted" />
                                         )}
                                     </div>
 
-                                    <span className="text-xs text-green-600 font-medium">
+                                    <span className="text-xs text-brand-black font-semibold tabular-nums">
                                         #{i + 1}
                                     </span>
                                 </div>
 
-                                <h4 className="font-semibold text-sm truncate">{p.title}</h4>
+                                <h4 className="font-semibold text-sm truncate text-brand-black">{p.title}</h4>
 
-                                <p className="text-sm text-[#86868b] mt-2">
+                                <p className="text-xs text-gray-muted mt-2 uppercase tracking-wider tabular-nums">
                                     {p.totalSold} sold
                                 </p>
                             </div>
                         ))}
                     </div>
                 ) : (
-                    <div className="bg-white border border-black/5 rounded-[28px] py-16 text-center">
+                    <div className="bg-white border border-[#E5E5E5] rounded-none py-16 text-center">
                         <HugeiconsIcon icon={PackageIcon} size={30} className="mx-auto text-gray-300 mb-3" />
-                        <p className="text-sm text-[#86868b]">
+                        <p className="text-sm text-gray-muted">
                             No product data yet
                         </p>
                     </div>

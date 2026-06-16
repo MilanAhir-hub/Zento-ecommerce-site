@@ -33,6 +33,7 @@ const AppRoutes = () => {
             {/* Public layout matches routes that get both the Navbar and Category bar */}
             <Route element={<PublicLayout />}>
                 <Route path="/" element={<GuestLandingPage />} />
+                <Route path="/category/:name/:subCategory" element={<CategoryPage />} />
                 <Route path="/category/:name" element={<CategoryPage />} />
                 <Route path="/products" element={<Listing />} />
                 <Route path="/products/:id" element={<ProductDetail />} />

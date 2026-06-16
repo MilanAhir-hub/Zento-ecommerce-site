@@ -44,10 +44,18 @@ const WishList = () => {
 
                 <Link
                     to="/products"
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#0071e3] text-white text-[13px] font-medium hover:bg-[#0077ED] transition"
+                    className="
+                        inline-flex items-center justify-center gap-2
+                        bg-black text-white
+                        text-[11px] font-semibold uppercase
+                        tracking-[0.18em] px-8 h-12
+                        rounded-none border border-black
+                        hover:bg-transparent hover:text-black
+                        transition-colors duration-200
+                    "
                 >
                     <HugeiconsIcon icon={ShoppingBag01Icon} size={16} />
-                    Browse
+                    Browse Products
                 </Link>
             </section>
         );

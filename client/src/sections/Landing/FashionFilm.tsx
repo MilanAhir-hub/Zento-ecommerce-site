@@ -95,7 +95,7 @@ const FashionFilm = () => {
     return (
         <section
             ref={sectionRef}
-            className="w-full py-24 md:py-32 bg-white border-t border-[#E5E5E5]"
+            className="w-full py-24 md:py-32 bg-white"
             aria-label="Autumn / Winter Cinematic Film"
         >
             <div className="max-w-[1440px] mx-auto px-4 md:px-10">

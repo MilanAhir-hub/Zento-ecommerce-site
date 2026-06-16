@@ -5,7 +5,7 @@ import { useAuth } from "../../context/authContext";
 import { useInteractionLogger } from "../../hooks/useInteractionLogger";
 import { useWishlist } from "../../hooks/useWishlist";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { FavouriteIcon } from "@hugeicons/core-free-icons";
+import { FavouriteIcon, ShoppingBag01Icon } from "@hugeicons/core-free-icons";
 import BlurImage from "./BlurImage";
 
 export interface Product {
@@ -82,7 +82,6 @@ export const ProductCard = ({ product }: { product: Product }) => {
             {/* Image Container */}
             <div
                 className="
-<<<<<<< HEAD
                     relative w-full
                     bg-[#F9F9F9]
                     overflow-hidden
@@ -101,12 +100,49 @@ export const ProductCard = ({ product }: { product: Product }) => {
                     wrapperClassName="aspect-[3/4]"
                     className="
                         object-cover
-                        transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]
-                        group-hover:scale-[1.04]
+                        transition-opacity duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]
+                        group-hover:opacity-90
                     "
                 />
 
-                {/* Wishlist Heart Button */}
+                {/* Desktop Hover Actions */}
+                <div
+                    className="
+                        absolute inset-0
+                        flex items-end justify-center
+                        pb-6
+                        opacity-0
+                        group-hover:opacity-100
+                        transition-opacity duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]
+                        pointer-events-none
+                        group-hover:pointer-events-auto
+                    "
+                >
+                    {/* Quick Add Button */}
+                    <button
+                        type="button"
+                        onClick={handleAddToCart}
+                        disabled={isAddingToCart}
+                        className="
+                            h-10 px-5
+                            inline-flex items-center justify-center gap-2
+                            bg-white/95 backdrop-blur-sm text-[#000000]
+                            border border-[#E5E5E5]
+                            text-[11px] font-medium uppercase tracking-[0.12em]
+                            hover:bg-[#000000] hover:text-white hover:border-[#000000]
+                            active:scale-[0.98]
+                            disabled:opacity-40 disabled:cursor-not-allowed
+                            transition-[background-color,color,border-color] duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]
+                            focus-visible:outline focus-visible:outline-1
+                            focus-visible:outline-offset-2 focus-visible:outline-[#000000]
+                        "
+                    >
+                        <HugeiconsIcon icon={ShoppingBag01Icon} size={14} aria-hidden="true" />
+                        {isProductInCart ? "Added" : isAddingToCart ? "Adding…" : "Quick Add"}
+                    </button>
+                </div>
+
+                {/* Wishlist Button (Always in top-right) */}
                 <button
                     type="button"
                     onClick={handleWishlistToggle}
@@ -117,13 +153,17 @@ export const ProductCard = ({ product }: { product: Product }) => {
                         w-9 h-9
                         inline-flex items-center justify-center
                         bg-white border border-[#E5E5E5]
-                        rounded-full
-                        opacity-0 translate-y-1
-                        group-hover:opacity-100 group-hover:translate-y-0
-                        focus-visible:opacity-100 focus-visible:translate-y-0
-                        transition-[opacity,transform,background-color] duration-200
+                        text-[#222222] hover:text-white
                         hover:bg-[#000000] hover:border-[#000000]
                         active:scale-95
+                        transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]
+                        focus-visible:outline focus-visible:outline-1
+                        focus-visible:outline-offset-2 focus-visible:outline-[#000000]
+                        ${
+                            inWishlist
+                                ? "opacity-100"
+                                : "opacity-100 md:opacity-0 group-hover:opacity-100"
+                        }
                     `}
                 >
                     <HugeiconsIcon
@@ -133,7 +173,7 @@ export const ProductCard = ({ product }: { product: Product }) => {
                         className={
                             inWishlist
                                 ? "text-[#BC0000] fill-[#BC0000]"
-                                : "text-[#222222] group-hover:text-white"
+                                : "transition-colors duration-200"
                         }
                     />
                 </button>
@@ -149,7 +189,7 @@ export const ProductCard = ({ product }: { product: Product }) => {
                         line-clamp-2
                         underline-offset-4
                         group-hover:underline
-                        transition-colors duration-200
+                        transition-colors duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]
                     "
                 >
                     {product.title}
@@ -166,22 +206,22 @@ export const ProductCard = ({ product }: { product: Product }) => {
                 </p>
             </div>
 
-            {/* Add to Bag */}
+            {/* Mobile: Add to Bag */}
             <button
                 type="button"
                 onClick={handleAddToCart}
                 disabled={isAddingToCart}
                 className="
+                    md:hidden
                     mt-4 w-full h-11
                     inline-flex items-center justify-center
                     bg-[#000000] text-white
                     border border-[#000000]
-                    rounded-none
                     text-[11px] font-medium uppercase tracking-[0.12em]
                     hover:bg-white hover:text-[#000000]
                     active:scale-[0.98]
                     disabled:opacity-40 disabled:cursor-not-allowed
-                    transition-[background-color,color] duration-200
+                    transition-[background-color,color] duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]
                     focus-visible:outline focus-visible:outline-1
                     focus-visible:outline-offset-2 focus-visible:outline-[#000000]
                 "
