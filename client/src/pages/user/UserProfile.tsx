@@ -116,7 +116,7 @@ const UserProfile = () => {
                             <div className="space-y-1">
                                 <Link to="/help" className="block py-2.5 text-[15px] text-[#515154] hover:text-[#1d1d1f] transition font-medium">Support</Link>
                                 <Link to="/guide" className="block py-2.5 text-[15px] text-[#515154] hover:text-[#1d1d1f] transition font-medium">Shopping Guide</Link>
-                                <Link to="/about" className="block py-2.5 text-[15px] text-[#515154] hover:text-[#1d1d1f] transition font-medium">About Zento</Link>
+                                <Link to="/about" className="block py-2.5 text-[15px] text-[#515154] hover:text-[#1d1d1f] transition font-medium">About Novara</Link>
 
                                 <button
                                     onClick={handleLogout}
@@ -249,7 +249,7 @@ const UserProfile = () => {
                             ) : !showVendorForm ? (
                                 <div className="py-2 animate-in fade-in duration-500">
                                     <h3 className="text-[24px] font-semibold text-[#1d1d1f] tracking-tight mb-2">
-                                        Start selling with Zento.
+                                        Start selling with Novara.
                                     </h3>
                                     <p className="text-[15px] text-[#86868b] mb-8 leading-relaxed max-w-[80%]">
                                         Turn your passion into a business. Reach millions of customers with our seamless, powerful selling tools. Let's get you set up.

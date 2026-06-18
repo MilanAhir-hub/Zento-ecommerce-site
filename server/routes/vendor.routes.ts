@@ -13,7 +13,8 @@ import {
     getVendorDashboardStats,
     getTopSellingProducts,
     getStoreInfo,
-    updateStoreInfo
+    updateStoreInfo,
+    getVendorAnalytics
 } from "../controllers/vendor.controller";
 import {
     createBanner,
@@ -49,6 +50,7 @@ router.get("/order/:id", getvendororderbyid);
 // --- DASHBOARD ROUTING ---
 router.get("/dashboard-stats", getVendorDashboardStats);
 router.get("/top-selling-products", getTopSellingProducts);
+router.get("/analytics", getVendorAnalytics);
 
 // --- STORE PROFILE ROUTING ---
 router.get("/store", getStoreInfo);

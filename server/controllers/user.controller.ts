@@ -11,6 +11,8 @@ import { Notification } from "../models/Notification";
 import { VendorRequest } from "../models/VendorRequest";
 import { getIO } from "../utils/socket";
 import { AuthRequest } from "../middlewares/auth.middleware";
+import { createOrdersFromCart } from "../services/order.service";
+import { OrderStatus, NON_REFUNDABLE_STATUSES } from "../constants/orderStatus";
 
 export const profile = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
@@ -409,58 +411,14 @@ export const createOrder = async (req: AuthRequest, res: Response): Promise<void
             return;
         }
 
-        // 1. Double check stock and group items cleanly by the `vendorId` field on their embedded Product models!
-        const itemsByVendor: Record<string, any[]> = {};
-
-        for (const item of cart.items) {
-            const product: any = item.product;
-
-            // Fail fast if an item was suddenly purchased out of stock by someone else
-            if (!product || product.stock < item.quantity) {
-                res.status(400).json({ message: `Product ${product?.title || "Unknown"} is out of stock` });
-                return;
-            }
-
-            const vId = product.vendorId.toString();
-
-            if (!itemsByVendor[vId]) {
-                itemsByVendor[vId] = [];
-            }
-
-            itemsByVendor[vId].push({
-                product: product._id,
+        const items = cart.items
+            .filter(item => item && item.product)
+            .map(item => ({
+                product: item.product._id,
                 quantity: item.quantity,
-                price: product.price, // Lock in the snapshot price of the product at checkout time
-            });
-        }
+            }));
 
-        const createdOrders = [];
-
-        // 2. Iterate each vendor category individually and produce a discrete Order document for each vendor
-        for (const [vendorId, items] of Object.entries(itemsByVendor)) {
-            // Calculate exact total amount for this specific vendor's subset of the cart
-            const totalAmount = items.reduce((acc, currentItem) => acc + (currentItem.price * currentItem.quantity), 0);
-
-            const newOrder = await Order.create({
-                user: userId,
-                vendorId,
-                items,
-                totalAmount,
-                status: 'Pending'
-            });
-
-            createdOrders.push(newOrder);
-
-            // Deduct the inventory live so nobody else can buy it
-            for (const item of items) {
-                await Product.findByIdAndUpdate(item.product, {
-                    $inc: { stock: -item.quantity } // safely decrement natively using DB guarantees
-                });
-            }
-        }
-
-        // 3. Wipe out the user's cart now that orders have successfully processed
-        await Cart.findOneAndUpdate({ user: userId }, { $set: { items: [] } });
+        const createdOrders = await createOrdersFromCart({ userId: new mongoose.Types.ObjectId(userId), items });
 
         // ⭐ REAL-TIME UPDATE
         try {
@@ -539,13 +497,13 @@ export const cancelOrder = async (req: AuthRequest, res: Response): Promise<void
             return;
         }
 
-        if (order.status === "Shipped" || order.status === "Delivered" || order.status === "Cancelled") {
+        if (NON_REFUNDABLE_STATUSES.includes(order.status)) {
             res.status(400).json({ message: `Order cannot be cancelled because it is already ${order.status}` });
             return;
         }
 
         // Mutate status to Cancelled
-        order.status = "Cancelled";
+        order.status = OrderStatus.CANCELLED;
         await order.save();
 
         // Very important: Safely return the reserved stock quantities back into the Product inventory pool
@@ -678,7 +636,7 @@ export const addReview = async (req: AuthRequest, res: Response): Promise<void> 
         const hasPurchased = await Order.findOne({
             user: userId,
             "items.product": productId,
-            status: { $ne: "Cancelled" } // As long as order went through and didn't cancel
+            status: { $ne: OrderStatus.CANCELLED } // As long as order went through and didn't cancel
         });
 
         if (!hasPurchased) {

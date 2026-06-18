@@ -12,11 +12,13 @@ import {
     getStoreInfo,
     updateStoreInfo,
     getVendorBanners,
-    createVendorBanner
+    createVendorBanner,
+    getVendorAnalytics
 } from '../../services/vendor.api';
 import type {
     StoreInfo,
-    VendorBanner
+    VendorBanner,
+    VendorAnalytics
 } from '../../services/vendor.api';
 
 export const useVendorStats = () => {
@@ -137,5 +139,13 @@ export const useCreateVendorBanner = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['vendorBanners'] });
         },
+    });
+};
+
+export const useVendorAnalytics = () => {
+    return useQuery<VendorAnalytics, Error>({
+        queryKey: ['vendorAnalytics'],
+        queryFn: getVendorAnalytics,
+        staleTime: 5 * 60 * 1000, // 5 minutes
     });
 };

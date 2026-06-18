@@ -8,7 +8,7 @@ const features = [
         icon: ShoppingBag01Icon,
         title: "Premium Products",
         description:
-            "Zento offers carefully selected high-quality products designed to enhance your lifestyle.",
+            "Novara offers carefully selected high-quality products designed to enhance your lifestyle.",
     },
     {
         icon: TruckIcon,
@@ -38,11 +38,11 @@ const About = () => {
 
             <div className="text-center max-w-3xl mx-auto mb-16">
                 <h1 className="text-4xl sm:text-5xl font-black text-stone-900 mb-6">
-                    About <span className="text-stone-700">Zento</span>
+                    About <span className="text-stone-700">Novara</span>
                 </h1>
 
                 <p className="text-lg text-stone-600 leading-relaxed">
-                    Zento is built to deliver a modern shopping experience where quality,
+                    Novara is built to deliver a modern shopping experience where quality,
                     simplicity, and innovation come together. Our mission is to make
                     online shopping effortless while offering premium products you can
                     trust.
@@ -59,7 +59,7 @@ const About = () => {
                     </h2>
 
                     <p className="text-stone-600 leading-relaxed mb-4">
-                        Zento started with a simple idea: online shopping should feel
+                        Novara started with a simple idea: online shopping should feel
                         effortless and enjoyable. Instead of overwhelming users with
                         endless choices, we focus on offering carefully selected products
                         that bring value to everyday life.
@@ -68,7 +68,7 @@ const About = () => {
                     <p className="text-stone-600 leading-relaxed">
                         We believe great design, trusted service, and fast delivery are
                         essential to building a modern ecommerce experience. That's why
-                        every feature in Zento is built with the customer in mind.
+                        every feature in Novara is built with the customer in mind.
                     </p>
                 </div>
 
@@ -86,7 +86,7 @@ const About = () => {
             <div className="mb-20">
 
                 <h2 className="text-3xl font-bold text-center text-stone-900 mb-12">
-                    Why Shop With Zento?
+                    Why Shop With Novara?
                 </h2>
 
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -123,7 +123,7 @@ const About = () => {
             <div className="bg-stone-100 rounded-2xl p-12 text-center">
 
                 <h2 className="text-3xl font-bold text-stone-900 mb-4">
-                    Start Shopping with Zento
+                    Start Shopping with Novara
                 </h2>
 
                 <p className="text-stone-600 mb-8">

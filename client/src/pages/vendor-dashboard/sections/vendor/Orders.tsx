@@ -116,10 +116,10 @@ const Orders = () => {
                         onChange={(val) => setStatusFilter(val)}
                         options={[
                             { value: "all", label: "All" },
-                            { value: "pending", label: "Pending" },
-                            { value: "shipped", label: "Shipped" },
-                            { value: "delivered", label: "Delivered" },
-                            { value: "cancelled", label: "Cancelled" },
+                            { value: "Pending", label: "Pending" },
+                            { value: "Shipped", label: "Shipped" },
+                            { value: "Delivered", label: "Delivered" },
+                            { value: "Cancelled", label: "Cancelled" },
                         ]}
                         className="w-[130px]"
                         triggerClassName="!h-9 !text-[12px]"

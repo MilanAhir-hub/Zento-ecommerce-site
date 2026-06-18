@@ -59,6 +59,7 @@ const Checkout = () => {
             }
 
             const orderResponse = await createRazorpayOrder(total);
+            console.log("createRazorpayOrder response:", orderResponse);
             if (!orderResponse.success) {
                 toast.error("Could not create order.");
                 setIsProcessing(false);
@@ -66,7 +67,7 @@ const Checkout = () => {
             }
 
             const options = {
-                key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_XXXXXXXXX",
+                key: orderResponse.keyId || import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_XXXXXXXXX",
                 amount: orderResponse.amount,
                 currency: orderResponse.currency,
                 name: "NOVARA",
@@ -74,15 +75,24 @@ const Checkout = () => {
                 order_id: orderResponse.orderId,
                 handler: async function (response: any) {
                     try {
+                        console.log("[CLIENT PAY] Razorpay payment handler response:", response);
                         const verifyResult = await verifyRazorpayPayment(
                             response.razorpay_order_id,
                             response.razorpay_payment_id,
                             response.razorpay_signature,
                             total
                         );
+                        console.log("[CLIENT PAY] Verification result from server:", verifyResult);
 
                         if (verifyResult.success) {
-                            toast.success("Payment Successful!");
+                            // Check if orders were created or already exist
+                            if (verifyResult.orderIds && verifyResult.orderIds.length > 0) {
+                                toast.success("Payment Successful! Order(s) created.");
+                            } else if (verifyResult.alreadyProcessed) {
+                                toast.success("Payment already processed. Orders exist.");
+                            } else {
+                                toast.success("Payment verified! Redirecting to orders...");
+                            }
                             navigate("/user/orders");
                         } else {
                             toast.error("Payment Verification Failed.");
@@ -95,13 +105,13 @@ const Checkout = () => {
                 prefill: {
                     name: user.name || "Customer",
                     email: user.email || "",
-                    contact: "",
                 },
                 theme: {
                     color: "#000000",
                 },
             };
 
+            console.log("Razorpay options:", options);
             const paymentObject = new window.Razorpay(options);
 
             paymentObject.on("payment.failed", function (response: any) {
@@ -286,11 +296,28 @@ const Checkout = () => {
                         </div>
 
                         {/* Security Note */}
-                        <div className="flex items-center gap-3 mb-8 p-4 border border-gray-200">
+                        <div className="flex items-center gap-3 mb-6 p-4 border border-gray-200">
                             <HugeiconsIcon icon={LockIcon} size={16} className="text-gray-400 shrink-0" />
                             <p className="text-[12px] text-gray-500 font-normal">
                                 Your payment is encrypted and secure. We never store your card details.
                             </p>
+                        </div>
+
+                        {/* Test Mode Warning Banner */}
+                        <div className="mb-6 p-4 bg-amber-50/60 border border-amber-200/50 text-amber-900">
+                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-800 block mb-1">
+                                Test Mode Active
+                            </span>
+                            <p className="text-[12px] font-normal leading-relaxed text-amber-800 mb-2">
+                                Real or international cards are not processed. Please use Razorpay's domestic sandbox cards:
+                            </p>
+                            <ul className="text-[11px] text-amber-800 space-y-1.5 font-mono">
+                                <li>• <span className="font-semibold">RuPay (Domestic):</span> <code className="bg-amber-100/50 px-1 py-0.5">6527 6589 0000 1005</code></li>
+                                <li>• <span className="font-semibold">Visa (Domestic):</span> <code className="bg-amber-100/50 px-1 py-0.5">4100 2800 0000 1007</code></li>
+                                <li>• <span className="font-semibold">Mastercard (Domestic):</span> <code className="bg-amber-100/50 px-1 py-0.5">5500 6700 0000 1002</code></li>
+                                <li>• <span className="font-semibold">Expiry:</span> <code className="bg-amber-100/50 px-1 py-0.5">12/30</code> | <span className="font-semibold">CVV:</span> <code className="bg-amber-100/50 px-1 py-0.5">123</code></li>
+                                <li>• <span className="font-semibold">UPI ID:</span> <code className="bg-amber-100/50 px-1 py-0.5">success@razorpay</code></li>
+                            </ul>
                         </div>
 
                         {/* Pay Button */}

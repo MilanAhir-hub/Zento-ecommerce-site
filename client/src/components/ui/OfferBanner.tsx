@@ -2,7 +2,7 @@ import { useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Cancel01Icon } from "@hugeicons/core-free-icons";
 
-const STORAGE_KEY = "zento_offer_banner_closed";
+const STORAGE_KEY = "novara_offer_banner_closed";
 
 const OfferBanner = () => {
     const [isVisible, setIsVisible] = useState<boolean>(() => {
@@ -23,7 +23,7 @@ const OfferBanner = () => {
                 <div className="flex items-center justify-center h-[35px] text-[11px] font-medium uppercase tracking-[0.1em] text-center">
                     <span className="text-white/90">
                         Free shipping on orders over $50&nbsp;·&nbsp;Use code{" "}
-                        <span className="font-semibold tracking-[0.12em]">ZENTO20</span>{" "}
+                        <span className="font-semibold tracking-[0.12em]">NOVARA20</span>{" "}
                         for 20% off
                     </span>
                 </div>

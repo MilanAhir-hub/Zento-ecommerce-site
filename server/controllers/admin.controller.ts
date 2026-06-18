@@ -5,6 +5,7 @@ import { Order } from "../models/Order";
 import { VendorRequest } from "../models/VendorRequest";
 import { Notification } from "../models/Notification";
 import { getIO } from "../utils/socket";
+import { OrderStatus, ACTIVE_STATUSES, isValidStatus } from "../constants/orderStatus";
 
 // ==========================================
 // OVERVIEW STATS
@@ -12,10 +13,10 @@ import { getIO } from "../utils/socket";
 export const getDashboardStats = async (req: Request, res: Response) => {
     try {
         // Calculate total revenue from all delivered/paid orders
-        const orders = await Order.find({ status: { $ne: 'cancelled' } });
+        const orders = await Order.find({ status: { $ne: OrderStatus.CANCELLED } });
         const totalRevenue = orders.reduce((sum, order) => sum + order.totalAmount, 0);
 
-        const activeOrders = await Order.countDocuments({ status: { $in: ['pending', 'processing', 'shipped'] } });
+        const activeOrders = await Order.countDocuments({ status: { $in: ACTIVE_STATUSES } });
         const totalCustomers = await User.countDocuments({ role: 'user' });
         const pendingVendors = await VendorRequest.countDocuments({ status: 'pending' });
 
@@ -49,6 +50,10 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const { status } = req.body;
+
+        if (!isValidStatus(status)) {
+            return res.status(400).json({ success: false, message: `Invalid status. Valid values: ${Object.values(OrderStatus).join(', ')}` });
+        }
 
         const order = await Order.findByIdAndUpdate(id, { status }, { new: true });
         if (!order) {

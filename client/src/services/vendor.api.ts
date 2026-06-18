@@ -74,6 +74,45 @@ export interface VendorBanner {
     createdAt: string;
 }
 
+// New Analytics Types
+export interface TopProduct {
+    _id: string;
+    title: string;
+    imageUrl?: string;
+    price: number;
+    totalRevenue: number;
+    totalUnits: number;
+    orderCount: number;
+}
+
+export interface DailyChartPoint {
+    date: string;
+    revenue?: number;
+    orders: number;
+}
+
+export interface VendorAnalytics {
+    // Core metrics
+    totalRevenue: number;
+    totalOrders: number;
+    avgOrderValue: number;
+    productsSold: number;
+    
+    // Status breakdown
+    pendingOrders: number;
+    processingOrders: number;
+    shippedOrders: number;
+    deliveredOrders: number;
+    cancelledOrders: number;
+
+    // Charts (last 30 days)
+    revenueChart: DailyChartPoint[];
+    ordersChart: DailyChartPoint[];
+
+    // Top products
+    topProducts: TopProduct[];
+}
+
 export const getVendorDashboardStats = async (): Promise<VendorDashboardStats> => {
     const response = await api.get('/vendor/dashboard-stats');
     if (response.data.success && response.data.stats) {
@@ -151,4 +190,12 @@ export const createVendorBanner = async (formData: FormData): Promise<VendorBann
         headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data.banner;
+};
+
+export const getVendorAnalytics = async (): Promise<VendorAnalytics> => {
+    const response = await api.get('/vendor/analytics');
+    if (response.data.success && response.data.analytics) {
+        return response.data.analytics;
+    }
+    return response.data;
 };

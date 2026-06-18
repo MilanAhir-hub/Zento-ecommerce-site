@@ -101,7 +101,7 @@ const Footer = () => {
                     </nav>
 
                     <p className="text-[12px] text-[#767676] tracking-[0.02em]">
-                        © {year} Zento. All rights reserved.
+                        © {year} Novara. All rights reserved.
                     </p>
                     
                 </div>

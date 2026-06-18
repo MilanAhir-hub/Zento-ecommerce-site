@@ -57,27 +57,27 @@ const OrdersManagement = () => {
                                     <td className="py-5 px-6 text-[13px] font-medium text-[#1d1d1f]">{new Date(order.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}</td>
                                     <td className="py-5 px-6 font-bold text-[14px] text-[#1d1d1f]">₹{order.totalAmount.toLocaleString()}</td>
                                     <td className="py-5 px-6">
-                                        <Select
-                                            value={order.status}
-                                            onChange={(val) => updateOrder.mutate({ id: order._id, status: val })}
-                                            disabled={updateOrder.isPending}
-                                            options={[
-                                                { value: "pending", label: "PENDING" },
-                                                { value: "processing", label: "PROCESSING" },
-                                                { value: "shipped", label: "SHIPPED" },
-                                                { value: "delivered", label: "DELIVERED" },
-                                                { value: "cancelled", label: "CANCELLED" }
-                                            ]}
-                                            className="w-[140px]"
-                                            triggerClassName={`
-                                                !py-1.5 !px-4 !font-black !rounded-full !text-[10px] !tracking-widest
-                                                ${order.status === 'delivered' ? '!bg-green-50 !text-green-600' :
-                                                    order.status === 'processing' ? '!bg-[#0071e3]/5 !text-[#0071e3]' :
-                                                        order.status === 'cancelled' ? '!bg-red-50 !text-[#ff453a]' :
-                                                            '!bg-orange-50 !text-orange-500'
-                                                }
-                                            `}
-                                        />
+                                    <Select
+                                        value={order.status}
+                                        onChange={(val) => updateOrder.mutate({ id: order._id, status: val })}
+                                        disabled={updateOrder.isPending}
+                                        options={[
+                                            { value: "Pending", label: "PENDING" },
+                                            { value: "Processing", label: "PROCESSING" },
+                                            { value: "Shipped", label: "SHIPPED" },
+                                            { value: "Delivered", label: "DELIVERED" },
+                                            { value: "Cancelled", label: "CANCELLED" }
+                                        ]}
+                                        className="w-[140px]"
+                                        triggerClassName={`
+                                            !py-1.5 !px-4 !font-black !rounded-full !text-[10px] !tracking-widest
+                                            ${order.status === 'Delivered' ? '!bg-green-50 !text-green-600' :
+                                                order.status === 'Processing' ? '!bg-[#0071e3]/5 !text-[#0071e3]' :
+                                                    order.status === 'Cancelled' ? '!bg-red-50 !text-[#ff453a]' :
+                                                        '!bg-orange-50 !text-orange-500'
+                                            }
+                                        `}
+                                    />
                                     </td>
                                     <td className="py-5 px-6 text-right">
                                         <button className="text-[12px] font-bold text-[#0071e3] opacity-0 group-hover:opacity-100 transition-all hover:underline">Manage</button>

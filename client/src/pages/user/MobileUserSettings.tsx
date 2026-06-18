@@ -51,7 +51,7 @@ const MobileUserSettings = () => {
             <div className="w-full border-t border-stone-100 flex-1">
                 <Link to="/user/personal-info" className="w-full flex items-center gap-4 px-6 py-5 hover:bg-stone-50 transition-colors border-b border-stone-100 group">
                     <HugeiconsIcon icon={User02Icon} size={20} className="text-stone-400 group-hover:text-stone-600" />
-                    <span className="text-[15px] font-semibold text-stone-700 group-hover:text-stone-900">Personal Info on Zento</span>
+                    <span className="text-[15px] font-semibold text-stone-700 group-hover:text-stone-900">Personal Info on Novara</span>
                 </Link>
 
                 <button onClick={handleLogout} className="w-full flex items-center gap-4 px-6 py-5 hover:bg-red-50 transition-colors group cursor-pointer text-left border-b border-stone-100">

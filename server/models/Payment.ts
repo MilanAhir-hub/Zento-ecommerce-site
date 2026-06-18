@@ -8,6 +8,7 @@ export interface IPayment extends Document {
     amount: number;
     currency: string;
     status: 'created' | 'successful' | 'failed';
+    orderIds: mongoose.Types.ObjectId[];
     createdAt: Date;
     updatedAt: Date;
 }
@@ -24,7 +25,7 @@ const paymentSchema: Schema<IPayment> = new mongoose.Schema({
     },
     razorpay_payment_id: {
         type: String,
-        required: false // Not present immediately on order creation
+        required: false
     },
     razorpay_signature: {
         type: String,
@@ -42,7 +43,12 @@ const paymentSchema: Schema<IPayment> = new mongoose.Schema({
         type: String,
         enum: ['created', 'successful', 'failed'],
         default: 'created'
-    }
+    },
+    orderIds: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Order',
+        default: []
+    }]
 }, { timestamps: true });
 
 export const Payment = mongoose.model<IPayment>('Payment', paymentSchema);

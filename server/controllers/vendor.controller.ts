@@ -4,6 +4,7 @@ import { Order } from "../models/Order";
 import { User } from "../models/User";
 import { AuthRequest } from "../middlewares/auth.middleware";
 import { uploadToCloudinary } from "../middlewares/upload.middleware";
+import { OrderStatus, REVENUE_STATUSES, ACTIVE_STATUSES, isValidStatus } from "../constants/orderStatus";
 
 export const createVendorProduct = async (
     req: AuthRequest,
@@ -322,6 +323,11 @@ export const updateVendorOrderStatus = async (req: AuthRequest, res: Response): 
         const vendorId = req.userId;
         const { status } = req.body;
 
+        if (!isValidStatus(status)) {
+            res.status(400).json({ success: false, message: `Invalid status. Valid values: ${Object.values(OrderStatus).join(', ')}` });
+            return;
+        }
+
         const updatedOrder = await Order.findOneAndUpdate(
             { _id: id, vendorId },
             { $set: { status } },
@@ -385,14 +391,14 @@ export const getVendorDashboardStats = async (req: AuthRequest, res: Response): 
             Order.countDocuments({ vendorId }),
 
             // 3. Total subset of orders manually marked "Pending"
-            Order.countDocuments({ vendorId, status: "Pending" }),
+            Order.countDocuments({ vendorId, status: OrderStatus.PENDING }),
 
             // 4. Aggregation Pipeline to sum up total revenue calculation based ONLY on non-cancelled orders
             Order.aggregate([
                 {
                     $match: {
                         vendorId,
-                        status: { $ne: "Cancelled" }
+                        status: { $in: REVENUE_STATUSES }
                     }
                 },
                 {
@@ -439,7 +445,7 @@ export const getTopSellingProducts = async (req: AuthRequest, res: Response): Pr
                 // 1. Only look at non-cancelled orders belonging to this vendor
                 $match: {
                     vendorId,
-                    status: { $ne: "Cancelled" }
+                    status: { $in: REVENUE_STATUSES }
                 }
             },
             {
@@ -490,6 +496,193 @@ export const getTopSellingProducts = async (req: AuthRequest, res: Response): Pr
         ]);
 
         res.status(200).json({ success: true, topProducts });
+    } catch (error: any) {
+        res.status(500).json({ success: false, message: error.message || "Internal Server Error" });
+    }
+};
+
+// --- ENHANCED ANALYTICS ---
+
+// Get comprehensive vendor dashboard analytics
+export const getVendorAnalytics = async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+        const vendorId = req.userId;
+
+        if (!vendorId) {
+            res.status(401).json({ message: "Not authorized" });
+            return;
+        }
+
+        const now = new Date();
+        const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+        // Single aggregation for all core metrics
+        const [
+            revenueResult,
+            orderCountsResult,
+            topProductsResult,
+            dailyRevenueResult,
+            dailyOrdersResult
+        ] = await Promise.all([
+            // Total revenue (excluding cancelled)
+            Order.aggregate([
+                {
+                    $match: {
+                        vendorId,
+                        status: { $in: REVENUE_STATUSES }
+                    }
+                },
+                {
+                    $group: {
+                        _id: null,
+                        totalRevenue: { $sum: "$totalAmount" },
+                        totalOrders: { $sum: 1 },
+                        avgOrderValue: { $avg: "$totalAmount" }
+                    }
+                }
+            ]),
+
+            // Order counts by status
+            Order.aggregate([
+                {
+                    $match: { vendorId }
+                },
+                {
+                    $group: {
+                        _id: "$status",
+                        count: { $sum: 1 }
+                    }
+                }
+            ]),
+
+            // Top products with revenue, units, order count
+            Order.aggregate([
+                {
+                    $match: {
+                        vendorId,
+                        status: { $in: REVENUE_STATUSES }
+                    }
+                },
+                { $unwind: "$items" },
+                {
+                    $group: {
+                        _id: "$items.product",
+                        totalRevenue: { $sum: { $multiply: ["$items.quantity", "$items.price"] } },
+                        totalUnits: { $sum: "$items.quantity" },
+                        orderCount: { $sum: 1 }
+                    }
+                },
+                { $sort: { totalRevenue: -1 } },
+                { $limit: 10 },
+                {
+                    $lookup: {
+                        from: "products",
+                        localField: "_id",
+                        foreignField: "_id",
+                        as: "product"
+                    }
+                },
+                { $unwind: "$product" },
+                {
+                    $project: {
+                        _id: 1,
+                        title: "$product.title",
+                        imageUrl: "$product.imageUrl",
+                        price: "$product.price",
+                        totalRevenue: 1,
+                        totalUnits: 1,
+                        orderCount: 1
+                    }
+                }
+            ]),
+
+            // Revenue last 30 days (daily)
+            Order.aggregate([
+                {
+                    $match: {
+                        vendorId,
+                        status: { $in: REVENUE_STATUSES },
+                        createdAt: { $gte: thirtyDaysAgo }
+                    }
+                },
+                {
+                    $group: {
+                        _id: {
+                            $dateToString: { format: "%Y-%m-%d", date: "$createdAt" }
+                        },
+                        revenue: { $sum: "$totalAmount" },
+                        orders: { $sum: 1 }
+                    }
+                },
+                { $sort: { "_id": 1 } }
+            ]),
+
+            // Orders last 30 days (daily)
+            Order.aggregate([
+                {
+                    $match: {
+                        vendorId,
+                        createdAt: { $gte: thirtyDaysAgo }
+                    }
+                },
+                {
+                    $group: {
+                        _id: {
+                            $dateToString: { format: "%Y-%m-%d", date: "$createdAt" }
+                        },
+                        orders: { $sum: 1 }
+                    }
+                },
+                { $sort: { "_id": 1 } }
+            ])
+        ]);
+
+        const revenue = revenueResult[0] || { totalRevenue: 0, totalOrders: 0, avgOrderValue: 0 };
+        const orderCounts = orderCountsResult.reduce((acc: any, curr: any) => {
+            acc[curr._id] = curr.count;
+            return acc;
+        }, {});
+
+        // Build last 30 days arrays with zero-fill
+        const last30Days = Array.from({ length: 30 }, (_, i) => {
+            const d = new Date(now.getTime() - (29 - i) * 24 * 60 * 60 * 1000);
+            return d.toISOString().split('T')[0];
+        });
+
+        const revenueChart = last30Days.map(date => {
+            const day = dailyRevenueResult.find((r: any) => r._id === date);
+            return { date, revenue: day?.revenue || 0, orders: day?.orders || 0 };
+        });
+
+        const ordersChart = last30Days.map(date => {
+            const day = dailyOrdersResult.find((r: any) => r._id === date);
+            return { date, orders: day?.orders || 0 };
+        });
+
+        res.status(200).json({
+            success: true,
+            analytics: {
+                // Core metrics
+                totalRevenue: revenue.totalRevenue || 0,
+                totalOrders: revenue.totalOrders || 0,
+                avgOrderValue: revenue.avgOrderValue || 0,
+                productsSold: topProductsResult.reduce((sum: number, p: any) => sum + p.totalUnits, 0),
+                
+                // Status breakdown
+                pendingOrders: orderCounts.Pending || 0,
+                processingOrders: orderCounts.Processing || 0,
+                shippedOrders: orderCounts.Shipped || 0,
+                deliveredOrders: orderCounts.Delivered || 0,
+                cancelledOrders: orderCounts.Cancelled || 0,
+
+                // Charts
+                revenueChart,
+                ordersChart,
+
+                // Top products
+                topProducts: topProductsResult
+            }
+        });
     } catch (error: any) {
         res.status(500).json({ success: false, message: error.message || "Internal Server Error" });
     }
