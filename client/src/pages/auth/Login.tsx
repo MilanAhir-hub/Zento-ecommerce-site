@@ -1,9 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Loading03Icon } from "@hugeicons/core-free-icons";
 import { useAuth } from "../../context/authContext";
-import { useGoogleLogin } from "@react-oauth/google";
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -14,23 +13,39 @@ const Login = () => {
     const { login, googleLogin } = useAuth();
     const navigate = useNavigate();
 
-    const handleGoogleAuth = useGoogleLogin({
-        onSuccess: async (tokenResponse) => {
-            try {
-                setError("");
-                setIsLoading(true);
-                await googleLogin(tokenResponse.access_token);
-                navigate("/");
-            } catch (err: any) {
-                setError(err.response?.data?.message || "Google Login failed");
-            } finally {
-                setIsLoading(false);
+    // Check for Google redirect access token in URL hash on mount
+    useEffect(() => {
+        const handleRedirectCallback = async () => {
+            const hash = window.location.hash;
+            if (hash) {
+                const params = new URLSearchParams(hash.substring(1));
+                const accessToken = params.get("access_token");
+                if (accessToken) {
+                    // Clear the hash from the URL bar immediately
+                    window.history.replaceState(null, "", window.location.pathname);
+                    try {
+                        setIsLoading(true);
+                        setError("");
+                        await googleLogin(accessToken);
+                        navigate("/");
+                    } catch (err: any) {
+                        setError(err.response?.data?.message || "Google Login failed");
+                    } finally {
+                        setIsLoading(false);
+                    }
+                }
             }
-        },
-        onError: () => {
-            setError("Google Login was unsuccessful. Please try again.");
-        }
-    });
+        };
+        handleRedirectCallback();
+    }, [googleLogin, navigate]);
+
+    const handleGoogleAuth = () => {
+        const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
+        const redirectUri = encodeURIComponent(window.location.origin + window.location.pathname);
+        const scope = encodeURIComponent("openid profile email");
+        const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=token&scope=${scope}&prompt=select_account`;
+        window.location.href = authUrl;
+    };
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
