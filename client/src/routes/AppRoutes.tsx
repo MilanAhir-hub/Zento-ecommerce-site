@@ -22,6 +22,8 @@ import DeliveryAddress from "../pages/user/DeliveryAddress";
 import Help from "../pages/user/Help";
 import Guide from "../pages/user/Guide";
 import About from "../pages/user/About";
+import Privacy from "../pages/user/Privacy";
+import Terms from "../pages/user/Terms";
 import MyNotification from "../pages/user/MyNotification";
 import MyOrders from "../pages/user/MyOrders";
 import UserProfile from "../pages/user/UserProfile";
@@ -42,6 +44,8 @@ const AppRoutes = () => {
                 <Route path="/help" element={<Help />} />
                 <Route path="/guide" element={<Guide />} />
                 <Route path="/about" element={<About />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/terms" element={<Terms />} />
                 <Route path="/apply-seller" element={<UserProfile />} />
             </Route>
 

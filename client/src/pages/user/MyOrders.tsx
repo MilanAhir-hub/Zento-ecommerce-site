@@ -75,7 +75,7 @@ const MyOrders = () => {
                 <span className="text-[10px] font-medium uppercase tracking-[0.25em] text-gray-400 block mb-3">
                     Purchases
                 </span>
-                <h1 className="text-[36px] md:text-[44px] font-light text-black tracking-[0.02em]">
+                <h1 className="text-[28px] sm:text-[36px] md:text-[44px] font-light text-black tracking-[0.02em]">
                     Your Orders
                 </h1>
             </header>
@@ -90,7 +90,7 @@ const MyOrders = () => {
                         {/* Order Metadata Header */}
                         <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 pb-6 border-b border-gray-100 mb-6">
                             <div className="space-y-1">
-                                <span className="text-[11px] font-mono text-gray-400 block uppercase">
+                                <span className="text-[11px] font-mono text-gray-400 block uppercase truncate">
                                     Order ID: {order._id}
                                 </span>
                                 <span className="text-[13px] text-gray-500 block">

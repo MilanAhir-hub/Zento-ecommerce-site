@@ -9,13 +9,14 @@ const OrdersManagement = () => {
 
     return (
         <div className="bg-white rounded-4xl border border-[#d2d2d7]/30 overflow-hidden flex flex-col h-full min-h-[500px] shadow-sm">
-            <div className="px-8 py-6 border-b border-[#f5f5f7] flex items-center justify-between shrink-0">
-                <h2 className="text-[18px] font-bold text-[#1d1d1f] flex items-center gap-3">
+            <div className="px-4 sm:px-8 py-4 sm:py-6 border-b border-[#f5f5f7] flex items-center justify-between shrink-0">
+                <h2 className="text-[16px] sm:text-[18px] font-bold text-[#1d1d1f] flex items-center gap-3">
                     <HugeiconsIcon icon={ShoppingBag01Icon} size={24} className="text-[#0071e3]" />
-                    Orders Management
+                    <span className="hidden sm:inline">Orders Management</span>
+                    <span className="sm:hidden">Orders</span>
                 </h2>
                 <div className="flex gap-2">
-                    <button className="text-[13px] font-bold text-[#1d1d1f] bg-[#f5f5f7] px-5 py-2.5 rounded-2xl hover:bg-[#d2d2d7]/30 transition-all border border-[#d2d2d7]/50">Export Report</button>
+                    <button className="text-[11px] sm:text-[13px] font-bold text-[#1d1d1f] bg-[#f5f5f7] px-3 sm:px-5 py-2 sm:py-2.5 rounded-2xl hover:bg-[#d2d2d7]/30 transition-all border border-[#d2d2d7]/50">Export</button>
                 </div>
             </div>
             <div className="p-4 flex-1 overflow-x-auto">

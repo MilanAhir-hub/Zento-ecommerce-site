@@ -26,6 +26,7 @@ const AdminDashboard = () => {
 
     const [activeSection, setActiveSection] = useState('overview');
     const [filterVendorId, setFilterVendorId] = useState<string | null>(null);
+    const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
     const { logout } = useAuth();
 
     const handleLogout = async () => {
@@ -68,10 +69,27 @@ const AdminDashboard = () => {
     return (
         <div className="min-h-screen bg-[#f5f5f7] flex font-sans antialiased text-[#1d1d1f]">
 
+            {/* Mobile Sidebar Overlay */}
+            {isMobileSidebarOpen && (
+                <div
+                    className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 md:hidden"
+                    onClick={() => setIsMobileSidebarOpen(false)}
+                />
+            )}
+
             {/* Sidebar */}
-            <aside className="w-72 bg-white/80 backdrop-blur-xl border-r border-[#d2d2d7]/30 hidden md:flex flex-col sticky top-0 h-screen">
+            <aside className={`w-72 bg-white/80 backdrop-blur-xl border-r border-[#d2d2d7]/30 hidden md:flex flex-col sticky top-0 h-screen max-md:fixed max-md:inset-y-0 max-md:left-0 max-md:z-50 max-md:transition-transform max-md:duration-300 ${isMobileSidebarOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full'}`}>
                 <div className="h-20 flex items-center px-8">
                     <span className="text-[22px] font-bold tracking-tight text-[#1d1d1f]">Novara <span className="text-[#0071e3]">Admin</span></span>
+                    <button
+                        onClick={() => setIsMobileSidebarOpen(false)}
+                        className="ml-auto md:hidden p-2 text-[#86868b] hover:text-[#1d1d1f] transition-colors"
+                        aria-label="Close sidebar"
+                    >
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
 
                 <nav className="flex-1 px-4 py-4 space-y-8 overflow-y-auto custom-scrollbar">
@@ -129,11 +147,20 @@ const AdminDashboard = () => {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 flex flex-col min-w-0">
+            <main className="flex-1 flex flex-col min-w-0 md:ml-72">
                 {/* Header */}
-                <header className="h-20 bg-white/80 backdrop-blur-xl border-b border-[#d2d2d7]/30 flex items-center justify-between px-8 lg:px-12 sticky top-0 z-30">
-                    <div className="flex flex-col">
-                        <h1 className="text-[22px] font-bold text-[#1d1d1f] tracking-tight">
+                <header className="h-20 bg-white/80 backdrop-blur-xl border-b border-[#d2d2d7]/30 flex items-center justify-between px-4 sm:px-8 lg:px-12 sticky top-0 z-30">
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => setIsMobileSidebarOpen(true)}
+                            className="md:hidden p-2 -ml-2 text-[#1d1d1f] hover:bg-[#f5f5f7] rounded-xl transition-colors"
+                            aria-label="Open sidebar"
+                        >
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                            </svg>
+                        </button>
+                        <h1 className="text-[18px] sm:text-[22px] font-bold text-[#1d1d1f] tracking-tight">
                             {navItems.find(i => i.id === activeSection)?.label || 'Settings'}
                         </h1>
                     </div>

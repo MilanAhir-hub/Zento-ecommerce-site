@@ -241,7 +241,7 @@ const CategoryPage = () => {
                         {/* Editorial Divider */}
                         <div className="w-12 h-px bg-black mb-6" />
 
-                        <h1 className="text-[36px] md:text-[72px] font-light leading-[0.95] text-black uppercase tracking-[0.04em] mb-6">
+                        <h1 className="text-[28px] sm:text-[36px] md:text-[72px] font-light leading-[0.95] text-black uppercase tracking-[0.04em] mb-6 break-words">
                             {subCategory || name}
                         </h1>
 

@@ -303,7 +303,21 @@ const ProfileMegaMenu = ({
                                     onClick={onItemClick}
                                     className="text-[12px] font-medium uppercase tracking-[0.14em] text-[#000000] underline-offset-4 hover:underline transition-colors duration-200"
                                 >
+                                    About
+                                </Link>
+                                <Link
+                                    to="/privacy"
+                                    onClick={onItemClick}
+                                    className="text-[12px] font-medium uppercase tracking-[0.14em] text-[#000000] underline-offset-4 hover:underline transition-colors duration-200"
+                                >
                                     Privacy
+                                </Link>
+                                <Link
+                                    to="/terms"
+                                    onClick={onItemClick}
+                                    className="text-[12px] font-medium uppercase tracking-[0.14em] text-[#000000] underline-offset-4 hover:underline transition-colors duration-200"
+                                >
+                                    Terms
                                 </Link>
                                 <Link
                                     to="/help"

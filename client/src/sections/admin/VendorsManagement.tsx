@@ -25,10 +25,11 @@ const VendorsManagement = ({ onViewCatalog }: { onViewCatalog: (vendorId: string
 
     return (
         <div className="bg-white rounded-4xl border border-[#d2d2d7]/30 overflow-hidden flex flex-col h-full min-h-[500px] shadow-sm">
-            <div className="px-8 py-6 border-b border-[#f5f5f7] flex items-center justify-between shrink-0">
-                <h2 className="text-[18px] font-bold text-[#1d1d1f] flex items-center gap-3">
+            <div className="px-4 sm:px-8 py-4 sm:py-6 border-b border-[#f5f5f7] flex items-center justify-between shrink-0">
+                <h2 className="text-[16px] sm:text-[18px] font-bold text-[#1d1d1f] flex items-center gap-3">
                     <HugeiconsIcon icon={Store01Icon} size={24} className="text-[#0071e3]" />
-                    Verified Partners
+                    <span className="hidden sm:inline">Verified Partners</span>
+                    <span className="sm:hidden">Partners</span>
                 </h2>
             </div>
             <div className="p-8 flex-1 overflow-x-auto bg-[#fbfbfd]/50">

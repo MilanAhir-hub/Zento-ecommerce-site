@@ -20,8 +20,8 @@ const OfferBanner = () => {
     return (
         <div className="relative w-full bg-[#000000] text-white">
             <div className="max-w-[1440px] mx-auto px-4 md:px-10">
-                <div className="flex items-center justify-center h-[35px] text-[11px] font-medium uppercase tracking-[0.1em] text-center">
-                    <span className="text-white/90">
+                <div className="flex items-center justify-center h-[35px] text-[10px] sm:text-[11px] font-medium uppercase tracking-[0.1em] text-center overflow-hidden">
+                    <span className="text-white/90 truncate">
                         Free shipping on orders over $50&nbsp;·&nbsp;Use code{" "}
                         <span className="font-semibold tracking-[0.12em]">NOVARA20</span>{" "}
                         for 20% off

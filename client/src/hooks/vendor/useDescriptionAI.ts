@@ -37,12 +37,12 @@ export const useDescriptionAI = () => {
     };
 
     // Improve Description
-    const improve = async (description: string): Promise<string> => {
+    const improve = async (description: string, tone?: string): Promise<string> => {
         setLoading(true);
         try {
             const res = await api.post<AIResponse>(
                 "/vendor/ai/improve-description",
-                { description }
+                { description, tone }
             );
             return res.data.description;
         } catch (error) {

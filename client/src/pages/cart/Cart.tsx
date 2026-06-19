@@ -128,7 +128,7 @@ const Cart = () => {
                         {/* Editorial Divider */}
                         <div className="w-12 h-px bg-black mb-6" />
                         
-                        <h1 className="text-[36px] md:text-[48px] font-light text-black tracking-[0.02em] mb-2">
+                        <h1 className="text-[28px] sm:text-[36px] md:text-[48px] font-light text-black tracking-[0.02em] mb-2">
                             Your Bag
                         </h1>
                         <p className="text-[13px] text-gray-500 font-normal">

@@ -33,12 +33,8 @@ Product Details:
 - Key Features: ${features && features.length > 0 ? features.join(", ") : "Not provided"}
 
 Tone Instruction:
-- Automatically choose the most suitable tone based on the product type, category, and brand.
-- Examples:
-  • Electronics → clear & professional  
-  • Fashion → stylish & expressive  
-  • Luxury items → premium & elegant  
-  • Everyday products → simple & friendly  
+- Use a **${tone}** tone throughout the description.
+- Ensure the language aligns perfectly with a ${tone} brand voice.
 - Keep the tone natural, human-like, and non-generic.
 
 Strict Instructions:
@@ -82,7 +78,7 @@ Output Rules:
 /**
  * Improves an existing e-commerce product description using AI.
  */
-export const improveDescription = async (currentDescription: string, tone: string = "professional and compelling"): Promise<string> => {
+export const improveDescription = async (currentDescription: string, tone: string = "compelling"): Promise<string> => {
     try {
         const model = getGeminiModel();
 
@@ -97,8 +93,8 @@ ${currentDescription || "N/A"}
 """
 
 Tone Instruction:
-- Automatically choose the most suitable tone based on the product context.
-- Keep it natural, human-like, and non-generic.
+- Use a **${tone}** tone for this improvement.
+- Ensure the language is natural, human-like, and non-generic.
 - Maintain a premium, modern, and trustworthy feel.
 
 Strict Instructions:

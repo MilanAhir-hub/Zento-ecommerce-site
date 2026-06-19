@@ -8,16 +8,16 @@ const CustomersManagement = () => {
 
     return (
         <div className="bg-white rounded-2xl border border-stone-200 shadow-[0_2px_10px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col h-full min-h-[500px]">
-            <div className="px-6 py-5 border-b border-stone-100 flex items-center justify-between shrink-0">
-                <h2 className="text-xl font-bold text-stone-900 flex items-center gap-3">
+            <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-stone-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shrink-0">
+                <h2 className="text-lg sm:text-xl font-bold text-stone-900 flex items-center gap-3">
                     <HugeiconsIcon icon={UserGroupIcon} size={24} className="text-stone-400" />
                     Customers
                 </h2>
-                <div className="flex gap-2">
+                <div className="flex gap-2 w-full sm:w-auto">
                     <input
                         type="text"
                         placeholder="Search customers..."
-                        className="text-sm px-4 py-2 border border-stone-200 rounded-xl focus:outline-none focus:border-stone-400"
+                        className="text-sm px-4 py-2 border border-stone-200 rounded-xl focus:outline-none focus:border-stone-400 w-full sm:w-auto"
                     />
                 </div>
             </div>

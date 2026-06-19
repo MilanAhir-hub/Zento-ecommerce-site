@@ -255,7 +255,7 @@ const AddProduct = () => {
 
             {/* HEADER */}
             <div>
-                <h2 className="text-[32px] font-medium uppercase tracking-widest text-brand-black">
+                <h2 className="text-[24px] sm:text-[32px] font-medium uppercase tracking-widest text-brand-black">
                     {isEditMode ? "Refine Product" : "Create Product"}
                 </h2>
                 <p className="text-gray-muted text-[16px] mt-1">
@@ -463,13 +463,13 @@ const AddProduct = () => {
                                 </button>
 
                                 <button
-                                    type="button"
-                                    disabled={isAILoading || !formData.description}
-                                    onClick={async () => {
-                                        const desc = await improve(formData.description);
-                                        if (desc) setFormData(prev => ({ ...prev, description: desc }));
-                                    }}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-brand-black rounded-none hover:bg-brand-black hover:text-brand-white transition-colors disabled:opacity-40 text-[10px] font-bold uppercase tracking-tight border border-[#E5E5E5] cursor-pointer"
+                                   type="button"
+                                   disabled={isAILoading || !formData.description}
+                                   onClick={async () => {
+                                       const desc = await improve(formData.description, aiTone);
+                                       if (desc) setFormData(prev => ({ ...prev, description: desc }));
+                                   }}
+                                   className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-brand-black rounded-none hover:bg-brand-black hover:text-brand-white transition-colors disabled:opacity-40 text-[10px] font-bold uppercase tracking-tight border border-[#E5E5E5] cursor-pointer"
                                 >
                                     {isAILoading ? <HugeiconsIcon icon={Loading03Icon} size={12} className="animate-spin" /> : <HugeiconsIcon icon={MagicWand01Icon} size={12} />}
                                     <span>Polish</span>

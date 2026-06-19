@@ -25,10 +25,11 @@ const VendorRequests = () => {
 
     return (
         <div className="bg-white rounded-4xl border border-[#d2d2d7]/30 overflow-hidden flex flex-col h-full min-h-[500px] shadow-sm">
-            <div className="px-8 py-6 border-b border-[#f5f5f7] flex items-center justify-between shrink-0">
-                <h2 className="text-[18px] font-bold text-[#1d1d1f] flex items-center gap-3">
+            <div className="px-4 sm:px-8 py-4 sm:py-6 border-b border-[#f5f5f7] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shrink-0">
+                <h2 className="text-[16px] sm:text-[18px] font-bold text-[#1d1d1f] flex items-center gap-3">
                     <HugeiconsIcon icon={Alert01Icon} size={24} className="text-[#ff453a]" />
-                    Vendor Approval Queue
+                    <span className="hidden sm:inline">Vendor Approval Queue</span>
+                    <span className="sm:hidden">Approvals</span>
                 </h2>
                 <span className="text-[11px] font-black text-[#ff453a] bg-red-50 px-3 py-1 rounded-full uppercase tracking-widest">Action Required</span>
             </div>

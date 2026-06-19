@@ -16,11 +16,11 @@ const ProductsManagement = ({ filterVendorId, onClearFilter }: { filterVendorId:
 
     return (
         <div className="bg-white rounded-4xl border border-[#d2d2d7]/30 overflow-hidden flex flex-col h-full min-h-[500px] shadow-sm">
-            <div className="px-8 py-6 border-b border-[#f5f5f7] flex items-center justify-between shrink-0">
+            <div className="px-4 sm:px-8 py-4 sm:py-6 border-b border-[#f5f5f7] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shrink-0">
                 <div className="flex flex-col gap-1">
-                    <h2 className="text-[18px] font-bold text-[#1d1d1f] flex items-center gap-3">
+                    <h2 className="text-[16px] sm:text-[18px] font-bold text-[#1d1d1f] flex items-center gap-3">
                         <HugeiconsIcon icon={PackageIcon} size={24} className="text-[#0071e3]" />
-                        {filterVendorId ? `${activeVendorName}'s Catalog` : 'Products Inventory'}
+                        {filterVendorId ? `${activeVendorName}'s Catalog` : <><span className="hidden sm:inline">Products Inventory</span><span className="sm:hidden">Products</span></>}
                     </h2>
                     {filterVendorId && (
                         <div className="flex items-center gap-2">

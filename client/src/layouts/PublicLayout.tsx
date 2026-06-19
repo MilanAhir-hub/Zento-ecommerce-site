@@ -15,7 +15,7 @@ const PublicLayout = () => {
                 {isFullBleed ? (
                     <Outlet />
                 ) : (
-                    <div className="max-w-[1440px] mx-auto w-full px-6">
+                    <div className="max-w-[1440px] mx-auto w-full px-4 sm:px-6">
                         <Outlet />
                     </div>
                 )}

@@ -246,7 +246,7 @@ const ProductDetail = () => {
                             <HugeiconsIcon icon={ArrowRight01Icon} size={10} className="mx-2 opacity-40" />
                         </>
                     )}
-                    <span className="text-black truncate max-w-[200px]">{product.title}</span>
+                    <span className="text-black truncate max-w-[120px] sm:max-w-[200px]">{product.title}</span>
                 </nav>
             </div>
 

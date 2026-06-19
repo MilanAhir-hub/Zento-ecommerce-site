@@ -179,7 +179,7 @@ const Checkout = () => {
 
             {/* Header */}
             <header className="mb-12 md:mb-16">
-                <h1 className="text-[36px] md:text-[48px] font-light text-black tracking-[0.02em] mb-2">
+                <h1 className="text-[28px] sm:text-[36px] md:text-[48px] font-light text-black tracking-[0.02em] mb-2">
                     Checkout
                 </h1>
                 <p className="text-[13px] text-gray-500 font-normal">
@@ -304,14 +304,14 @@ const Checkout = () => {
                         </div>
 
                         {/* Test Mode Warning Banner */}
-                        <div className="mb-6 p-4 bg-amber-50/60 border border-amber-200/50 text-amber-900">
+                        <div className="mb-6 p-4 bg-amber-50/60 border border-amber-200/50 text-amber-900 overflow-hidden">
                             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-800 block mb-1">
                                 Test Mode Active
                             </span>
                             <p className="text-[12px] font-normal leading-relaxed text-amber-800 mb-2">
                                 Real or international cards are not processed. Please use Razorpay's domestic sandbox cards:
                             </p>
-                            <ul className="text-[11px] text-amber-800 space-y-1.5 font-mono">
+                            <ul className="text-[11px] text-amber-800 space-y-1.5 font-mono break-all">
                                 <li>• <span className="font-semibold">RuPay (Domestic):</span> <code className="bg-amber-100/50 px-1 py-0.5">6527 6589 0000 1005</code></li>
                                 <li>• <span className="font-semibold">Visa (Domestic):</span> <code className="bg-amber-100/50 px-1 py-0.5">4100 2800 0000 1007</code></li>
                                 <li>• <span className="font-semibold">Mastercard (Domestic):</span> <code className="bg-amber-100/50 px-1 py-0.5">5500 6700 0000 1002</code></li>

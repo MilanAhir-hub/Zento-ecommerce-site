@@ -43,11 +43,11 @@ const DashboardOverview = () => {
     return (
         <div className="space-y-12">
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 {statCards.map((card, idx) => (
-                    <div key={idx} className="bg-white rounded-4xl p-8 border border-[#d2d2d7]/30 hover:shadow-[0_20px_40px_rgba(0,0,0,0.04)] transition-all duration-300">
-                        <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-[13px] font-bold text-[#86868b] uppercase tracking-wider">{card.label}</h3>
+                    <div key={idx} className="bg-white rounded-4xl p-6 sm:p-8 border border-[#d2d2d7]/30 hover:shadow-[0_20px_40px_rgba(0,0,0,0.04)] transition-all duration-300">
+                        <div className="flex items-center justify-between mb-4 sm:mb-6">
+                            <h3 className="text-[11px] sm:text-[13px] font-bold text-[#86868b] uppercase tracking-wider">{card.label}</h3>
                             <div className={`p-2.5 ${card.bg} rounded-2xl`}>
                                 <HugeiconsIcon icon={card.icon} size={20} className={card.color} />
                             </div>
@@ -69,9 +69,9 @@ const DashboardOverview = () => {
 
                 {/* Recent Orders Overview */}
                 <div className="bg-white rounded-4xl border border-[#d2d2d7]/30 overflow-hidden flex flex-col">
-                    <div className="px-8 py-6 border-b border-[#f5f5f7] flex items-center justify-between">
-                        <h2 className="text-[18px] font-bold text-[#1d1d1f]">Recent Orders</h2>
-                        <button className="text-[13px] font-bold text-[#0071e3] hover:underline transition-all">View All</button>
+                    <div className="px-4 sm:px-8 py-4 sm:py-6 border-b border-[#f5f5f7] flex items-center justify-between">
+                        <h2 className="text-[16px] sm:text-[18px] font-bold text-[#1d1d1f]">Recent Orders</h2>
+                        <button className="text-[12px] sm:text-[13px] font-bold text-[#0071e3] hover:underline transition-all">View All</button>
                     </div>
                     <div className="p-12 flex-1 flex flex-col items-center justify-center bg-[#fbfbfd]/50">
                         <div className="w-12 h-12 bg-[#f5f5f7] rounded-full flex items-center justify-center mb-3">
@@ -83,12 +83,13 @@ const DashboardOverview = () => {
 
                 {/* Critical Vendor Requests */}
                 <div className="bg-white rounded-4xl border border-[#d2d2d7]/30 overflow-hidden flex flex-col">
-                    <div className="px-8 py-6 border-b border-[#f5f5f7] flex items-center justify-between">
-                        <h2 className="text-[18px] font-bold text-[#1d1d1f] flex items-center gap-3">
-                            Vendor Requests
+                    <div className="px-4 sm:px-8 py-4 sm:py-6 border-b border-[#f5f5f7] flex items-center justify-between">
+                        <h2 className="text-[16px] sm:text-[18px] font-bold text-[#1d1d1f] flex items-center gap-3">
+                            <span className="hidden sm:inline">Vendor Requests</span>
+                            <span className="sm:hidden">Requests</span>
                             <span className="bg-[#ff453a] text-white py-0.5 px-2.5 rounded-full text-[10px] font-black">ACTION</span>
                         </h2>
-                        <button className="text-[13px] font-bold text-[#0071e3] hover:underline transition-all">Review Hub</button>
+                        <button className="text-[12px] sm:text-[13px] font-bold text-[#0071e3] hover:underline transition-all">Review Hub</button>
                     </div>
                     <div className="p-8 space-y-4">
                         {[
