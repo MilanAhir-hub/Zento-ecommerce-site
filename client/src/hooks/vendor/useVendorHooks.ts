@@ -11,13 +11,10 @@ import {
     updateVendorOrderStatus,
     getStoreInfo,
     updateStoreInfo,
-    getVendorBanners,
-    createVendorBanner,
     getVendorAnalytics
 } from '../../services/vendor.api';
 import type {
     StoreInfo,
-    VendorBanner,
     VendorAnalytics
 } from '../../services/vendor.api';
 
@@ -121,24 +118,6 @@ export const useVendorTopProducts = () => {
         queryKey: ['vendorTopProducts'],
         queryFn: getTopSellingProducts,
         staleTime: 10 * 60 * 1000, // 10 minutes
-    });
-};
-
-export const useVendorBanners = () => {
-    return useQuery<VendorBanner[]>({
-        queryKey: ['vendorBanners'],
-        queryFn: getVendorBanners,
-        staleTime: 10 * 60 * 1000,
-    });
-};
-
-export const useCreateVendorBanner = () => {
-    const queryClient = useQueryClient();
-    return useMutation<VendorBanner, Error, FormData>({
-        mutationFn: (formData: FormData) => createVendorBanner(formData),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['vendorBanners'] });
-        },
     });
 };
 

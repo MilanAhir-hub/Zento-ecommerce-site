@@ -52,28 +52,6 @@ export interface StoreInfo {
     email: string;
 }
 
-export interface VendorBanner {
-    _id: string;
-    vendorId: string;
-    title: string;
-    subtitle?: string;
-    description?: string;
-    color?: string;
-    imageUrl: string;
-    imageSource?: "upload" | "ai";
-    generatedPrompt?: string;
-    category: string;
-    subcategory?: string;
-    discountType: "Percentage" | "Flat";
-    discountValue: number;
-    startDate: string;
-    endDate: string;
-    theme: "light" | "dark";
-    priority: number;
-    isActive: boolean;
-    createdAt: string;
-}
-
 // New Analytics Types
 export interface TopProduct {
     _id: string;
@@ -178,18 +156,6 @@ export const updateStoreInfo = async (storeData: Partial<StoreInfo>): Promise<St
 export const getTopSellingProducts = async (): Promise<any[]> => {
     const response = await api.get('/vendor/top-selling-products');
     return response.data.topProducts || [];
-};
-
-export const getVendorBanners = async (): Promise<VendorBanner[]> => {
-    const response = await api.get('/vendor/banners');
-    return response.data.banners || [];
-};
-
-export const createVendorBanner = async (formData: FormData): Promise<VendorBanner> => {
-    const response = await api.post('/vendor/banner', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-    });
-    return response.data.banner;
 };
 
 export const getVendorAnalytics = async (): Promise<VendorAnalytics> => {

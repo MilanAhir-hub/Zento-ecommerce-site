@@ -17,10 +17,6 @@ import {
     getVendorAnalytics
 } from "../controllers/vendor.controller";
 import {
-    createBanner,
-    getBanners
-} from "../controllers/banner.controller";
-import {
     generateAIProductDescription,
     improveAIProductDescription,
     processVendorImage
@@ -55,10 +51,6 @@ router.get("/analytics", getVendorAnalytics);
 // --- STORE PROFILE ROUTING ---
 router.get("/store", getStoreInfo);
 router.put("/store", updateStoreInfo);
-
-// --- BANNER ROUTING ---
-router.post("/banner", upload.single('image'), createBanner);
-router.get("/banners", getBanners);
 
 // --- AI CONTENT ASSISTANT ROUTING ---
 router.post("/ai/generate-description", generateAIProductDescription);
