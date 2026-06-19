@@ -1,10 +1,10 @@
 import api from './api';
 
 export interface InteractionData {
-    productId: string;
+    productId?: string;
     action: 'view' | 'click' | 'add_to_cart' | 'remove_from_cart' | 'checkout' | 'purchase' | 'search_query';
-    price: number;
     quantity?: number;
+    searchQuery?: string;
 }
 
 export const logUserInteraction = async (data: InteractionData) => {
