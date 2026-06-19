@@ -1,9 +1,9 @@
 import express from 'express';
 import { logInteraction } from '../controllers/interaction.controller';
+import { isAuthenticated } from '../middlewares/auth.middleware';
 
 const router = express.Router();
 
-// this will used by the frontend to send the data
-router.post('/log', logInteraction);
+router.post('/log', isAuthenticated, logInteraction);
 
 export default router;

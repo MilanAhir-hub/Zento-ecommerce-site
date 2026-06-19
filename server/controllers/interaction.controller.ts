@@ -1,11 +1,18 @@
 import { Request, Response } from 'express';
 import Interaction from '../models/Interaction';
+import { AuthRequest } from '../middlewares/auth.middleware';
 
-export const logInteraction = async (req: Request, res: Response) => {
+export const logInteraction = async (req: AuthRequest, res: Response) => {
     try {
-        const { userId, productId, action, quantity, price } = req.body;
+        const userId = req.userId;
 
-        // Create the new interaction record
+        if (!userId) {
+            res.status(401).json({ success: false, message: "User ID not found in token" });
+            return;
+        }
+
+        const { productId, action, quantity, price } = req.body;
+
         const newInteraction = new Interaction({
             userId,
             productId,
