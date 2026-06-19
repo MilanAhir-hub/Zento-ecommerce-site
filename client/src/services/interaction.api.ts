@@ -2,7 +2,7 @@ import api from './api';
 
 export interface InteractionData {
     productId?: string;
-    action: 'view' | 'click' | 'add_to_cart' | 'remove_from_cart' | 'checkout' | 'purchase' | 'search_query';
+    action: 'view' | 'click' | 'add_to_cart' | 'remove_from_cart' | 'checkout' | 'purchase' | 'search_query' | 'wishlist_add' | 'wishlist_remove';
     quantity?: number;
     searchQuery?: string;
 }

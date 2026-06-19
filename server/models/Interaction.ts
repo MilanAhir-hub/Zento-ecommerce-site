@@ -13,7 +13,7 @@ const interactionSchema = new mongoose.Schema({
     },
     action: {
         type: String,
-        enum: ['view', 'click', 'add_to_cart', 'remove_from_cart', 'checkout', 'purchase', 'search_query'],
+        enum: ['view', 'click', 'add_to_cart', 'remove_from_cart', 'checkout', 'purchase', 'search_query', 'wishlist_add', 'wishlist_remove'],
         required: true
     },
     quantity: {

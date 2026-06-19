@@ -4,7 +4,7 @@ import Interaction from '../models/Interaction';
 import { Product } from '../models/Product';
 import { AuthRequest } from '../middlewares/auth.middleware';
 
-const VALID_ACTIONS = ['view', 'click', 'add_to_cart', 'remove_from_cart', 'checkout', 'purchase', 'search_query'];
+const VALID_ACTIONS = ['view', 'click', 'add_to_cart', 'remove_from_cart', 'checkout', 'purchase', 'search_query', 'wishlist_add', 'wishlist_remove'];
 
 export const logInteraction = async (req: AuthRequest, res: Response) => {
     try {
