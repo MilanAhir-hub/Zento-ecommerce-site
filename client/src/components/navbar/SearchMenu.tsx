@@ -510,7 +510,7 @@ const SearchMenu = ({ isVisible, onClose }: SearchMenuProps) => {
                                                             flex items-center justify-between
                                                             py-1.5
                                                             text-[15px] font-medium 
-                                                            ${item.isSale ? "text-[#BC0000] hover:text-[#a00000]" : "text-[#222222] hover:text-[#000000]"}
+                                                            text-[#222222] hover:text-[#000000]
                                                             transition-colors duration-200
                                                         `}
                                                     >

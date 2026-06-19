@@ -70,7 +70,6 @@ const MiniLineChart = ({ data, valueFormatter, label }: MiniLineChartProps) => {
                 areaPath += ` L ${x} ${y}`;
             }
         });
-        const firstX = paddingLeft;
         const lastX = paddingLeft + chartWidth;
         areaPath += ` L ${lastX} ${paddingTop + chartHeight} Z`;
     }
@@ -187,7 +186,7 @@ const MiniLineChart = ({ data, valueFormatter, label }: MiniLineChartProps) => {
                     )}
 
                     {/* Hover trigger columns */}
-                    {data.map((d, i) => {
+                    {data.map((_, i) => {
                         const { x } = getCoords(i, 0);
                         const colWidth = chartWidth / (data.length - 1 || 1);
                         return (

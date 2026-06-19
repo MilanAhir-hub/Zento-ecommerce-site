@@ -1,6 +1,6 @@
 import { useState, useEffect, useId, useRef } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Alert01Icon, Search01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
+import { Alert01Icon, Search01Icon } from "@hugeicons/core-free-icons";
 import { useProducts } from "../../hooks/products/useProducts";
 import { ProductCard } from "../../components/ui/ProductCard";
 import { useLocation } from "react-router-dom";

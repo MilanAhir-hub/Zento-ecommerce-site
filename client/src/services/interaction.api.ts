@@ -4,6 +4,7 @@ export interface InteractionData {
     productId?: string;
     action: 'view' | 'click' | 'add_to_cart' | 'remove_from_cart' | 'checkout' | 'purchase' | 'search_query' | 'wishlist_add' | 'wishlist_remove';
     quantity?: number;
+    price?: number;
     searchQuery?: string;
     metadata?: Record<string, unknown>;
 }
