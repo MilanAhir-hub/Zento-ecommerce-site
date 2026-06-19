@@ -10,8 +10,14 @@ const syncEmbeddings = async () => {
         await mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/ecommerce");
         console.log("✅ connected to MongoDB");
 
-        // Find products that do not have an imageEmbedding field
-        const products = await Product.find({ imageEmbedding: { $exists: false } });
+        // Find products that do not have a valid imageEmbedding field (missing, null, or empty array)
+        const products = await Product.find({
+            $or: [
+                { imageEmbedding: { $exists: false } },
+                { imageEmbedding: { $size: 0 } },
+                { imageEmbedding: null }
+            ]
+        }).select("+imageEmbedding");
         console.log(`Found ${products.length} products without embeddings. Generating now...`);
 
         let count = 0;

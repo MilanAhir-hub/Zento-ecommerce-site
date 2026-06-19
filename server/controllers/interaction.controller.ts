@@ -50,7 +50,7 @@ export const logInteraction = async (req: AuthRequest, res: Response) => {
                 userId,
                 action,
                 metadata: {
-                    searchQuery: req.body.searchQuery || null
+                    searchQuery: req.body.searchQuery || req.body.metadata?.searchQuery || null
                 }
             });
 

@@ -3,6 +3,9 @@ import BrandTicker from "../../sections/Landing/BrandTicker";
 import CategoryGrid from "../../sections/Landing/CategoryGrid";
 import FashionFilm from "../../sections/Landing/FashionFilm";
 import EditorialGrid from "../../sections/Landing/EditorialGrid";
+import Recommended from "../../sections/Landing/Recommended";
+import TrendingProducts from "../../sections/Landing/TrendingProducts";
+import RecentlyViewed from "../../sections/Landing/RecentlyViewed";
 import { useLenis } from "../../hooks/motion/useLenis";
 import { useScrollTriggerSync } from "../../hooks/motion/useScrollTriggerSync";
 
@@ -24,6 +27,10 @@ const GuestLandingPage = () => {
             <CategoryGrid />
             <FashionFilm />
             <EditorialGrid />
+            {/* Personalized recommendation sections — handle guest/auth state internally */}
+            <Recommended />
+            <TrendingProducts />
+            <RecentlyViewed />
         </>
     );
 };

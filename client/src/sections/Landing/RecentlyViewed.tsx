@@ -1,5 +1,5 @@
 import CardSlider from "../../components/ui/CardSlider";
-import { useRecommendations } from "../../hooks/useRecommendations";
+import { useHomeRecommendations } from "../../hooks/useHomeRecommendations";
 import { useAuth } from "../../context/authContext";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Loading03Icon } from "@hugeicons/core-free-icons";
@@ -10,7 +10,7 @@ import { Loading03Icon } from "@hugeicons/core-free-icons";
  */
 const RecentlyViewed = () => {
     const { isAuthenticated } = useAuth();
-    const { data: recData, isLoading } = useRecommendations();
+    const { data: recData, isLoading } = useHomeRecommendations();
 
     // Don't render at all for guests
     if (!isAuthenticated) return null;
@@ -23,15 +23,16 @@ const RecentlyViewed = () => {
         );
     }
 
-    const products = recData?.recentlyViewed || [];
+    const recentlyViewedModule = recData?.find(m => m.type === 'recently_viewed');
+    const products = recentlyViewedModule?.products || [];
 
     if (products.length === 0) return null;
 
     return (
         <section className="py-28 bg-white font-sans relative overflow-hidden">
             <CardSlider
-                title="Recently Viewed"
-                subtitle="Pick up where you left off."
+                title={recentlyViewedModule?.title || "Recently Viewed"}
+                subtitle={recentlyViewedModule?.subtitle || "Pick up where you left off."}
                 items={products}
                 viewAllLink="/shop"
                 viewAllText="View All"

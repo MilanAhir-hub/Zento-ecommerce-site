@@ -64,8 +64,11 @@ const UserHome = () => {
     ];
 
     return (
-        <div className="bg-[#fbfbfd] min-h-screen font-sans">
-            <div className="max-w-[1100px] mx-auto px-6 pt-24 pb-20">
+        /* Break out of ProfileLayout's padded container using negative margins */
+        <div className="bg-[#fbfbfd] min-h-screen font-sans -mx-4 sm:-mx-6 -mt-12">
+
+            {/* Dashboard Header + Grid — constrained width */}
+            <div className="max-w-[1100px] mx-auto px-6 pt-24 pb-16">
 
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
@@ -88,7 +91,7 @@ const UserHome = () => {
                 </div>
 
                 {/* Dashboard Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {dashboardItems.map((item, idx) => (
                         <div
                             key={idx}
@@ -112,16 +115,13 @@ const UserHome = () => {
                         </div>
                     ))}
                 </div>
-
-                {/* Integration Sections */}
-                <div className="space-y-4">
-                    <Recommended />
-                    <div className="h-px bg-[#d2d2d7]/30 my-8" />
-                    <TrendingProducts />
-                    <div className="h-px bg-[#d2d2d7]/30 my-8" />
-                    <RecentlyViewed />
-                </div>
             </div>
+
+            {/* Full-width Recommendation Sections — rendered OUTSIDE the constrained container */}
+            <Recommended />
+            <TrendingProducts />
+            <RecentlyViewed />
+
         </div>
     );
 };

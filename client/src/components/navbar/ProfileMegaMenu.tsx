@@ -38,6 +38,7 @@ const ProfileMegaMenu = ({
               {
                   title: "Account",
                   links: [
+                      { label: "Dashboard", to: "/user/home" },
                       { label: "Profile", to: "/user/personal-info" },
                       { label: "Orders", to: "/user/orders" },
                       { label: "Settings", to: "/user/settings" },

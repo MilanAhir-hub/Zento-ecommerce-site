@@ -17,11 +17,14 @@ import Button from "../../components/ui/Button";
 import BlurImage from "../../components/ui/BlurImage";
 import { getCloudinaryUrl } from "../../utils/cloudinaryImage";
 import type { CartItem } from "../../services/cart.api";
+import { ProductCard } from "../../components/ui/ProductCard";
+import { useCartRecommendations } from "../../hooks/useCartRecommendations";
 
 const Cart = () => {
     const { cart, isCartLoading, updateCartItem, removeFromCart } = useCart();
     const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
     const { log } = useInteractionLogger();
+    const { data: recModules } = useCartRecommendations();
     const navigate = useNavigate();
 
     const [searchItem, setSearchItem] = React.useState("");
@@ -75,41 +78,73 @@ const Cart = () => {
     // EMPTY STATE
     if (items.length === 0) {
         return (
-            <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
-                <div className="w-16 h-16 border border-gray-200 flex items-center justify-center mb-8">
-                    <HugeiconsIcon icon={ShoppingBag01Icon} size={24} className="text-gray-300" />
-                </div>
-                
-                <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-gray-400 mb-4">
-                    Your Collection
-                </span>
-                
-                <h1 className="text-[28px] md:text-[36px] font-light text-black mb-4 tracking-[0.02em]">
-                    Your bag is empty
-                </h1>
-                
-                <p className="text-[14px] text-gray-500 font-normal mb-10 max-w-sm">
-                    Discover our curated selection and add pieces that speak to your personal aesthetic.
-                </p>
+            <div className="max-w-[1200px] mx-auto px-4 md:px-10 py-16 md:py-24">
+                <div className="flex flex-col items-center justify-center text-center mb-20 min-h-[40vh]">
+                    <div className="w-16 h-16 border border-gray-200 flex items-center justify-center mb-8">
+                        <HugeiconsIcon icon={ShoppingBag01Icon} size={24} className="text-gray-300" />
+                    </div>
+                    
+                    <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-gray-400 mb-4">
+                        Your Collection
+                    </span>
+                    
+                    <h1 className="text-[28px] md:text-[36px] font-light text-black mb-4 tracking-[0.02em]">
+                        Your bag is empty
+                    </h1>
+                    
+                    <p className="text-[14px] text-gray-500 font-normal mb-10 max-w-sm">
+                        Discover our curated selection and add pieces that speak to your personal aesthetic.
+                    </p>
 
-                <Link
-                    to="/products"
-                    className="
-                        group inline-flex items-center gap-3
-                        text-[11px] font-medium uppercase tracking-[0.15em]
-                        text-black pb-2
-                        border-b border-black
-                        hover:border-transparent
-                        transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]
-                    "
-                >
-                    Begin Shopping
-                    <HugeiconsIcon 
-                        icon={ArrowRight01Icon} 
-                        size={14} 
-                        className="transition-transform duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:translate-x-1" 
-                    />
-                </Link>
+                    <Link
+                        to="/products"
+                        className="
+                            group inline-flex items-center gap-3
+                            text-[11px] font-medium uppercase tracking-[0.15em]
+                            text-black pb-2
+                            border-b border-black
+                            hover:border-transparent
+                            transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]
+                        "
+                    >
+                        Begin Shopping
+                        <HugeiconsIcon 
+                            icon={ArrowRight01Icon} 
+                            size={14} 
+                            className="transition-transform duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:translate-x-1" 
+                        />
+                    </Link>
+                </div>
+
+                {/* Empty Cart Recommendations */}
+                {recModules && recModules.length > 0 && recModules.map((module) => {
+                    if (!module.products || module.products.length === 0) return null;
+                    return (
+                        <div key={module.moduleId} className="border-t border-gray-100 pt-16">
+                            <div className="flex items-baseline justify-between mb-10">
+                                <h2 className="text-[11px] font-medium uppercase tracking-[0.25em] text-black">
+                                    {module.title}
+                                </h2>
+                                <span className="text-[11px] font-medium text-gray-400 uppercase tracking-[0.12em]">
+                                    {module.subtitle}
+                                </span>
+                            </div>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                                {module.products.slice(0, 4).map((item) => (
+                                    <ProductCard
+                                        key={item._id}
+                                        product={{
+                                            _id: item._id,
+                                            title: item.title,
+                                            price: item.price,
+                                            imageUrl: item.imageUrl,
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
         );
     }
@@ -259,6 +294,36 @@ const Cart = () => {
                             </div>
                         ))}
                     </div>
+
+                    {/* Complete Your Order (Recommendation Widget) */}
+                    {recModules && recModules.length > 0 && recModules.map((module) => {
+                        if (!module.products || module.products.length === 0) return null;
+                        return (
+                            <div key={module.moduleId} className="mt-16 pt-12 border-t border-gray-100">
+                                <div className="mb-8">
+                                    <h3 className="text-[11px] font-medium uppercase tracking-[0.25em] text-black">
+                                        {module.title}
+                                    </h3>
+                                    <p className="text-[12px] text-gray-400 mt-1 tracking-[0.02em]">
+                                        {module.subtitle}
+                                    </p>
+                                </div>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
+                                    {module.products.slice(0, 3).map((item) => (
+                                        <ProductCard
+                                            key={item._id}
+                                            product={{
+                                                _id: item._id,
+                                                title: item.title,
+                                                price: item.price,
+                                                imageUrl: item.imageUrl,
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    })}
 
                     {/* Continue Shopping */}
                     <div className="mt-12 pt-8 border-t border-gray-100">

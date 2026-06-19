@@ -318,7 +318,7 @@ const PublicNavbar = () => {
                             >
                                 {user ? (
                                     <Link
-                                        to="/user/personal-info"
+                                        to="/user/home"
                                         onClick={handleItemClick}
                                         aria-label={`Account: ${user.name}`}
                                         className="

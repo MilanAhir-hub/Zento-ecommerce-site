@@ -1,5 +1,5 @@
 import CardSlider from "../../components/ui/CardSlider";
-import { useRecommendations } from "../../hooks/useRecommendations";
+import { useHomeRecommendations } from "../../hooks/useHomeRecommendations";
 import { useProducts } from "../../hooks/products/useProducts";
 import { useAuth } from "../../context/authContext";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -13,13 +13,15 @@ const TrendingProducts = () => {
     const { isAuthenticated } = useAuth();
 
     // For authenticated users, pull trending from the recommendation API
-    const { data: recData, isLoading: recLoading } = useRecommendations();
+    const { data: recData, isLoading: recLoading } = useHomeRecommendations();
 
     // Fallback: generic products for guests
     const { data: genericProducts, isLoading: genericLoading } = useProducts({ limit: 8 });
 
     const isLoading = isAuthenticated ? recLoading : genericLoading;
-    const products = isAuthenticated ? (recData?.trending || []) : (genericProducts || []);
+    
+    const trendingModule = recData?.find(m => m.type === 'trending');
+    const products = isAuthenticated ? (trendingModule?.products || []) : (genericProducts || []);
 
     if (isLoading) {
         return (
@@ -34,8 +36,8 @@ const TrendingProducts = () => {
     return (
         <section className="py-28 bg-[#f5f5f7] font-sans relative overflow-hidden">
             <CardSlider
-                title="Trending Now"
-                subtitle="What everyone's loving right now."
+                title={trendingModule?.title || "Trending Now"}
+                subtitle={trendingModule?.subtitle || "What everyone's loving right now."}
                 items={products}
                 viewAllLink="/shop"
                 viewAllText="See All"

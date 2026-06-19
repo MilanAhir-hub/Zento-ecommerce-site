@@ -8,7 +8,7 @@ import { generateAIResponse } from "../services/ai/chatService";
 import { generateDescription, improveDescription } from "../services/ai/descriptionService";
 import { enhanceImageWithAI } from "../services/ai/imageEnhancementService";
 import { uploadToCloudinary } from "../middlewares/upload.middleware";
-import { generateImageEmbedding, searchProductsByVector } from "../services/ai/visualSearchService";
+import { generateImageEmbedding, searchProductsByVector, extractProductMetadata, rerankByProductType } from "../services/ai/visualSearchService";
 
 // Simple data questions that can be answered directly from the DB
 const PRICE_PATTERNS = /\b(price|cost|how much|pricing|rate)\b/i;
@@ -299,15 +299,23 @@ export const visualSearch = async (req: Request, res: Response): Promise<void> =
             return;
         }
 
-        // 1. Generate description and text embedding using Gemini AI
-        console.log("🧠 Processing image via Gemini Vision...");
-        const { embedding, description } = await generateImageEmbedding(file.buffer, file.mimetype);
+        // 1. Generate description + embedding AND extract structured metadata in parallel
+        console.log("🧠 Processing image via Gemini Vision (embedding + metadata)...");
+        const [embeddingResult, metadata] = await Promise.all([
+            generateImageEmbedding(file.buffer, file.mimetype),
+            extractProductMetadata(file.buffer, file.mimetype),
+        ]);
+        const { embedding, description } = embeddingResult;
 
         // 2. Perform Vector Search on the Product model
         console.log("🔍 Running Vector Search on MongoDB Atlas...");
-        const matches = await searchProductsByVector(embedding, 15);
+        const rawMatches = await searchProductsByVector(embedding, 15);
 
-        console.log(`✅ Found ${matches.length} visual matches.`);
+        // 3. Rerank results using product-type-first boosting
+        console.log("🔄 Reranking results by product type...");
+        const matches = rerankByProductType(rawMatches, metadata);
+
+        console.log(`✅ Found ${matches.length} visual matches (reranked).`);
 
         res.status(200).json({
             success: true,

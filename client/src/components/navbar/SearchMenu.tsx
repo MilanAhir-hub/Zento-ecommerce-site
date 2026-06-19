@@ -38,8 +38,6 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 const QUICK_LINKS = [
     { name: "New Arrivals", link: "/new-arrivals" },
     { name: "Best Sellers", link: "/best-sellers" },
-    { name: "The Edit", link: "/edit" },
-    { name: "Sale", link: "/sale", isSale: true },
 ];
 
 const SearchMenu = ({ isVisible, onClose }: SearchMenuProps) => {

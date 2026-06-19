@@ -1,5 +1,5 @@
 import CardSlider from "../../components/ui/CardSlider";
-import { useRecommendations } from "../../hooks/useRecommendations";
+import { useHomeRecommendations } from "../../hooks/useHomeRecommendations";
 import { useProducts } from "../../hooks/products/useProducts";
 import { useAuth } from "../../context/authContext";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -9,13 +9,15 @@ const Recommended = () => {
     const { isAuthenticated } = useAuth();
 
     // Use personalized recommendations for logged-in users
-    const { data: recData, isLoading: recLoading } = useRecommendations();
+    const { data: recData, isLoading: recLoading } = useHomeRecommendations();
 
     // Fallback: generic products for guests
     const { data: genericProducts, isLoading: genericLoading } = useProducts({ limit: 8 });
 
     const isLoading = isAuthenticated ? recLoading : genericLoading;
-    const products = isAuthenticated ? (recData?.recommended || []) : (genericProducts || []);
+    
+    const recommendedModule = recData?.find(m => m.type === 'recommended_for_you');
+    const products = isAuthenticated ? (recommendedModule?.products || []) : (genericProducts || []);
 
     if (isLoading) {
         return (
@@ -30,9 +32,9 @@ const Recommended = () => {
     return (
         <section className="py-28 bg-white font-sans relative overflow-hidden">
             <CardSlider
-                title="Recommended For You"
+                title={recommendedModule?.title || "Recommended For You"}
                 subtitle={isAuthenticated
-                    ? "Personalized picks based on your activity."
+                    ? (recommendedModule?.subtitle || "Personalized picks based on your activity.")
                     : "Explore our curated collection."
                 }
                 items={products}
