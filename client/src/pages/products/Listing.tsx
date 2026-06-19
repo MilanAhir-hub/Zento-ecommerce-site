@@ -4,6 +4,7 @@ import { Alert01Icon, Search01Icon, ArrowRight01Icon } from "@hugeicons/core-fre
 import { useProducts } from "../../hooks/products/useProducts";
 import { ProductCard } from "../../components/ui/ProductCard";
 import { useLocation } from "react-router-dom";
+import { useInteractionLogger } from "../../hooks/useInteractionLogger";
 
 const Listing = () => {
     const location = useLocation();
@@ -11,6 +12,7 @@ const Listing = () => {
     const visualDescription = location.state?.visualDescription;
     const searchInputId = useId();
     const searchInputRef = useRef<HTMLInputElement>(null);
+    const { log } = useInteractionLogger();
 
     const [searchInput, setSearchInput] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -152,6 +154,15 @@ const Listing = () => {
                         {products?.map((product: any) => (
                             <div
                                 key={product._id}
+                                onClick={() => {
+                                    if (hasSearchActive && !isVisualSearch) {
+                                        log({
+                                            productId: product._id,
+                                            action: 'click',
+                                            metadata: { source: 'search' },
+                                        });
+                                    }
+                                }}
                             >
                                 <ProductCard product={product} />
                             </div>

@@ -19,6 +19,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDebounce } from "../../hooks/useDebounce";
 import { useProducts, type Product } from "../../hooks/products/useProducts";
 import { useAuth } from "../../context/authContext";
+import { useInteractionLogger } from "../../hooks/useInteractionLogger";
 import {
     addSearchHistory,
     syncSearchHistory,
@@ -47,6 +48,7 @@ const SearchMenu = ({ isVisible, onClose }: SearchMenuProps) => {
     const inputId = useId();
     const navigate = useNavigate();
     const prefersReduced = useReducedMotion();
+    const { log } = useInteractionLogger();
 
     const [searchTerm, setSearchTerm] = useState("");
     const [searchHistory, setSearchHistory] = useState<string[]>([]);
@@ -157,6 +159,7 @@ const SearchMenu = ({ isVisible, onClose }: SearchMenuProps) => {
     const handleSubmit = (term: string) => {
         const t = term.trim();
         if (!t) return;
+        log({ action: 'search_query', metadata: { searchQuery: t } });
         saveToHistory(t);
         navigate(`/search?q=${encodeURIComponent(t)}`);
         onClose();

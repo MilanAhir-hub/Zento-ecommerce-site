@@ -9,7 +9,7 @@
 - [x] **Ticket 0.5**: Product Detail Views and Add-to-Cart Tracking
 - [x] **Ticket 0.6**: Track Cart Changes and Wishlist Actions
 - [x] **Ticket 0.7**: Write Purchase Interactions on Order Creation
-- [ ] **Ticket 0.8**: Log Search Queries and Search Clicks
+- [x] **Ticket 0.8**: Log Search Queries and Search Clicks
 
 ## Phase 1: Contextual Placements and API Surface (P1)
 

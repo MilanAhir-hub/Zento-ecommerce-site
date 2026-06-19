@@ -5,6 +5,7 @@ export interface InteractionData {
     action: 'view' | 'click' | 'add_to_cart' | 'remove_from_cart' | 'checkout' | 'purchase' | 'search_query' | 'wishlist_add' | 'wishlist_remove';
     quantity?: number;
     searchQuery?: string;
+    metadata?: Record<string, unknown>;
 }
 
 export const logUserInteraction = async (data: InteractionData) => {
