@@ -13,7 +13,7 @@
 
 ## Phase 1: Contextual Placements and API Surface (P1)
 
-- [ ] **Ticket 1.1**: Define Unified Recommendation DTOs
+- [x] **Ticket 1.1**: Define Unified Recommendation DTOs
 - [ ] **Ticket 1.2**: Context-Specific Backend Routes and Controllers
 - [ ] **Ticket 1.3**: Frontend API Services and Queries
 - [ ] **Ticket 1.4**: Contextual Widgets on Product Detail Page
