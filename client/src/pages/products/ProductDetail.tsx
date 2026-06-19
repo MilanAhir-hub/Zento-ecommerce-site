@@ -1,12 +1,11 @@
 import { useState, useRef, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
     ShoppingBag01Icon,
     SentIcon,
     Loading03Icon,
     FavouriteIcon,
-    Store01Icon,
     ArrowRight01Icon,
     MinusSignIcon,
     PlusSignIcon,
@@ -16,6 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useCart } from "../../hooks/cart/useCart";
 import { useWishlist } from "../../hooks/useWishlist";
 import { useInteractionLogger } from "../../hooks/useInteractionLogger";
+import { useProductRecommendations } from "../../hooks/useProductRecommendations";
 import { getCloudinaryUrl } from "../../utils/cloudinaryImage";
 import api from "../../services/api";
 import BlurImage from "../../components/ui/BlurImage";
@@ -32,11 +32,6 @@ interface ChatMessage {
 
 const fetchProduct = async (id: string) => {
     const { data } = await api.get(`/products/${id}`);
-    return data.data;
-};
-
-const fetchCategoryProducts = async (category: string) => {
-    const { data } = await api.get(`/products/category/${category}?limit=15`);
     return data.data;
 };
 
@@ -96,7 +91,6 @@ const AccordionItem = ({
 
 const ProductDetail = () => {
     const { id } = useParams<{ id: string }>();
-    const navigate = useNavigate();
     const { addToCart, isAddingToCart } = useCart();
     const { toggleWishlist, isInWishlist } = useWishlist();
     const { log } = useInteractionLogger();
@@ -140,12 +134,7 @@ const ProductDetail = () => {
         }
     }, [product?._id, log]);
 
-    const { data: relatedProducts } = useQuery({
-        queryKey: ["products", "category", product?.category],
-        queryFn: () => fetchCategoryProducts(product!.category),
-        enabled: !!product?.category,
-        staleTime: STALE_TIME,
-    });
+    const { data: recModules } = useProductRecommendations(id);
 
     const handleAddToCart = async () => {
         if (!product || isAddingToCart) return;
@@ -230,11 +219,6 @@ const ProductDetail = () => {
         : product.imageUrl
         ? [product.imageUrl]
         : [PLACEHOLDER_IMAGE];
-
-    const mappedRelatedItems =
-        relatedProducts
-            ?.filter((p: { _id: string }) => p._id !== product._id)
-            .map((p: { _id: string }) => ({ ...p, id: p._id })) || [];
 
     const vendorId = product.vendorId && typeof product.vendorId === "object" ? product.vendorId._id : product.vendorId;
 
@@ -550,34 +534,37 @@ const ProductDetail = () => {
                 </div>
             </div>
 
-            {/* Related Products */}
-            {mappedRelatedItems.length > 0 && (
-                <section className="border-t border-gray-200">
-                    <div className="max-w-[1440px] mx-auto px-4 md:px-10 py-16 md:py-24">
-                        <div className="flex items-baseline justify-between mb-10">
-                            <h2 className="text-[11px] font-medium uppercase tracking-[0.25em] text-black">
-                                You May Also Like
-                            </h2>
-                            <span className="text-[11px] font-medium text-gray-400 uppercase tracking-[0.12em]">
-                                Related
-                            </span>
+            {/* Recommendation Modules */}
+            {recModules && recModules.length > 0 && recModules.map((module) => {
+                if (!module.products || module.products.length === 0) return null;
+                return (
+                    <section key={module.moduleId} className="border-t border-gray-200">
+                        <div className="max-w-[1440px] mx-auto px-4 md:px-10 py-16 md:py-24">
+                            <div className="flex items-baseline justify-between mb-10">
+                                <h2 className="text-[11px] font-medium uppercase tracking-[0.25em] text-black">
+                                    {module.title}
+                                </h2>
+                                <span className="text-[11px] font-medium text-gray-400 uppercase tracking-[0.12em]">
+                                    {module.subtitle}
+                                </span>
+                            </div>
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12">
+                                {module.products.slice(0, 4).map((item) => (
+                                    <ProductCard
+                                        key={item._id}
+                                        product={{
+                                            _id: item._id,
+                                            title: item.title,
+                                            price: item.price,
+                                            imageUrl: item.imageUrl,
+                                        }}
+                                    />
+                                ))}
+                            </div>
                         </div>
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12">
-                            {mappedRelatedItems.slice(0, 4).map((item: { _id: string; id?: string; title: string; price: number; imageUrl: string }) => (
-                                <ProductCard
-                                    key={item._id}
-                                    product={{
-                                        _id: item._id,
-                                        title: item.title,
-                                        price: item.price,
-                                        imageUrl: item.imageUrl,
-                                    }}
-                                />
-                            ))}
-                        </div>
-                    </div>
-                </section>
-            )}
+                    </section>
+                );
+            })}
         </div>
     );
 };

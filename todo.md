@@ -16,7 +16,7 @@
 - [x] **Ticket 1.1**: Define Unified Recommendation DTOs
 - [x] **Ticket 1.2**: Context-Specific Backend Routes and Controllers
 - [x] **Ticket 1.3**: Frontend API Services and Queries
-- [ ] **Ticket 1.4**: Contextual Widgets on Product Detail Page
+- [x] **Ticket 1.4**: Contextual Widgets on Product Detail Page
 - [ ] **Ticket 1.5**: Contextual Widgets on Cart Page
 - [ ] **Ticket 1.6**: Contextual Widgets on Wishlist Page
 - [ ] **Ticket 1.7**: Contextual Widget on Search & Listing Pages
