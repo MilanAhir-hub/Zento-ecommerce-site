@@ -2,6 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../../hooks/cart/useCart";
 import { useAuth } from "../../context/authContext";
+import { useInteractionLogger } from "../../hooks/useInteractionLogger";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
     MinusSignIcon,
@@ -20,6 +21,7 @@ import type { CartItem } from "../../services/cart.api";
 const Cart = () => {
     const { cart, isCartLoading, updateCartItem, removeFromCart } = useCart();
     const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
+    const { log } = useInteractionLogger();
     const navigate = useNavigate();
 
     const [searchItem, setSearchItem] = React.useState("");
@@ -65,6 +67,7 @@ const Cart = () => {
 
     const handleRemove = async (id: string) => {
         setRemovingId(id);
+        log({ productId: id, action: 'remove_from_cart' });
         await removeFromCart(id);
         setRemovingId(null);
     };

@@ -8,11 +8,13 @@ import {
 } from "@hugeicons/core-free-icons";
 import { useWishlist } from "../../hooks/useWishlist";
 import { useCart } from "../../hooks/cart/useCart";
+import { useInteractionLogger } from "../../hooks/useInteractionLogger";
 import BlurImage from "../../components/ui/BlurImage";
 
 const WishList = () => {
     const { wishlist, isWishlistLoading, removeFromWishlist } = useWishlist();
     const { addToCart } = useCart();
+    const { log } = useInteractionLogger();
 
     const items = wishlist?.items || [];
 
@@ -117,7 +119,10 @@ const WishList = () => {
                             </button>
 
                             <button
-                                onClick={() => removeFromWishlist(item._id)}
+                                onClick={() => {
+                                    log({ productId: item._id, action: 'wishlist_remove' });
+                                    removeFromWishlist(item._id);
+                                }}
                                 className="text-[#86868b] hover:text-[#d60000]"
                             >
                                 <HugeiconsIcon icon={Delete01Icon} size={18} />

@@ -15,6 +15,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { useCart } from "../../hooks/cart/useCart";
 import { useWishlist } from "../../hooks/useWishlist";
+import { useInteractionLogger } from "../../hooks/useInteractionLogger";
 import { getCloudinaryUrl } from "../../utils/cloudinaryImage";
 import api from "../../services/api";
 import BlurImage from "../../components/ui/BlurImage";
@@ -98,6 +99,7 @@ const ProductDetail = () => {
     const navigate = useNavigate();
     const { addToCart, isAddingToCart } = useCart();
     const { toggleWishlist, isInWishlist } = useWishlist();
+    const { log } = useInteractionLogger();
     const chatContainerRef = useRef<HTMLDivElement>(null);
     const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -132,6 +134,12 @@ const ProductDetail = () => {
         staleTime: STALE_TIME,
     });
 
+    useEffect(() => {
+        if (product?._id) {
+            log({ productId: product._id, action: 'view' });
+        }
+    }, [product?._id, log]);
+
     const { data: relatedProducts } = useQuery({
         queryKey: ["products", "category", product?.category],
         queryFn: () => fetchCategoryProducts(product!.category),
@@ -141,6 +149,7 @@ const ProductDetail = () => {
 
     const handleAddToCart = async () => {
         if (!product || isAddingToCart) return;
+        log({ productId: product._id, action: 'add_to_cart', quantity });
         await addToCart({ productId: product._id, quantity });
     };
 
@@ -267,7 +276,11 @@ const ProductDetail = () => {
                             {/* Wishlist */}
                             <button
                                 type="button"
-                                onClick={() => toggleWishlist(product._id)}
+                                onClick={() => {
+                                    const isCurrentlyInWishlist = isInWishlist(product._id);
+                                    log({ productId: product._id, action: isCurrentlyInWishlist ? 'wishlist_remove' : 'wishlist_add' });
+                                    toggleWishlist(product._id);
+                                }}
                                 aria-label={isInWishlist(product._id) ? "Remove from wishlist" : "Add to wishlist"}
                                 className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center bg-white/90 backdrop-blur-sm border border-gray-200 hover:bg-black hover:border-black transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]"
                             >

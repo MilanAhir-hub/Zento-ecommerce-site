@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { Cart } from "../models/Cart";
 import { Order } from "../models/Order";
 import { Product } from "../models/Product";
+import Interaction from "../models/Interaction";
 import { OrderStatus } from "../constants/orderStatus";
 
 interface CartItem {
@@ -109,6 +110,18 @@ export const createOrdersFromCart = async ({
 
         await session.commitTransaction();
         session.endSession();
+
+        for (const order of createdOrders) {
+            for (const item of order.items) {
+                await Interaction.create({
+                    userId,
+                    productId: item.product,
+                    action: 'purchase',
+                    quantity: item.quantity,
+                    price: item.price,
+                });
+            }
+        }
 
         return createdOrders;
     } catch (error) {
