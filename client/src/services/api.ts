@@ -19,6 +19,10 @@ const api = axios.create({
 // Request Interceptor
 api.interceptors.request.use(
     (config) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
         return config;
     },
     (error) => {
@@ -37,6 +41,7 @@ api.interceptors.response.use(
 
             if (status === 401) {
                 console.error("Unauthorized access - Perhaps token expired?");
+                localStorage.removeItem('token');
             } else if (status === 500) {
                 console.error("Server error:", data?.message || "Unknown error occurred on the server.");
             }

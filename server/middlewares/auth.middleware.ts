@@ -7,7 +7,12 @@ export interface AuthRequest extends Request {
 
 export const isAuthenticated = (req: AuthRequest, res: Response, next: NextFunction): void => {
     try {
-        const token = req.cookies.token;
+        let token = req.cookies.token;
+
+        // Fallback to Authorization header if cookie is not present
+        if (!token && req.headers.authorization && req.headers.authorization.startsWith("Bearer ")) {
+            token = req.headers.authorization.split(" ")[1];
+        }
 
         if (!token) {
             res.status(401).json({ message: "Authentication required - No token provided" });

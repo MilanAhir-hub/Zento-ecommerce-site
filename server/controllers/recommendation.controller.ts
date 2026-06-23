@@ -6,10 +6,13 @@ import { Product } from '../models/Product';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 
-// Helper to get optional userId from cookies
+// Helper to get optional userId from cookies or Authorization header
 const getOptionalUserId = (req: AuthRequest): string | undefined => {
     try {
-        const token = req.cookies?.token;
+        let token = req.cookies?.token;
+        if (!token && req.headers.authorization && req.headers.authorization.startsWith("Bearer ")) {
+            token = req.headers.authorization.split(" ")[1];
+        }
         if (token) {
             const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { userId: string };
             return decoded.userId;

@@ -57,6 +57,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             setUser(null);
             setVendorRequest(null);
             setIsAuthenticated(false);
+            localStorage.removeItem('token');
         } finally {
             setIsLoading(false);
         }
@@ -68,31 +69,39 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const login = async (credentials: LoginCredentials) => {
         const response = await authService.login(credentials);
-        setUser(response.data.user);
-
-        // After login, we must re-check auth to get the vendorRequest and other sensitive info 
-        // since the old authService.login might only return minimal user data
+        if (response.data.token) {
+            localStorage.setItem('token', response.data.token);
+        }
         await checkAuth();
-        setIsAuthenticated(true);
     };
 
     const googleLogin = async (googleToken: string) => {
         const response = await authService.googleLogin(googleToken);
-        setUser(response.data.user);
-        setIsAuthenticated(true);
+        if (response.data.token) {
+            localStorage.setItem('token', response.data.token);
+        }
+        await checkAuth();
     };
 
     const signup = async (userData: SignupData) => {
         const response = await authService.signup(userData);
-        setUser(response.data.user);
-        setIsAuthenticated(true);
+        if (response.data.token) {
+            localStorage.setItem('token', response.data.token);
+        }
+        await checkAuth();
     };
 
     const logout = async () => {
-        await authService.logout();
-        setUser(null);
-        setVendorRequest(null);
-        setIsAuthenticated(false);
+        try {
+            await authService.logout();
+        } catch (error) {
+            console.error("Logout request failed:", error);
+        } finally {
+            localStorage.removeItem('token');
+            setUser(null);
+            setVendorRequest(null);
+            setIsAuthenticated(false);
+        }
     };
 
     return (
